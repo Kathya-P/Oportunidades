@@ -74,6 +74,11 @@ public String verAsistencias(
     model.addAttribute("fechaConsultada", java.sql.Date.valueOf(fechaConsultada));
     model.addAttribute("fechaSeleccionada", fechaConsultada.toString());
     model.addAttribute("modoHistorial", modoHistorial);
+    // La plantilla viene de una versión "docente" y espera estas variables.
+    // El supervisor actualmente trabaja por fecha puntual (no rango).
+    model.addAttribute("modoRango", false);
+    model.addAttribute("fechaDesdeStr", "");
+    model.addAttribute("fechaHastaStr", "");
     return "supervisor/asistencias";
 }
 
@@ -81,26 +86,15 @@ public String verAsistencias(
     @GetMapping("/riesgo")
     public String verRiesgo(Model model) {
         model.addAttribute("enRiesgo", supervisorService.detectarRiesgoAusentismo());
+        model.addAttribute("periodoActual", calendarioService.periodoActual().orElse(null));
         return "supervisor/riesgo";
     }
 
     // ── Ver estudiantes (solo lectura) ─────────────────────────
     @GetMapping("/usuarios")
 public String verEstudiantes(Model model) {
-
-    List<Map<String, Object>> enRiesgo =
-            supervisorService.detectarRiesgoAusentismo();
-
-    Map<String, Map<String, Object>> riesgoMap = new HashMap<>();
-
-    for (Map<String, Object> r : enRiesgo) {
-        riesgoMap.put((String) r.get("nombre"), r);
-    }
-
-    model.addAttribute("estudiantes", estudianteRepo.findAll());
-    model.addAttribute("riesgoMap", riesgoMap);
-
-    return "supervisor/usuarios";
+    // Vista deshabilitada: el supervisor ahora usa solo Dashboard/Asistencias/Riesgo.
+    return "redirect:/supervisor";
 }
     
     @GetMapping("/riesgo/exportar")

@@ -18,6 +18,9 @@ public class SupervisorService {
     @Autowired
     private EstudianteRepository estudianteRepo;
 
+    @Autowired
+    private CalendarioService calendarioService;
+
     // ── 1. Estadísticas globales ───────────────────────────────
     public Map<String, Object> obtenerEstadisticasGlobales() {
         Map<String, Object> stats = new HashMap<>();
@@ -61,28 +64,50 @@ public class SupervisorService {
         return resultado;
     }
 
-    // ── 3. Detectar estudiantes en riesgo (por periodo de 10 semanas) ──
+    // ── 3. Detectar estudiantes en riesgo (por tardanzas en período) ──
 public List<Map<String, Object>> detectarRiesgoAusentismo() {
     List<Map<String, Object>> enRiesgo = new ArrayList<>();
 
-    for (Estudiante est : estudianteRepo.findAll()) {
-        List<Asistencia> todasAsistencias = asistenciaRepo
-            .findByEstudiante_IdEstudiante(est.getIdEstudiante());
+    // Obtener período activo; si no hay, usar las últimas 10 semanas
+    java.time.LocalDate fechaInicio = null;
+    java.time.LocalDate fechaFin = null;
+    
+    var periodoOpt = calendarioService.periodoActual();
+    if (periodoOpt.isPresent()) {
+        fechaInicio = periodoOpt.get().getFechaInicio();
+        fechaFin = periodoOpt.get().getFechaFin();
+    } else {
+        // Fallback: últimas 10 semanas
+        fechaFin = java.time.LocalDate.now();
+        fechaInicio = fechaFin.minusWeeks(10);
+    }
 
-        long ausencias = todasAsistencias.stream()
+    final java.time.LocalDate inicio = fechaInicio;
+    final java.time.LocalDate fin = fechaFin;
+
+    for (Estudiante est : estudianteRepo.findAll()) {
+        // Convertir LocalDate a java.util.Date para el repo
+        java.util.Date dateInicio = java.sql.Date.valueOf(inicio);
+        java.util.Date dateFin = java.sql.Date.valueOf(fin);
+
+        List<Asistencia> asistenciasPeriodo = asistenciaRepo
+            .findByEstudiante_IdEstudianteAndFechaBetween(
+                est.getIdEstudiante(), dateInicio, dateFin);
+
+        long ausencias = asistenciasPeriodo.stream()
             .filter(a -> "AUSENTE".equals(a.getEstado())).count();
 
-        long tardanzas = todasAsistencias.stream()
+        long tardanzas = asistenciasPeriodo.stream()
             .filter(a -> "TARDANZA".equals(a.getEstado())).count();
 
-        long total = todasAsistencias.size();
+        long total = asistenciasPeriodo.size();
 
-        // 1 falta = PRECAUCION, 2 = ALERTA, 3+ = CRITICO
-        if (ausencias >= 1) {
+        // Umbrales por TARDANZAS: 2=PRECAUCION, 3=ALERTA, 4+=CRITICO
+        if (tardanzas >= 2) {
             String nivel;
-            if (ausencias >= 3) {
+            if (tardanzas >= 4) {
                 nivel = "CRITICO";
-            } else if (ausencias == 2) {
+            } else if (tardanzas == 3) {
                 nivel = "ALERTA";
             } else {
                 nivel = "PRECAUCION";
@@ -99,7 +124,7 @@ public List<Map<String, Object>> detectarRiesgoAusentismo() {
     }
 
     enRiesgo.sort((a, b) ->
-        Long.compare((Long) b.get("ausencias"), (Long) a.get("ausencias")));
+        Long.compare((Long) b.get("tardanzas"), (Long) a.get("tardanzas")));
 
     return enRiesgo;
 }

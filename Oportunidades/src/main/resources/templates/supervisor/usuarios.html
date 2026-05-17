@@ -278,35 +278,21 @@
 <nav>
 
     <div class="brand">
-        <img src="/images/opor.png" alt="Logo Oportunidades"/>
-        <span>Programa Oportunidades</span>
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel de supervisión FGK</div>
+        </div>
     </div>
 
-    <div class="nav-links">
+    <div class="nav-right">
+        <div class="user-chip" sec:authentication="name">Supervisor</div>
 
-        <span class="username"
-              sec:authentication="name">
-            Usuario
-        </span>
-
-        <a th:href="@{/supervisor}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/supervisor/asistencias}">
-            Asistencias
-        </a>
-
-        <a th:href="@{/supervisor/riesgo}">
-            Riesgo
-        </a>
-
-        <a th:href="@{/logout}">
-            Cerrar sesión
-        </a>
-
+        <a th:href="@{/supervisor}">Dashboard</a>
+        <a th:href="@{/supervisor/asistencias}">Asistencias</a>
+        <a th:href="@{/supervisor/riesgo}">Riesgo</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
     </div>
-
 </nav>
 
 <div class="container">

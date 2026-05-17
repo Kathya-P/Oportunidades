@@ -26,4 +26,5 @@ List<Asistencia> findByGrupoAndFechaBetween(Grupo grupo, Date inicio, Date fin);
         @Param("fin") LocalDate fin
     );
     
+    List<Asistencia> findByEstudiante_IdEstudianteAndFechaBetween(Integer idEstudiante, Date fechaInicio, Date fechaFin);
 }

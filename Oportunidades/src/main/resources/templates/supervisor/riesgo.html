@@ -263,38 +263,21 @@
 <body>
 
 <nav>
-
     <div class="brand">
-        <img src="/images/opor.png" alt="Logo Oportunidades"/>
-        <span>Programa Oportunidades</span>
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel de supervisión FGK</div>
+        </div>
     </div>
 
-    <div class="links">
+    <div class="nav-right">
+        <div class="user-chip" sec:authentication="name">Supervisor</div>
 
-        <span class="chip"
-              sec:authentication="name">
-            Usuario
-        </span>
-
-        <a th:href="@{/supervisor}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/supervisor/asistencias}">
-            Asistencias
-        </a>
-
-        <a th:href="@{/supervisor/usuarios}">
-            Usuarios
-        </a>
-
-        <a th:href="@{/logout}"
-           class="logout">
-            Cerrar sesión
-        </a>
-
+        <a th:href="@{/supervisor}">Dashboard</a>
+        <a th:href="@{/supervisor/asistencias}">Asistencias</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
     </div>
-
 </nav>
 
 <div class="container">
@@ -315,23 +298,26 @@
     </div>
 
     <p class="subtitle">
-        Estudiantes con al menos 1 ausencia en el periodo actual
+        Estudiantes con 2 o más tardanzas en el período
+        <span th:if="${periodoActual}">
+            (<span th:text="${periodoActual.nombre}"></span>)
+        </span>
     </p>
 
     <!-- ALERTA -->
     <div class="alerta">
 
         <strong>
-            ⚠ Criterio del periodo (10 semanas):
+            ⚠ Criterio de riesgo (por tardanzas):
         </strong>
 
         <br><br>
 
-        1 falta = Precaución
+        2 tardanzas = Precaución
         &nbsp;|&nbsp;
-        2 faltas = Alerta
+        3 tardanzas = Alerta
         &nbsp;|&nbsp;
-        3 o más = Crítico
+        4 o más = Crítico
 
     </div>
 
