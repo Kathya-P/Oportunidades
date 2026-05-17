@@ -64,7 +64,7 @@ public class SupervisorService {
         return resultado;
     }
 
-    // ── 3. Detectar estudiantes en riesgo (por tardanzas en período) ──
+    // ── 3. Detectar estudiantes en riesgo (por AUSENCIAS en período) ──
 public List<Map<String, Object>> detectarRiesgoAusentismo() {
     List<Map<String, Object>> enRiesgo = new ArrayList<>();
 
@@ -102,18 +102,19 @@ public List<Map<String, Object>> detectarRiesgoAusentismo() {
 
         long total = asistenciasPeriodo.size();
 
-        // Umbrales por TARDANZAS: 2=PRECAUCION, 3=ALERTA, 4+=CRITICO
-        if (tardanzas >= 2) {
+        // Umbrales por AUSENCIAS: 1=PRECAUCION, 2=ALERTA, 3+=CRITICO (máximo recomendado: 2)
+        if (ausencias >= 1) {
             String nivel;
-            if (tardanzas >= 4) {
+            if (ausencias >= 3) {
                 nivel = "CRITICO";
-            } else if (tardanzas == 3) {
+            } else if (ausencias == 2) {
                 nivel = "ALERTA";
             } else {
                 nivel = "PRECAUCION";
             }
 
             Map<String, Object> item = new HashMap<>();
+            item.put("idEstudiante", est.getIdEstudiante());
             item.put("nombre", est.getNombre() + " " + est.getApellido());
             item.put("ausencias", ausencias);
             item.put("tardanzas", tardanzas);
@@ -124,7 +125,7 @@ public List<Map<String, Object>> detectarRiesgoAusentismo() {
     }
 
     enRiesgo.sort((a, b) ->
-        Long.compare((Long) b.get("tardanzas"), (Long) a.get("tardanzas")));
+        Long.compare((Long) b.get("ausencias"), (Long) a.get("ausencias")));
 
     return enRiesgo;
 }

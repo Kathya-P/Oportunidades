@@ -93,8 +93,21 @@ public String verAsistencias(
     // ── Ver estudiantes (solo lectura) ─────────────────────────
     @GetMapping("/usuarios")
 public String verEstudiantes(Model model) {
-    // Vista deshabilitada: el supervisor ahora usa solo Dashboard/Asistencias/Riesgo.
-    return "redirect:/supervisor";
+
+    List<Map<String, Object>> enRiesgo = supervisorService.detectarRiesgoAusentismo();
+
+    Map<Integer, Map<String, Object>> riesgoMap = new HashMap<>();
+    for (Map<String, Object> r : enRiesgo) {
+        Object idObj = r.get("idEstudiante");
+        if (idObj instanceof Integer id) {
+            riesgoMap.put(id, r);
+        }
+    }
+
+    model.addAttribute("estudiantes", estudianteRepo.findAll());
+    model.addAttribute("riesgoMap", riesgoMap);
+
+    return "supervisor/usuarios";
 }
     
     @GetMapping("/riesgo/exportar")
