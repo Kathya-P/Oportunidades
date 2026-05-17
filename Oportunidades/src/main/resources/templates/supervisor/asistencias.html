@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    lang="es">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -161,14 +163,16 @@
         <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
         <div>
             <div class="brand-name">Programa Oportunidades</div>
-            <div class="brand-sub">Panel docente</div>
+            <div class="brand-sub">Panel de supervisión FGK</div>
         </div>
     </div>
+
     <div class="nav-right">
-        <div class="user-chip"
-             th:text="${docente.nombre + ' ' + (docente.apellido != null ? docente.apellido : '')}">
-            Docente
-        </div>
+        <div class="user-chip" sec:authentication="name">Supervisor</div>
+
+        <a th:href="@{/supervisor}">Dashboard</a>
+        <a th:href="@{/supervisor/riesgo}">Riesgo</a>
+        <a th:href="@{/supervisor/usuarios}">Usuarios</a>
         <a th:href="@{/logout}" class="logout-link">Cerrar sesión</a>
     </div>
 </nav>
@@ -180,78 +184,24 @@
             <div class="eyebrow">Control académico</div>
             <h1>Asistencias</h1>
             <p class="fecha-label"
-               th:text="${modoRango}
-                         ? 'Historial — ' + fechaDesdeStr + ' → ' + fechaHastaStr
-                         : (modoHistorial ? 'Historial' : 'Registro de hoy')">
+               th:text="${modoHistorial ? 'Historial — ' + fechaSeleccionada : 'Registro de hoy'}">
             </p>
         </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-        <a th:href="@{/docente}"
-           th:classappend="${!modoHistorial and !modoRango} ? ' active' : ''"
-           class="tab">Hoy</a>
-        <a th:href="@{/docente/historial}"
-           th:classappend="${modoHistorial or modoRango} ? ' active' : ''"
-           class="tab">Historial</a>
-    </div>
-
-    <!-- Export global -->
-    <div class="export-bar">
-        <span class="export-label">Exportar todo</span>
-        <div class="export-group">
-            <a th:if="${modoRango}"
-               th:href="@{/docente/exportar(filtro='rango',formato='pdf',desde=${fechaDesdeStr},hasta=${fechaHastaStr})}"
-               class="btn btn-pdf">PDF rango completo</a>
-            <a th:if="${modoRango}"
-               th:href="@{/docente/exportar(filtro='rango',formato='excel',desde=${fechaDesdeStr},hasta=${fechaHastaStr})}"
-               class="btn btn-excel">Excel rango completo</a>
-            <a th:if="${!modoRango}"
-               th:href="@{/docente/exportar(filtro='dia',formato='pdf',fecha=${fechaSeleccionada != null ? fechaSeleccionada : #dates.format(#dates.createNow(),'yyyy-MM-dd')})}"
-               class="btn btn-pdf">PDF día</a>
-            <a th:if="${!modoRango}"
-               th:href="@{/docente/exportar(filtro='dia',formato='excel',fecha=${fechaSeleccionada != null ? fechaSeleccionada : #dates.format(#dates.createNow(),'yyyy-MM-dd')})}"
-               class="btn btn-excel">Excel día</a>
-        </div>
-        <div class="export-divider"></div>
-        <div class="export-group">
-            <a th:href="@{/docente/exportar(filtro='semana',formato='pdf')}"  class="btn btn-pdf">PDF semana</a>
-            <a th:href="@{/docente/exportar(filtro='semana',formato='excel')}" class="btn btn-excel">Excel semana</a>
-        </div>
-        <div class="export-divider"></div>
-        <div class="export-group">
-            <a th:href="@{/docente/exportar(filtro='mes',formato='pdf')}"  class="btn btn-pdf">PDF mes</a>
-            <a th:href="@{/docente/exportar(filtro='mes',formato='excel')}" class="btn btn-excel">Excel mes</a>
-        </div>
-    </div>
-
-    <!-- Selector de rango -->
-    <div class="historial-card" th:if="${modoHistorial or modoRango}">
-        <p class="historial-card-title">Seleccionar rango de fechas</p>
-        <form th:action="@{/docente/historial}" method="get" class="range-form">
+    <!-- Selector de fecha (historial) -->
+    <div class="historial-card">
+        <p class="historial-card-title">Seleccionar fecha</p>
+        <form th:action="@{/supervisor/asistencias}" method="get" class="range-form">
             <div class="range-field">
-                <label>Desde</label>
-                <input type="date" name="desde"
-                       th:value="${fechaDesdeStr}"
+                <label>Fecha</label>
+                <input type="date" name="fecha"
+                       th:value="${fechaSeleccionada}"
                        th:max="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"/>
             </div>
-            <div class="range-sep">→</div>
-            <div class="range-field">
-                <label>Hasta</label>
-                <input type="date" name="hasta"
-                       th:value="${fechaHastaStr}"
-                       th:max="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"/>
-            </div>
-            <button type="submit" class="btn btn-dark">Ver asistencias</button>
+            <button type="submit" class="btn btn-dark">Ver</button>
+            <a th:href="@{/supervisor/asistencias}" class="btn btn-ghost">Hoy</a>
         </form>
-        <div class="range-pill" th:if="${modoRango}">
-            <strong th:text="${fechaDesdeStr}">—</strong>
-            <span style="color:var(--gris-30);">→</span>
-            <strong th:text="${fechaHastaStr}">—</strong>
-            <span th:text="${'(' + #lists.size(asistencias) + ' registros)'}"></span>
-            <a th:href="@{/docente/historial}" title="Limpiar rango">✕</a>
-        </div>
     </div>
 
     <!-- Sin grupos -->
@@ -313,18 +263,12 @@
                         <th>Hora entrada</th>
                         <th>Hora salida</th>
                         <th>Estado</th>
-                        <!--
-                            Columna exportar por alumno:
-                            - En modo rango: exporta registros del alumno en ese rango
-                            - En modo hoy/fecha puntual: exporta registros del alumno en ese día
-                        -->
-                        <th>Exportar</th>
                     </tr>
                 </thead>
                 <tbody id="tablaAsistencias">
 
                     <tr th:if="${#lists.isEmpty(asistencias)}">
-                        <td th:colspan="${modoRango ? 7 : 6}" class="empty">
+                        <td th:colspan="${modoRango ? 6 : 5}" class="empty">
                             No hay registros para el período seleccionado.
                         </td>
                     </tr>
@@ -352,51 +296,6 @@
                                 <span th:case="'TARDANZA'" class="badge badge-tardanza">Tardanza</span>
                                 <span th:case="*" class="badge" th:text="${a.estado}">—</span>
                             </span>
-                        </td>
-
-                        <!-- Exportar por alumno -->
-                        <td>
-                            <div class="acciones-cell">
-                                <!-- MODO RANGO: usa desde/hasta del rango activo -->
-                                <a th:if="${modoRango}"
-                                   th:href="@{/docente/exportar/alumno(
-                                       idEstudiante=${a.estudiante.idEstudiante},
-                                       formato='pdf',
-                                       desde=${fechaDesdeStr},
-                                       hasta=${fechaHastaStr})}"
-                                   class="btn-mini btn-mini-pdf">
-                                    PDF
-                                </a>
-                                <a th:if="${modoRango}"
-                                   th:href="@{/docente/exportar/alumno(
-                                       idEstudiante=${a.estudiante.idEstudiante},
-                                       formato='excel',
-                                       desde=${fechaDesdeStr},
-                                       hasta=${fechaHastaStr})}"
-                                   class="btn-mini btn-mini-excel">
-                                    Excel
-                                </a>
-
-                                <!-- MODO HOY / fecha puntual: usa fechaSeleccionada -->
-                                <a th:if="${!modoRango}"
-                                   th:href="@{/docente/exportar/alumno(
-                                       idEstudiante=${a.estudiante.idEstudiante},
-                                       formato='pdf',
-                                       desde=${fechaSeleccionada},
-                                       hasta=${fechaSeleccionada})}"
-                                   class="btn-mini btn-mini-pdf">
-                                    PDF
-                                </a>
-                                <a th:if="${!modoRango}"
-                                   th:href="@{/docente/exportar/alumno(
-                                       idEstudiante=${a.estudiante.idEstudiante},
-                                       formato='excel',
-                                       desde=${fechaSeleccionada},
-                                       hasta=${fechaSeleccionada})}"
-                                   class="btn-mini btn-mini-excel">
-                                    Excel
-                                </a>
-                            </div>
                         </td>
 
                     </tr>

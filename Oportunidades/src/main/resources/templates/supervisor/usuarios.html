@@ -59,6 +59,48 @@
             color:#1a1a1a;
         }
 
+        .nav-links a.logout{
+            background:#111827;
+            color:#fff;
+            padding:6px 10px;
+            border-radius:8px;
+        }
+
+        .nav-links a.logout:hover{
+            background:#0b1220;
+            color:#fff;
+        }
+
+        .filters{
+            display:flex;
+            gap:0.75rem;
+            align-items:center;
+            flex-wrap:wrap;
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            padding:0.75rem;
+            margin-bottom:1rem;
+        }
+
+        .filter-input, .filter-select{
+            border:1px solid #d1d5db;
+            background:#fff;
+            border-radius:10px;
+            padding:0.55rem 0.7rem;
+            font-size:13px;
+            color:#111827;
+        }
+
+        .filter-input{ min-width:260px; flex:1; }
+
+        .filters-count{
+            margin-left:auto;
+            color:#6b7280;
+            font-size:13px;
+            white-space:nowrap;
+        }
+
         .username{
             background:#f3f4f6;
             padding:4px 10px;
@@ -289,24 +331,12 @@
             Usuario
         </span>
 
-        <a th:href="@{/supervisor}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/supervisor/asistencias}">
-            Asistencias
-        </a>
-
-        <a th:href="@{/supervisor/riesgo}">
-            Riesgo
-        </a>
-
-        <a th:href="@{/logout}">
-            Cerrar sesión
-        </a>
+        <a th:href="@{/supervisor}">Dashboard</a>
+        <a th:href="@{/supervisor/riesgo}">Riesgo</a>
+        <a th:href="@{/supervisor/usuarios}">Usuarios</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
 
     </div>
-
 </nav>
 
 <div class="container">
@@ -332,6 +362,18 @@
 
         </a>
 
+    </div>
+
+    <div class="filters">
+        <input id="searchInput" class="filter-input" type="text" placeholder="Buscar por nombre o código…"/>
+        <select id="nivelFilter" class="filter-select">
+            <option value="">Todos</option>
+            <option value="CRITICO">Crítico</option>
+            <option value="ALERTA">Alerta</option>
+            <option value="PRECAUCION">Precaución</option>
+            <option value="OK">OK</option>
+        </select>
+        <div class="filters-count">Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span></div>
     </div>
 
     <div class="leyenda">
@@ -388,9 +430,11 @@
 
                 th:with="
                 nombreCompleto=${e.nombre + ' ' + e.apellido},
-                riesgo=${riesgoMap[nombreCompleto]},
+                riesgo=${riesgoMap[e.idEstudiante]},
                 nivel=${riesgo != null ? riesgo.nivel : 'OK'}
                 "
+
+                th:attr="data-nombre=${nombreCompleto},data-codigo=${e.codigoBarras},data-nivel=${nivel}"
 
                 th:classappend="
                 ${nivel == 'CRITICO'} ? 'fila-critico' :
@@ -433,20 +477,9 @@
                     style="color:#6b7280;">
                 </td>
 
-                <td>
+                <td th:text="${riesgo != null ? riesgo.ausencias : 0}" style="color:#6b7280;"></td>
 
-                    <span style="font-weight:600; color:#b91c1c;"
-                          th:text="${riesgo != null ? riesgo.ausencias : 0}">
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <span th:text="${riesgo != null ? riesgo.tardanzas : 0}">
-                    </span>
-
-                </td>
+                <td th:text="${riesgo != null ? riesgo.tardanzas : 0}" style="color:#6b7280;"></td>
 
                 <td>
 
@@ -500,6 +533,44 @@
     </div>
 
 </div>
+
+<script>
+    (function(){
+        const searchInput = document.getElementById('searchInput');
+        const nivelFilter = document.getElementById('nivelFilter');
+        const rows = document.querySelectorAll('tbody tr[data-nombre]');
+        const countVisible = document.getElementById('countVisible');
+        const countTotal = document.getElementById('countTotal');
+
+        const normalize = (s) => (s || '').toString().toLowerCase();
+
+        const applyFilters = () => {
+            const q = normalize(searchInput?.value);
+            const nivel = (nivelFilter?.value || '').toUpperCase();
+            let visible = 0;
+
+            rows.forEach(row => {
+                const nombre = normalize(row.getAttribute('data-nombre'));
+                const codigo = normalize(row.getAttribute('data-codigo'));
+                const rowNivel = (row.getAttribute('data-nivel') || '').toUpperCase();
+
+                const matchText = !q || nombre.includes(q) || codigo.includes(q);
+                const matchNivel = !nivel || rowNivel === nivel;
+
+                const show = matchText && matchNivel;
+                row.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            if (countVisible) countVisible.textContent = String(visible);
+            if (countTotal) countTotal.textContent = String(rows.length);
+        };
+
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (nivelFilter) nivelFilter.addEventListener('change', applyFilters);
+        applyFilters();
+    })();
+</script>
 
 </body>
 </html>
