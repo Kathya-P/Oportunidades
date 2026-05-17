@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Asistencias — Programa Oportunidades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #F5D0D7;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFFFFF;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans', sans-serif; background:var(--gris-10); color:var(--negro); }
+
+        nav {
+            height:72px; background:rgba(20,20,20,0.98); backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(255,255,255,0.05); padding:0 2.5rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand-name { font-size:14px; font-weight:600; color:white; }
+        .brand-sub  { font-size:11px; color:#8D8D8D; margin-top:2px; }
+        .nav-right  { display:flex; align-items:center; gap:1rem; }
+        .user-chip  { padding:9px 14px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); font-size:12px; font-weight:500; color:#BABABA; }
+        .logout-link { text-decoration:none; color:#7A7A7A; font-size:13px; font-weight:500; transition:0.15s; }
+        .logout-link:hover { color:var(--rojo); }
+
+        .container { max-width:1200px; margin:2.5rem auto; padding:0 1.2rem; }
+        .page-header { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:2rem; }
+        .eyebrow { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--rojo); margin-bottom:10px; }
+        .page-header h1 { font-family:'DM Serif Display', serif; font-size:2.4rem; line-height:1.1; color:var(--negro); }
+        .fecha-label { margin-top:10px; color:var(--gris-50); font-size:14px; }
+
+        .tabs { display:inline-flex; gap:6px; background:var(--blanco); border:1px solid #ececec; border-radius:14px; padding:6px; margin-bottom:1.7rem; }
+        .tab { text-decoration:none; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:600; color:var(--gris-50); transition:0.15s; }
+        .tab:hover { color:var(--negro); background:#fafafa; }
+        .tab.active { background:var(--rojo); color:white; box-shadow:0 6px 18px rgba(200,16,46,0.18); }
+
+        /* ── EXPORT BAR GLOBAL ── */
+        .export-bar {
+            background:var(--blanco); border:1px solid #ececec; border-radius:18px;
+            padding:1.2rem; margin-bottom:1.6rem;
+            display:flex; flex-wrap:wrap; gap:1rem; align-items:center;
+        }
+        .export-label { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); }
+        .export-group { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .export-divider { width:1px; height:26px; background:#ececec; }
+
+        .btn { border:none; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:11px 16px; border-radius:10px; font-family:'DM Sans', sans-serif; font-size:13px; font-weight:600; transition:0.15s; }
+        .btn-dark   { background:var(--negro); color:white; }
+        .btn-dark:hover { background:var(--gris-90); }
+        .btn-pdf    { background:#FFF1F3; color:var(--rojo); border:1px solid var(--rojo-light); }
+        .btn-pdf:hover  { background:#FFE3E8; }
+        .btn-excel  { background:var(--gris-10); color:var(--gris-70); border:1px solid var(--gris-20); }
+        .btn-excel:hover { border-color:var(--negro); color:var(--negro); }
+
+        /* botones mini para la tabla */
+        .btn-mini {
+            text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+            padding:5px 10px; border-radius:7px;
+            font-family:'DM Sans', sans-serif; font-size:11px; font-weight:700;
+            transition:0.15s; white-space:nowrap;
+        }
+        .btn-mini-pdf   { background:#FFF1F3; color:var(--rojo);    border:1px solid var(--rojo-light); }
+        .btn-mini-pdf:hover   { background:#FFE3E8; }
+        .btn-mini-excel { background:var(--gris-10); color:var(--gris-70); border:1px solid var(--gris-20); }
+        .btn-mini-excel:hover { border-color:var(--negro); color:var(--negro); }
+
+        /* ── HISTORIAL CARD ── */
+        .historial-card { background:var(--blanco); border:1px solid #ececec; border-radius:18px; padding:1.6rem; margin-bottom:1.6rem; }
+        .historial-card-title { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); margin-bottom:1.2rem; }
+        .range-form { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+        .range-field { display:flex; flex-direction:column; gap:5px; }
+        .range-field label { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--gris-50); }
+        .range-field input[type="date"] { padding:11px 14px; border-radius:10px; border:1.5px solid var(--gris-20); font-family:'DM Sans', sans-serif; font-size:13px; outline:none; background:#fafafa; color:var(--negro); transition:0.15s; min-width:160px; }
+        .range-field input[type="date"]:focus { border-color:var(--rojo); background:white; box-shadow:0 0 0 4px rgba(200,16,46,0.08); }
+        .range-sep { font-size:20px; color:var(--gris-30); padding-bottom:11px; }
+        .range-pill { display:inline-flex; align-items:center; gap:8px; margin-top:1rem; padding:8px 16px; border-radius:999px; background:var(--gris-10); border:1px solid var(--gris-20); font-size:12px; color:var(--gris-70); }
+        .range-pill strong { color:var(--negro); font-weight:600; }
+        .range-pill a { color:var(--gris-30); text-decoration:none; font-weight:700; font-size:15px; line-height:1; transition:0.15s; }
+        .range-pill a:hover { color:var(--rojo); }
+
+        /* ── STATS ── */
+        .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:1rem; margin-bottom:1.8rem; }
+        .stat-card { background:var(--blanco); border:1px solid #ececec; border-radius:18px; padding:1.4rem; position:relative; overflow:hidden; }
+        .stat-card::before { content:''; position:absolute; top:-20px; right:-20px; width:90px; height:90px; border-radius:50%; opacity:0.06; }
+        .stat-total::before    { background:var(--negro); }
+        .stat-presente::before { background:var(--negro); }
+        .stat-ausente::before  { background:var(--rojo); }
+        .stat-tardanza::before { background:var(--gris-50); }
+        .stat-num   { font-size:2rem; font-weight:700; margin-bottom:6px; }
+        .stat-label { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); font-weight:600; }
+        .stat-total .stat-num    { color:var(--negro); }
+        .stat-presente .stat-num { color:var(--negro); }
+        .stat-ausente .stat-num  { color:var(--rojo); }
+        .stat-tardanza .stat-num { color:var(--gris-50); }
+
+        /* ── FILTROS ── */
+        .filters-bar { background:white; border-radius:16px; border:1px solid rgba(0,0,0,0.05); padding:1.2rem 1.5rem; margin-bottom:1.2rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap; box-shadow:0 2px 12px rgba(0,0,0,0.03); }
+        .search-wrap { position:relative; flex:1; min-width:200px; }
+        .search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; stroke:var(--gris-50); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+        .search-wrap input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--gris-20); border-radius:10px; font-size:13px; font-family:'DM Sans', sans-serif; color:var(--negro); background:var(--gris-10); outline:none; transition:0.15s; }
+        .search-wrap input:focus { border-color:var(--rojo); background:white; }
+        .filter-select { padding:10px 14px; border:1.5px solid var(--gris-20); border-radius:10px; font-size:13px; font-family:'DM Sans', sans-serif; color:var(--gris-70); background:var(--gris-10); outline:none; cursor:pointer; transition:0.15s; min-width:150px; }
+        .filter-select:focus { border-color:var(--rojo); background:white; }
+        .filters-count { font-size:12px; color:var(--gris-50); white-space:nowrap; }
+        .filters-count span { font-weight:600; color:var(--negro); }
+
+        /* ── TABLE ── */
+        .card { background:var(--blanco); border:1px solid #ececec; border-radius:18px; overflow:hidden; }
+        table { width:100%; border-collapse:collapse; }
+        thead { background:#FAFAFA; }
+        th { text-align:left; padding:14px 18px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); border-bottom:1px solid #ececec; }
+        td { padding:13px 18px; font-size:14px; border-bottom:1px solid #f1f1f1; vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr { transition:0.15s; }
+        tbody tr:hover { background:#fcfcfc; }
+
+        .badge { display:inline-flex; align-items:center; justify-content:center; padding:5px 12px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.02em; }
+        .badge-presente { background:var(--negro); color:white; }
+        .badge-ausente  { background:rgba(200,16,46,0.1); color:var(--rojo-dark); border:1px solid rgba(200,16,46,0.2); }
+        .badge-tardanza { background:var(--gris-10); color:var(--gris-70); border:1px solid var(--gris-20); }
+
+        .fecha-badge { font-size:11px; font-weight:600; color:var(--gris-50); background:var(--gris-10); border:1px solid var(--gris-20); padding:3px 9px; border-radius:6px; white-space:nowrap; }
+
+        /* columna acciones */
+        .acciones-cell { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+
+        .empty, .no-grupos { padding:3rem; text-align:center; color:var(--gris-50); font-size:14px; }
+        #no-results { display:none; text-align:center; padding:2.5rem; color:var(--gris-50); font-size:14px; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1rem; }
+            .page-header h1 { font-size:2rem; }
+            .export-bar { flex-direction:column; align-items:flex-start; }
+            .export-divider { display:none; }
+            table { min-width:820px; }
+            .card { overflow-x:auto; }
+            .range-sep { display:none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="brand">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel docente</div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <div class="user-chip"
+             th:text="${docente.nombre + ' ' + (docente.apellido != null ? docente.apellido : '')}">
+            Docente
+        </div>
+        <a th:href="@{/logout}" class="logout-link">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">Control académico</div>
+            <h1>Asistencias</h1>
+            <p class="fecha-label"
+               th:text="${modoRango}
+                         ? 'Historial — ' + fechaDesdeStr + ' → ' + fechaHastaStr
+                         : (modoHistorial ? 'Historial' : 'Registro de hoy')">
+            </p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <a th:href="@{/docente}"
+           th:classappend="${!modoHistorial and !modoRango} ? ' active' : ''"
+           class="tab">Hoy</a>
+        <a th:href="@{/docente/historial}"
+           th:classappend="${modoHistorial or modoRango} ? ' active' : ''"
+           class="tab">Historial</a>
+    </div>
+
+    <!-- Export global -->
+    <div class="export-bar">
+        <span class="export-label">Exportar todo</span>
+        <div class="export-group">
+            <a th:if="${modoRango}"
+               th:href="@{/docente/exportar(filtro='rango',formato='pdf',desde=${fechaDesdeStr},hasta=${fechaHastaStr})}"
+               class="btn btn-pdf">PDF rango completo</a>
+            <a th:if="${modoRango}"
+               th:href="@{/docente/exportar(filtro='rango',formato='excel',desde=${fechaDesdeStr},hasta=${fechaHastaStr})}"
+               class="btn btn-excel">Excel rango completo</a>
+            <a th:if="${!modoRango}"
+               th:href="@{/docente/exportar(filtro='dia',formato='pdf',fecha=${fechaSeleccionada != null ? fechaSeleccionada : #dates.format(#dates.createNow(),'yyyy-MM-dd')})}"
+               class="btn btn-pdf">PDF día</a>
+            <a th:if="${!modoRango}"
+               th:href="@{/docente/exportar(filtro='dia',formato='excel',fecha=${fechaSeleccionada != null ? fechaSeleccionada : #dates.format(#dates.createNow(),'yyyy-MM-dd')})}"
+               class="btn btn-excel">Excel día</a>
+        </div>
+        <div class="export-divider"></div>
+        <div class="export-group">
+            <a th:href="@{/docente/exportar(filtro='semana',formato='pdf')}"  class="btn btn-pdf">PDF semana</a>
+            <a th:href="@{/docente/exportar(filtro='semana',formato='excel')}" class="btn btn-excel">Excel semana</a>
+        </div>
+        <div class="export-divider"></div>
+        <div class="export-group">
+            <a th:href="@{/docente/exportar(filtro='mes',formato='pdf')}"  class="btn btn-pdf">PDF mes</a>
+            <a th:href="@{/docente/exportar(filtro='mes',formato='excel')}" class="btn btn-excel">Excel mes</a>
+        </div>
+    </div>
+
+    <!-- Selector de rango -->
+    <div class="historial-card" th:if="${modoHistorial or modoRango}">
+        <p class="historial-card-title">Seleccionar rango de fechas</p>
+        <form th:action="@{/docente/historial}" method="get" class="range-form">
+            <div class="range-field">
+                <label>Desde</label>
+                <input type="date" name="desde"
+                       th:value="${fechaDesdeStr}"
+                       th:max="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"/>
+            </div>
+            <div class="range-sep">→</div>
+            <div class="range-field">
+                <label>Hasta</label>
+                <input type="date" name="hasta"
+                       th:value="${fechaHastaStr}"
+                       th:max="${#dates.format(#dates.createNow(),'yyyy-MM-dd')}"/>
+            </div>
+            <button type="submit" class="btn btn-dark">Ver asistencias</button>
+        </form>
+        <div class="range-pill" th:if="${modoRango}">
+            <strong th:text="${fechaDesdeStr}">—</strong>
+            <span style="color:var(--gris-30);">→</span>
+            <strong th:text="${fechaHastaStr}">—</strong>
+            <span th:text="${'(' + #lists.size(asistencias) + ' registros)'}"></span>
+            <a th:href="@{/docente/historial}" title="Limpiar rango">✕</a>
+        </div>
+    </div>
+
+    <!-- Sin grupos -->
+    <div class="no-grupos" th:if="${#lists.isEmpty(grupos)}">
+        No tenés grupos asignados todavía.
+    </div>
+
+    <!-- Con grupos -->
+    <div th:if="${!#lists.isEmpty(grupos)}">
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card stat-total">
+                <div class="stat-num" th:text="${#lists.size(asistencias)}">0</div>
+                <div class="stat-label">Total registros</div>
+            </div>
+            <div class="stat-card stat-presente">
+                <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PRESENTE'])}">0</div>
+                <div class="stat-label">Presentes</div>
+            </div>
+            <div class="stat-card stat-ausente">
+                <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'AUSENTE'])}">0</div>
+                <div class="stat-label">Ausentes</div>
+            </div>
+            <div class="stat-card stat-tardanza">
+                <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'TARDANZA'])}">0</div>
+                <div class="stat-label">Tardanzas</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-bar">
+            <div class="search-wrap">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="searchInput" placeholder="Buscar por estudiante o grupo…"/>
+            </div>
+            <select class="filter-select" id="filterEstado">
+                <option value="">Todos los estados</option>
+                <option value="PRESENTE">Presente</option>
+                <option value="AUSENTE">Ausente</option>
+                <option value="TARDANZA">Tardanza</option>
+            </select>
+            <select class="filter-select" id="filterGrupo">
+                <option value="">Todos los grupos</option>
+            </select>
+            <div class="filters-count">
+                Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span> registros
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Grupo</th>
+                        <th th:if="${modoRango}">Fecha</th>
+                        <th>Hora entrada</th>
+                        <th>Hora salida</th>
+                        <th>Estado</th>
+                        <!--
+                            Columna exportar por alumno:
+                            - En modo rango: exporta registros del alumno en ese rango
+                            - En modo hoy/fecha puntual: exporta registros del alumno en ese día
+                        -->
+                        <th>Exportar</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaAsistencias">
+
+                    <tr th:if="${#lists.isEmpty(asistencias)}">
+                        <td th:colspan="${modoRango ? 7 : 6}" class="empty">
+                            No hay registros para el período seleccionado.
+                        </td>
+                    </tr>
+
+                    <tr th:each="a : ${asistencias}"
+                        th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},
+                                 data-grupo=${a.grupo.nombre},
+                                 data-estado=${a.estado}">
+
+                        <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}">—</td>
+                        <td th:text="${a.grupo.nombre}" style="color:var(--gris-50);">—</td>
+
+                        <td th:if="${modoRango}">
+                            <span class="fecha-badge"
+                                  th:text="${a.fecha != null ? #dates.format(a.fecha,'dd/MM/yyyy') : '—'}">—</span>
+                        </td>
+
+                        <td th:text="${a.horaEntrada != null ? a.horaEntrada : '—'}" style="color:var(--gris-50);">—</td>
+                        <td th:text="${a.horaSalida  != null ? a.horaSalida  : '—'}" style="color:var(--gris-50);">—</td>
+
+                        <td>
+                            <span th:switch="${a.estado}">
+                                <span th:case="'PRESENTE'" class="badge badge-presente">Presente</span>
+                                <span th:case="'AUSENTE'"  class="badge badge-ausente">Ausente</span>
+                                <span th:case="'TARDANZA'" class="badge badge-tardanza">Tardanza</span>
+                                <span th:case="*" class="badge" th:text="${a.estado}">—</span>
+                            </span>
+                        </td>
+
+                        <!-- Exportar por alumno -->
+                        <td>
+                            <div class="acciones-cell">
+                                <!-- MODO RANGO: usa desde/hasta del rango activo -->
+                                <a th:if="${modoRango}"
+                                   th:href="@{/docente/exportar/alumno(
+                                       idEstudiante=${a.estudiante.idEstudiante},
+                                       formato='pdf',
+                                       desde=${fechaDesdeStr},
+                                       hasta=${fechaHastaStr})}"
+                                   class="btn-mini btn-mini-pdf">
+                                    PDF
+                                </a>
+                                <a th:if="${modoRango}"
+                                   th:href="@{/docente/exportar/alumno(
+                                       idEstudiante=${a.estudiante.idEstudiante},
+                                       formato='excel',
+                                       desde=${fechaDesdeStr},
+                                       hasta=${fechaHastaStr})}"
+                                   class="btn-mini btn-mini-excel">
+                                    Excel
+                                </a>
+
+                                <!-- MODO HOY / fecha puntual: usa fechaSeleccionada -->
+                                <a th:if="${!modoRango}"
+                                   th:href="@{/docente/exportar/alumno(
+                                       idEstudiante=${a.estudiante.idEstudiante},
+                                       formato='pdf',
+                                       desde=${fechaSeleccionada},
+                                       hasta=${fechaSeleccionada})}"
+                                   class="btn-mini btn-mini-pdf">
+                                    PDF
+                                </a>
+                                <a th:if="${!modoRango}"
+                                   th:href="@{/docente/exportar/alumno(
+                                       idEstudiante=${a.estudiante.idEstudiante},
+                                       formato='excel',
+                                       desde=${fechaSeleccionada},
+                                       hasta=${fechaSeleccionada})}"
+                                   class="btn-mini btn-mini-excel">
+                                    Excel
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <div id="no-results">
+                <svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#D6D6D6;fill:none;stroke-width:1.8;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                No se encontraron registros con esos filtros.
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const searchInput  = document.getElementById('searchInput');
+    const filterEstado = document.getElementById('filterEstado');
+    const filterGrupo  = document.getElementById('filterGrupo');
+    const rows         = document.querySelectorAll('#tablaAsistencias tr[data-estudiante]');
+    const countVisible = document.getElementById('countVisible');
+    const countTotal   = document.getElementById('countTotal');
+    const noResults    = document.getElementById('no-results');
+
+    if (countTotal) countTotal.textContent = rows.length;
+
+    const inputDesde = document.querySelector('input[name="desde"]');
+    const inputHasta = document.querySelector('input[name="hasta"]');
+    if (inputDesde && inputHasta) {
+        inputDesde.addEventListener('change', () => {
+            inputHasta.min = inputDesde.value;
+            if (inputHasta.value && inputHasta.value < inputDesde.value) {
+                inputHasta.value = inputDesde.value;
+            }
+        });
+    }
+
+    const grupos = new Set();
+    rows.forEach(row => { const g = (row.dataset.grupo || '').trim(); if (g) grupos.add(g); });
+    grupos.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g; opt.textContent = g;
+        filterGrupo.appendChild(opt);
+    });
+
+    function applyFilters() {
+        const q      = (searchInput.value || '').toLowerCase().trim();
+        const estado = filterEstado.value;
+        const grupo  = filterGrupo.value;
+        let visible  = 0;
+        rows.forEach(row => {
+            const matchQ   = !q      || (row.dataset.estudiante||'').toLowerCase().includes(q) || (row.dataset.grupo||'').toLowerCase().includes(q);
+            const matchEst = !estado || (row.dataset.estado||'').trim() === estado;
+            const matchGrp = !grupo  || (row.dataset.grupo||'').trim() === grupo;
+            row.style.display = matchQ && matchEst && matchGrp ? '' : 'none';
+            if (matchQ && matchEst && matchGrp) visible++;
+        });
+        if (countVisible) countVisible.textContent = visible;
+        if (noResults) noResults.style.display = visible === 0 && rows.length > 0 ? 'block' : 'none';
+    }
+
+    applyFilters();
+    if (searchInput)  searchInput.addEventListener('input',   applyFilters);
+    if (filterEstado) filterEstado.addEventListener('change', applyFilters);
+    if (filterGrupo)  filterGrupo.addEventListener('change',  applyFilters);
+</script>
+
+</body>
+</html>

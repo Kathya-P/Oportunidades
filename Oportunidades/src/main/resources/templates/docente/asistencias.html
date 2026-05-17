@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Asistencias — Programa Oportunidades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+
+    <style>
+
+        :root{
+            --rojo:#C8102E;
+            --rojo-dark:#A00E25;
+            --rojo-light:#FCE7EB;
+            --negro:#141414;
+            --gris-90:#222;
+            --gris-70:#4A4A4A;
+            --gris-50:#7A7A7A;
+            --gris-30:#B0B0B0;
+            --gris-20:#D6D6D6;
+            --gris-10:#F4F3F1;
+            --blanco:#FFF;
+        }
+
+        *{ margin:0; padding:0; box-sizing:border-box; }
+
+        body{ font-family:'DM Sans',sans-serif; background:var(--gris-10); color:var(--negro); }
+
+        nav{
+            height:72px; background:#141414; padding:0 2rem;
+            display:flex; align-items:center; justify-content:space-between;
+        }
+
+        .brand{ display:flex; align-items:center; gap:14px; }
+        .brand-name{ color:white; font-size:14px; font-weight:700; }
+        .brand-sub{ color:#8D8D8D; font-size:11px; }
+        .nav-right{ display:flex; align-items:center; gap:1rem; }
+
+        .user-chip{
+            padding:9px 14px; border-radius:999px;
+            background:rgba(255,255,255,.06); color:#BABABA; font-size:12px;
+        }
+
+        .logout-link{ color:#888; text-decoration:none; font-size:13px; }
+        .logout-link:hover{ color:var(--rojo); }
+
+        .container{ max-width:1200px; margin:2rem auto; padding:0 1rem; }
+        .page-header{ margin-bottom:2rem; }
+
+        .eyebrow{
+            font-size:11px; text-transform:uppercase; color:var(--rojo);
+            font-weight:700; margin-bottom:10px; letter-spacing:.1em;
+        }
+
+        .page-header h1{ font-family:'DM Serif Display',serif; font-size:2.5rem; }
+        .fecha-label{ margin-top:10px; color:var(--gris-50); font-size:14px; }
+
+        .tabs{
+            display:inline-flex; gap:6px; background:white;
+            border:1px solid #ececec; border-radius:14px; padding:6px; margin-bottom:1.6rem;
+        }
+
+        .tab{
+            text-decoration:none; color:var(--gris-50);
+            padding:10px 18px; border-radius:10px; font-size:13px; font-weight:600;
+        }
+
+        .tab.active{ background:var(--rojo); color:white; }
+        .tab-lector {
+    background: rgba(200,16,46,0.08);
+    color: var(--rojo);
+    border: 1px solid rgba(200,16,46,0.2);
+}
+
+.tab-lector:hover {
+    background: rgba(200,16,46,0.15);
+}
+
+        .export-bar{
+            background:white; border:1px solid #ececec; border-radius:18px;
+            padding:1.2rem 1.4rem; margin-bottom:1.6rem;
+            display:flex; gap:1rem; align-items:center; flex-wrap:wrap;
+        }
+
+        .export-label{
+            font-size:11px; font-weight:700; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--gris-50);
+        }
+
+        .export-select{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa;
+            font-family:'DM Sans',sans-serif; font-size:13px;
+            cursor:pointer; min-width:120px;
+        }
+
+        .export-select:focus{ outline:none; border-color:var(--rojo); background:white; }
+
+        .btn-download{
+            background:var(--rojo); color:white; border:none;
+            border-radius:10px; padding:11px 18px;
+            font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif;
+            cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+        }
+
+        .btn-download:hover{ background:var(--rojo-dark); }
+
+        .historial-card{
+            background:white; border-radius:18px;
+            border:1px solid #ececec; padding:1.5rem; margin-bottom:1.5rem;
+        }
+
+        .historial-card-title{
+            font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+            color:var(--gris-50); font-weight:700; margin-bottom:1rem;
+        }
+
+        .section-divider{ border:none; border-top:1px solid #ececec; margin:1.4rem 0; }
+
+        .range-form{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+
+        .range-field{ display:flex; flex-direction:column; gap:6px; }
+
+        .range-field label{
+            font-size:11px; text-transform:uppercase;
+            letter-spacing:.06em; color:var(--gris-50); font-weight:700;
+        }
+
+        .range-field input[type="date"]{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa;
+            min-width:170px; font-family:'DM Sans',sans-serif;
+        }
+
+        .range-field input[type="date"]:focus{
+            outline:none; border-color:var(--rojo); background:white;
+        }
+
+        .btn{
+            border:none; border-radius:10px; padding:11px 16px;
+            cursor:pointer; font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif;
+        }
+
+        .btn-dark{ background:var(--negro); color:white; }
+        .btn-dark:hover{ opacity:.92; }
+
+        .filter-select{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa; font-family:'DM Sans',sans-serif;
+        }
+
+        .stats{
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+            gap:1rem; margin-bottom:1.5rem;
+        }
+
+        /* ── Calendario grande separado de stats ── */
+        .dash-grid{
+            display:grid;
+            grid-template-columns: 440px 1fr;
+            gap: 1.2rem;
+            align-items:start;
+            margin-bottom:1.5rem;
+        }
+        @media(max-width:1000px){ .dash-grid{ grid-template-columns:1fr; } }
+        .dash-calendar .mini-day{ padding:7px 2px; font-size:12.5px; }
+        .dash-calendar .mini-day-name{ font-size:10.5px; padding:6px 0; }
+
+        .stat-card{ background:white; border:1px solid #ececec; border-radius:18px; padding:1.4rem; }
+        .stat-num{ font-size:2rem; font-weight:700; margin-bottom:5px; }
+
+        .stat-label{
+            font-size:12px; text-transform:uppercase;
+            color:var(--gris-50); letter-spacing:.08em;
+        }
+
+        .filters-bar{
+            background:white; border:1px solid #ececec; border-radius:18px;
+            padding:1.2rem; margin-bottom:1.2rem;
+            display:flex; gap:1rem; flex-wrap:wrap; align-items:center;
+        }
+
+        .search-wrap{ flex:1; min-width:240px; }
+
+        .search-wrap input{
+            width:100%; border:1.5px solid var(--gris-20);
+            border-radius:10px; padding:11px 14px; background:#fafafa;
+        }
+
+        .search-wrap input:focus{ outline:none; border-color:var(--rojo); background:white; }
+
+        .card{ background:white; border:1px solid #ececec; border-radius:18px; overflow:hidden; }
+
+        table{ width:100%; border-collapse:collapse; }
+        thead{ background:#fafafa; }
+
+        th{
+            text-align:left; padding:16px; font-size:11px;
+            text-transform:uppercase; color:var(--gris-50); letter-spacing:.08em;
+        }
+
+        td{ padding:16px; border-top:1px solid #f1f1f1; font-size:14px; }
+        tbody tr:hover{ background:#fcfcfc; }
+
+        .badge{
+            display:inline-flex; align-items:center; justify-content:center;
+            padding:5px 12px; border-radius:999px; font-size:11px; font-weight:700;
+        }
+
+        .badge-presente{ background:black; color:white; }
+        .badge-ausente{ background:#FDEBEC; color:var(--rojo-dark); }
+        .badge-tardanza{ background:#F1F1F1; color:#555; }
+
+        .fecha-badge{ padding:4px 10px; border-radius:8px; background:#f4f4f4; font-size:12px; }
+        .empty{ padding:3rem; text-align:center; color:var(--gris-50); }
+
+        /* ── Botón exportar por alumno ── */
+        .btn-alumno{
+            background:transparent; border:1.5px solid var(--gris-20);
+            border-radius:8px; padding:6px 12px;
+            font-size:12px; font-weight:600; font-family:'DM Sans',sans-serif;
+            color:var(--gris-70); cursor:pointer;
+            display:inline-flex; align-items:center; gap:6px;
+            transition:.15s;
+        }
+
+        .btn-alumno:hover{
+            border-color:var(--rojo); color:var(--rojo); background:var(--rojo-light);
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay{
+            display:none;
+            position:fixed; inset:0;
+            background:rgba(0,0,0,.45);
+            backdrop-filter:blur(4px);
+            z-index:1000;
+            align-items:center; justify-content:center;
+        }
+
+        .modal-overlay.open{ display:flex; }
+
+        .modal{
+            background:white; border-radius:20px;
+            padding:2rem; width:100%; max-width:440px;
+            box-shadow:0 24px 60px rgba(0,0,0,.15);
+            position:relative;
+        }
+
+        .modal-close{
+            position:absolute; top:1rem; right:1rem;
+            background:none; border:none; font-size:20px;
+            cursor:pointer; color:var(--gris-30); line-height:1;
+        }
+
+        .modal-close:hover{ color:var(--negro); }
+
+        .modal-eyebrow{
+            font-size:10px; font-weight:700; letter-spacing:.1em;
+            text-transform:uppercase; color:var(--rojo); margin-bottom:6px;
+        }
+
+        .modal-title{
+            font-family:'DM Serif Display',serif;
+            font-size:1.5rem; margin-bottom:1.4rem; color:var(--negro);
+        }
+
+        .modal-fields{
+            display:flex; flex-direction:column; gap:1rem; margin-bottom:1.4rem;
+        }
+
+        .modal-field{ display:flex; flex-direction:column; gap:6px; }
+
+        .modal-field label{
+            font-size:11px; font-weight:700; text-transform:uppercase;
+            letter-spacing:.06em; color:var(--gris-50);
+        }
+
+        .modal-field input[type="date"],
+        .modal-field select{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa;
+            font-family:'DM Sans',sans-serif; font-size:13px; width:100%;
+        }
+
+        .modal-field input[type="date"]:focus,
+        .modal-field select:focus{
+            outline:none; border-color:var(--rojo); background:white;
+        }
+
+        .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+
+        .btn-cancel{
+            background:var(--gris-10); color:var(--gris-70);
+            border:none; border-radius:10px; padding:11px 18px;
+            font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif;
+            cursor:pointer;
+        }
+
+        .btn-cancel:hover{ background:var(--gris-20); }
+
+        /* ── MULTISELECT ── */
+        .multi-select{ position:relative; width:260px; }
+
+        .multi-select-btn{
+            width:100%; background:#fafafa; border:1.5px solid var(--gris-20);
+            border-radius:10px; padding:11px 14px; cursor:pointer;
+            display:flex; align-items:center; justify-content:space-between; font-size:13px;
+        }
+
+        .multi-select-dropdown{
+            display:none; position:absolute; top:105%; left:0; width:100%;
+            background:white; border:1px solid #ececec; border-radius:12px;
+            box-shadow:0 10px 25px rgba(0,0,0,.08); z-index:999;
+            max-height:220px; overflow-y:auto;
+        }
+
+        .multi-select-dropdown.show{ display:block; }
+
+        .multi-option{
+            display:flex; align-items:center; gap:10px;
+            padding:10px 14px; border-bottom:1px solid #f3f3f3;
+        }
+
+        .multi-option:last-child{ border-bottom:none; }
+        .multi-option:hover{ background:#fafafa; }
+        .multi-option input{ width:16px; height:16px; accent-color:var(--rojo); }
+
+        @media(max-width:768px){
+            nav{ padding:0 1rem; }
+            table{ min-width:760px; }
+            .card{ overflow:auto; }
+            .modal{ margin:1rem; }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">
+        <img src="/images/opor.png" style="height:42px;width:auto;" alt="Logo"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel docente</div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <div class="user-chip"
+             th:text="${docente.nombre + ' ' + (docente.apellido != null ? docente.apellido : '')}">
+            Docente
+        </div>
+        <a th:href="@{/logout}" class="logout-link">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div class="eyebrow">Control académico</div>
+        <h1>Asistencias</h1>
+        <p class="fecha-label"
+   th:text="${modoRango} ? ('Historial ' + fechaDesdeStr + ' - ' + fechaHastaStr) : 'Registro de hoy'">
+</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+    <a th:href="@{/docente}" class="tab"
+       th:classappend="${!modoHistorial and !modoRango} ? ' active' : ''">Hoy</a>
+    <a th:href="@{/docente/historial}" class="tab"
+       th:classappend="${modoHistorial or modoRango} ? ' active' : ''">Historial</a>
+    <a th:href="@{/asistencia/lector}" class="tab tab-lector">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;margin-right:4px;">
+            <path d="M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14"/>
+        </svg>
+        Lector
+    </a>
+</div>
+
+    <!-- EXPORTAR — solo vista Hoy -->
+    <div class="export-bar" th:if="${!modoHistorial and !modoRango}">
+        <span class="export-label">Exportar</span>
+        <select class="export-select" id="formatoHoy">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+        </select>
+        <button class="btn-download" onclick="descargarHoy()">
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Descargar
+        </button>
+        <span id="fechaHoyStr" th:text="${fechaSeleccionada}" style="display:none;"></span>
+    </div>
+
+    <!-- CALENDARIO + STATS (separados) -->
+    <div class="dash-grid">
+        <div class="dash-calendar">
+            <div th:replace="~{calendario/widget-calendario :: widget}"></div>
+        </div>
+        <div>
+            <div class="stats">
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias)}">0</div>
+            <div class="stat-label">Total registros</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PRESENTE'])}">0</div>
+            <div class="stat-label">Presentes</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'AUSENTE'])}">0</div>
+            <div class="stat-label">Ausentes</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'TARDANZA'])}">0</div>
+            <div class="stat-label">Tardanzas</div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HISTORIAL CARD -->
+    <div class="historial-card" th:if="${modoHistorial or modoRango}">
+
+        <p class="historial-card-title">Seleccionar rango de fechas</p>
+
+        <form th:action="@{/docente/historial}" method="get" class="range-form">
+
+            <div class="range-field">
+                <label>Secciones</label>
+                <div class="multi-select">
+                    <button type="button" class="multi-select-btn" id="multiSelectBtn">
+                        <span id="multiSelectText">Seleccionar secciones</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="multi-select-dropdown" id="multiSelectDropdown">
+                        <label class="multi-option" th:each="g : ${grupos}">
+                            <input type="checkbox" name="secciones"
+                                   th:value="${g.idGrupo}"
+                                   th:checked="${seccionesSeleccionadas.contains(g.idGrupo)}"/>
+                            <span th:text="${g.nombre}">A1</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="range-field">
+                <label>Desde</label>
+                <input type="date" name="desde" th:value="${fechaDesdeStr}"/>
+            </div>
+
+            <div class="range-field">
+                <label>Hasta</label>
+                <input type="date" name="hasta" th:value="${fechaHastaStr}"/>
+            </div>
+
+            <button type="submit" class="btn btn-dark">Ver asistencias</button>
+
+        </form>
+
+        <hr class="section-divider"/>
+
+        <!-- EXPORTAR RANGO -->
+        <p class="historial-card-title">Exportar rango</p>
+
+        <form th:action="@{/docente/exportar}" method="get"
+              style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+
+            <input type="hidden" name="filtro" value="rango"/>
+            <input type="hidden" name="desde" th:value="${fechaDesdeStr}"/>
+            <input type="hidden" name="hasta" th:value="${fechaHastaStr}"/>
+            <div id="hiddenSeccionesExport"></div>
+
+            <select name="formato" class="export-select">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+            </select>
+
+            <button type="submit" class="btn-download">
+                <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters-bar">
+        <div class="search-wrap">
+            <input type="text" id="searchInput" placeholder="Buscar estudiante o grupo..."/>
+        </div>
+        <select id="filterEstado" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="PRESENTE">Presente</option>
+            <option value="AUSENTE">Ausente</option>
+            <option value="TARDANZA">Tardanza</option>
+        </select>
+        <select id="filterGrupo" class="filter-select">
+            <option value="">Todos los grupos</option>
+        </select>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Grupo</th>
+                    <th th:if="${modoRango}">Fecha</th>
+                    <th>Hora entrada</th>
+                    <th>Hora salida</th>
+                    <th>Estado</th>
+                    <th>Exportar</th>
+                </tr>
+            </thead>
+            <tbody id="tablaAsistencias">
+
+                <tr th:if="${#lists.isEmpty(asistencias)}">
+                    <td th:colspan="${modoRango ? 7 : 6}" class="empty">
+                        No hay registros.
+                    </td>
+                </tr>
+
+                <tr th:each="a : ${asistencias}"
+    th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},
+             data-grupo=${a.grupo.nombre},
+             data-estado=${a.estado}">
+
+    <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
+    <td th:text="${a.grupo.nombre}"></td>
+
+    <td th:if="${modoRango}">
+        <span class="fecha-badge" th:text="${#dates.format(a.fecha,'dd/MM/yyyy')}"></span>
+    </td>
+
+    <td th:text="${a.horaEntrada != null ? a.horaEntrada : '—'}"></td>
+    <td th:text="${a.horaSalida  != null ? a.horaSalida  : '—'}"></td>
+
+    <td>
+        <span th:switch="${a.estado}">
+            <span th:case="'PRESENTE'" class="badge badge-presente">Presente</span>
+            <span th:case="'AUSENTE'"  class="badge badge-ausente">Ausente</span>
+            <span th:case="'TARDANZA'" class="badge badge-tardanza">Tardanza</span>
+        </span>
+    </td>
+
+    <td>
+        <button class="btn-alumno"
+                th:attr="data-id=${a.estudiante.idEstudiante},
+                         data-nombre=${a.estudiante.nombre + ' ' + a.estudiante.apellido}">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Exportar
+        </button>
+    </td>
+
+</tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL — Exportar por alumno
+     ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalAlumno">
+    <div class="modal">
+
+        <button class="modal-close" onclick="cerrarModal()">✕</button>
+
+        <div class="modal-eyebrow">Exportar asistencia</div>
+        <div class="modal-title" id="modalNombreAlumno">Alumno</div>
+
+        <div class="modal-fields">
+
+            <div class="modal-field">
+                <label>Desde</label>
+                <input type="date" id="modalDesde"/>
+            </div>
+
+            <div class="modal-field">
+                <label>Hasta</label>
+                <input type="date" id="modalHasta"/>
+            </div>
+
+            <div class="modal-field">
+                <label>Formato</label>
+                <select id="modalFormato">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn-download" onclick="descargarAlumno()">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    // ── MULTISELECT ───────────────────────────────────────────────────────────
+
+    const multiBtn      = document.getElementById('multiSelectBtn');
+    const multiDropdown = document.getElementById('multiSelectDropdown');
+    const multiText     = document.getElementById('multiSelectText');
+
+    if (multiBtn) {
+
+        multiBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            multiDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!multiDropdown.contains(e.target) && !multiBtn.contains(e.target)) {
+                multiDropdown.classList.remove('show');
+            }
+        });
+
+        const checks = multiDropdown.querySelectorAll('input[type="checkbox"]');
+        updateText();
+        checks.forEach(chk => chk.addEventListener('change', updateText));
+
+        function updateText() {
+            const selected = [];
+            checks.forEach(chk => {
+                if (chk.checked) selected.push(chk.parentElement.innerText.trim());
+            });
+            multiText.textContent = selected.length > 0 ? selected.join(', ') : 'Seleccionar secciones';
+
+            const hiddenExport = document.getElementById('hiddenSeccionesExport');
+            if (hiddenExport) {
+                hiddenExport.innerHTML = '';
+                checks.forEach(chk => {
+                    if (chk.checked) {
+                        hiddenExport.innerHTML +=
+                            `<input type="hidden" name="secciones" value="${chk.value}">`;
+                    }
+                });
+            }
+        }
+    }
+
+    // ── DESCARGA VISTA HOY ────────────────────────────────────────────────────
+
+    function descargarHoy() {
+        const formato = document.getElementById('formatoHoy').value;
+        const fecha   = document.getElementById('fechaHoyStr').textContent.trim()
+                        || new Date().toISOString().split('T')[0];
+        window.location.href = `/docente/exportar?filtro=dia&formato=${formato}&fecha=${fecha}`;
+    }
+
+    // ── MODAL ALUMNO ──────────────────────────────────────────────────────────
+
+let alumnoIdActual = null;
+
+// Event delegation — un solo listener para todos los botones de la tabla
+document.getElementById('tablaAsistencias').addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-alumno');
+    if (!btn) return;
+
+    alumnoIdActual = btn.dataset.id;
+    const nombre   = btn.dataset.nombre || 'Alumno';
+
+    document.getElementById('modalNombreAlumno').textContent = nombre;
+
+    const hoy     = new Date().toISOString().split('T')[0];
+    const desdeEl = document.querySelector('input[name="desde"]');
+    const hastaEl = document.querySelector('input[name="hasta"]');
+    document.getElementById('modalDesde').value = desdeEl?.value || hoy;
+    document.getElementById('modalHasta').value = hastaEl?.value || hoy;
+
+    document.getElementById('modalAlumno').classList.add('open');
+});
+
+function cerrarModal() {
+    document.getElementById('modalAlumno').classList.remove('open');
+    alumnoIdActual = null;
+}
+
+document.getElementById('modalAlumno').addEventListener('click', function (e) {
+    if (e.target === this) cerrarModal();
+});
+
+function descargarAlumno() {
+    if (!alumnoIdActual) return;
+
+    const desde   = document.getElementById('modalDesde').value;
+    const hasta   = document.getElementById('modalHasta').value;
+    const formato = document.getElementById('modalFormato').value;
+
+    if (!desde || !hasta) {
+        alert('Seleccioná ambas fechas.');
+        return;
+    }
+
+    if (hasta < desde) {
+        alert('La fecha "Hasta" no puede ser anterior a "Desde".');
+        return;
+    }
+
+    window.location.href =
+        `/docente/exportar?filtro=alumno&formato=${formato}&idEstudiante=${alumnoIdActual}&desde=${desde}&hasta=${hasta}`;
+}
+
+    // ── FILTROS TABLA ─────────────────────────────────────────────────────────
+
+    const searchInput  = document.getElementById('searchInput');
+    const filterEstado = document.getElementById('filterEstado');
+    const filterGrupo  = document.getElementById('filterGrupo');
+    const rows         = document.querySelectorAll('#tablaAsistencias tr[data-estudiante]');
+
+    const gruposSet = new Set();
+    rows.forEach(row => {
+        const g = (row.dataset.grupo || '').trim();
+        if (g) gruposSet.add(g);
+    });
+
+    gruposSet.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        filterGrupo.appendChild(opt);
+    });
+
+    function applyFilters() {
+        const q      = (searchInput.value || '').toLowerCase().trim();
+        const estado = filterEstado.value;
+        const grupo  = filterGrupo.value;
+
+        rows.forEach(row => {
+            const matchQ      = !q      || (row.dataset.estudiante||'').toLowerCase().includes(q) || (row.dataset.grupo||'').toLowerCase().includes(q);
+            const matchEstado = !estado || (row.dataset.estado||'') === estado;
+            const matchGrupo  = !grupo  || (row.dataset.grupo||'')  === grupo;
+            row.style.display = matchQ && matchEstado && matchGrupo ? '' : 'none';
+        });
+    }
+
+    if (searchInput)  searchInput.addEventListener('input',   applyFilters);
+    if (filterEstado) filterEstado.addEventListener('change', applyFilters);
+    if (filterGrupo)  filterGrupo.addEventListener('change',  applyFilters);
+
+</script>
+
+</body>
+</html>

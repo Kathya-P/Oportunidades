@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Acceso denegado — Programa Oportunidades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #F5D0D7;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F0EFED;
+            --blanco:     #FFFFFF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--gris-10);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--negro);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+        }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: var(--rojo);
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand-icon svg { width: 17px; height: 17px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .brand-name { font-size: 14px; font-weight: 500; color: var(--gris-70); }
+
+        .card {
+            background: var(--blanco);
+            border: 1px solid var(--gris-20);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .icon-wrap {
+            width: 72px; height: 72px;
+            background: var(--gris-10);
+            border: 1px solid var(--gris-20);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        .icon-wrap svg {
+            width: 32px; height: 32px;
+            stroke: var(--gris-50);
+            fill: none; stroke-width: 1.5;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .code {
+            font-family: 'DM Serif Display', serif;
+            font-size: 5rem;
+            line-height: 1;
+            color: var(--rojo);
+            margin-bottom: 0.25rem;
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gris-50);
+            margin-bottom: 1rem;
+        }
+
+        .mensaje {
+            font-size: 14px;
+            color: var(--gris-70);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .divider { height: 1px; background: var(--gris-10); margin-bottom: 1.5rem; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            padding: 11px 20px;
+            background: var(--negro);
+            color: var(--blanco);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .btn svg { width: 15px; height: 15px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .btn:hover { background: var(--gris-90); }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 11px;
+            color: var(--gris-50);
+        }
+    </style>
+</head>
+<body>
+
+<div class="brand">
+    <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+        </svg>
+    </div>
+    <span class="brand-name">Programa Oportunidades</span>
+</div>
+
+<div class="card">
+    <div class="icon-wrap">
+        <svg viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+    </div>
+
+    <div class="code">403</div>
+    <p class="eyebrow">Acceso denegado</p>
+
+    <p class="mensaje">
+        No tenés permisos para ver esta página.<br/>
+        Si creés que es un error, contactá al administrador del sistema.
+    </p>
+
+    <div class="divider"></div>
+
+    <a th:href="@{/login}" class="btn">
+        <svg viewBox="0 0 24 24">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        Volver al inicio
+    </a>
+</div>
+
+<p class="footer">FGK &copy; 2026 &mdash; Solo personal autorizado</p>
+
+</body>
+</html>

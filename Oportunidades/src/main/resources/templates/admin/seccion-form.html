@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Sección — Programa Oportunidades</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Segoe UI',sans-serif;
+            background:#f8f9fa;
+            color:#333;
+        }
+
+        /* NAVBAR */
+        nav{
+            height:72px;
+            background:rgba(20,20,20,0.97);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 2.5rem;
+            position:sticky;
+            top:0;
+            z-index:100;
+            backdrop-filter:blur(10px);
+        }
+
+        .nav-left{ display:flex; align-items:center; gap:14px; }
+        .brand-info{ display:flex; flex-direction:column; }
+        .brand-name{ color:var(--blanco); font-size:14px; font-weight:600; letter-spacing:0.02em; }
+        .brand-sub{ color:#8D8D8D; font-size:11px; }
+
+        .nav-links{ display:flex; align-items:center; gap:12px; }
+
+        .nav-links a{
+            color:#B8B8B8; text-decoration:none;
+            font-size:13px; font-weight:500;
+            padding:10px 14px; border-radius:8px;
+            transition:0.15s ease;
+        }
+
+        .nav-links a:hover{ background:rgba(255,255,255,0.05); color:white; }
+
+        .nav-links a.active{
+            background:rgba(200,16,46,0.15);
+            color:white;
+            border:1px solid rgba(200,16,46,0.35);
+        }
+
+        .logout{
+            margin-left:10px;
+            border-left:1px solid rgba(255,255,255,0.08);
+            padding-left:18px;
+        }
+
+        /* CONTENIDO */
+        .container{
+            max-width:700px;
+            margin:2.5rem auto;
+            padding:0 2rem;
+        }
+
+        .page-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:1.5rem;
+            gap:1rem;
+            flex-wrap:wrap;
+        }
+
+        .page-title h1{
+            font-size:1.6rem;
+            font-weight:600;
+            color:#2c3e50;
+        }
+
+        .page-title p{
+            color:#888;
+            font-size:0.88rem;
+            margin-top:0.25rem;
+        }
+
+        .btn-back{
+            text-decoration:none;
+            border:1px solid #ddd;
+            padding:0.55rem 1rem;
+            border-radius:8px;
+            color:#555;
+            background:white;
+            font-size:0.85rem;
+            transition:0.2s;
+        }
+
+        .btn-back:hover{
+            border-color:#2c3e50;
+            color:#2c3e50;
+        }
+
+        /* CARD */
+        .card{
+            background:white;
+            border-radius:14px;
+            border:1px solid #eee;
+            box-shadow:0 2px 6px rgba(0,0,0,0.04);
+            padding:2rem;
+        }
+
+        /* FORM */
+        .field{
+            margin-bottom:1.2rem;
+        }
+
+        .field label{
+            display:block;
+            font-size:0.85rem;
+            color:#555;
+            margin-bottom:0.45rem;
+            font-weight:500;
+        }
+
+        .field input{
+            width:100%;
+            padding:11px 13px;
+            border:1px solid #d1d5db;
+            border-radius:10px;
+            font-size:0.9rem;
+            outline:none;
+            transition:0.2s;
+            background:white;
+        }
+
+        .field input:focus{
+            border-color:#2c3e50;
+            box-shadow:0 0 0 3px rgba(44,62,80,0.08);
+        }
+
+        .field-row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:1rem;
+        }
+
+        /* BOTONES */
+        .form-actions{
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:2rem;
+            padding-top:1.5rem;
+            border-top:1px solid #f0f0f0;
+        }
+
+        .btn{
+            padding:0.65rem 1.2rem;
+            border-radius:8px;
+            font-size:0.88rem;
+            font-weight:500;
+            text-decoration:none;
+            cursor:pointer;
+            border:none;
+            transition:0.2s;
+        }
+
+        .btn-primary{
+            background:#2c3e50;
+            color:white;
+        }
+
+        .btn-primary:hover{
+            background:#1f2d3a;
+        }
+
+        .btn-outline{
+            background:white;
+            border:1px solid #ddd;
+            color:#555;
+        }
+
+        .btn-outline:hover{
+            border-color:#2c3e50;
+            color:#2c3e50;
+        }
+
+        @media(max-width:700px){
+
+            .container{
+                padding:0 1rem;
+            }
+
+            .field-row{
+                grid-template-columns:1fr;
+            }
+
+            .page-header{
+                align-items:flex-start;
+            }
+
+            .form-actions{
+                flex-direction:column-reverse;
+            }
+
+            .form-actions .btn,
+            .form-actions a{
+                width:100%;
+                text-align:center;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="nav-left">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div class="brand-info">
+            <span class="brand-name">Programa Oportunidades</span>
+            <span class="brand-sub">Fundación Gloria Kriete</span>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/secciones}" class="active">Secciones</a>
+        <a th:href="@{/admin/alumnos}">Alumnos</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+
+<div class="container">
+
+    <div class="page-header">
+
+        <div class="page-title">
+
+            <h1 th:text="${titulo}">
+                Sección
+            </h1>
+
+            <p>
+                Gestión de secciones del Programa Oportunidades
+            </p>
+
+        </div>
+
+        <a th:href="@{/admin/secciones}"
+           class="btn-back">
+
+            ← Volver
+
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <form th:action="@{/admin/secciones/guardar}"
+              th:object="${seccion}"
+              method="post">
+
+            <input type="hidden"
+                   th:field="*{idGrupo}"/>
+
+            <div class="field">
+
+                <label>
+                    Nombre de la sección *
+                </label>
+
+                <input type="text"
+                       th:field="*{nombre}"
+                       placeholder="Ej. Sección A"
+                       required/>
+
+            </div>
+
+            <div class="field-row">
+
+                <div class="field">
+
+                    <label>
+                        Horario
+                    </label>
+
+                    <input type="text"
+                           th:field="*{horario}"
+                           placeholder="Ej. Lunes 8:00 AM - 10:00 AM"/>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Capacidad
+                    </label>
+
+                    <input type="number"
+                           th:field="*{capacidad}"
+                           placeholder="Ej. 25"
+                           min="1"/>
+
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <a th:href="@{/admin/secciones}"
+                   class="btn btn-outline">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Guardar sección
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

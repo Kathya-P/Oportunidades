@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Administrar Calendario — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #FCE7EB;
+            --negro:      #141414;
+            --gris-90:    #222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFF;
+            --verde:      #027A48;
+            --verde-bg:   #ECFDF3;
+            --azul:       #175CD3;
+            --azul-bg:    #EFF8FF;
+            --naranja:    #B54708;
+            --naranja-bg: #FFF5E7;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--gris-10); color:var(--negro); min-height:100vh; }
+
+        nav {
+            height:72px; background:var(--negro); padding:0 2rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand-logo {
+            width:38px; height:38px; border-radius:8px;
+            background:var(--rojo); display:flex; align-items:center;
+            justify-content:center; color:white; font-weight:700; font-size:15px;
+        }
+        .brand-name { color:white; font-size:14px; font-weight:700; line-height:1.2; }
+        .brand-sub  { color:#8D8D8D; font-size:11px; }
+        .nav-right  { display:flex; align-items:center; gap:1rem; }
+        .user-chip  { padding:9px 14px; border-radius:999px; background:rgba(255,255,255,.07); color:#BABABA; font-size:12px; }
+        .nav-link   { color:#BABABA; text-decoration:none; font-size:13px; padding:6px 12px; border-radius:6px; }
+        .nav-link:hover { background:rgba(255,255,255,.08); color:white; }
+        .logout-link { color:#888; text-decoration:none; font-size:13px; }
+        .logout-link:hover { color:var(--rojo); }
+
+        .container { max-width:1100px; margin:2.5rem auto; padding:0 1.5rem; }
+
+        .page-header { margin-bottom:2rem; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+        .eyebrow { font-size:11px; font-weight:600; color:var(--gris-50); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+        .page-title { font-size:26px; font-weight:700; }
+
+        .btn {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:9px 18px; border-radius:8px;
+            font-size:13px; font-weight:600;
+            text-decoration:none; cursor:pointer;
+            border:none; transition:background .15s;
+        }
+        .btn-primary { background:var(--rojo); color:white; }
+        .btn-primary:hover { background:var(--rojo-dark); }
+        .btn-secondary { background:white; color:var(--negro); border:1px solid var(--gris-20); }
+        .btn-secondary:hover { border-color:var(--gris-50); }
+        .btn-ghost { background:none; color:var(--gris-70); border:1px solid var(--gris-20); }
+        .btn-ghost:hover { background:var(--gris-10); }
+        .btn-danger { background:#FEF3F2; color:#B42318; border:1px solid #FDA29B; }
+        .btn-danger:hover { background:#FEE4E2; }
+        .btn-sm { padding:6px 12px; font-size:12px; }
+
+        /* ── FLASH ── */
+        .flash {
+            padding:12px 16px; border-radius:10px;
+            margin-bottom:1.5rem; font-size:13px; font-weight:500;
+        }
+        .flash-ok   { background:var(--verde-bg); color:var(--verde); }
+        .flash-err  { background:var(--rojo-light); color:var(--rojo); }
+
+        /* ── SECTION ── */
+        .section { margin-bottom:2.5rem; }
+        .section-header {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:1rem;
+        }
+        .section-title { font-size:17px; font-weight:700; }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background:white; border-radius:14px; border:1px solid var(--gris-20);
+            overflow:hidden;
+        }
+
+        table { width:100%; border-collapse:collapse; }
+        th {
+            padding:11px 16px; text-align:left; font-size:11px; font-weight:600;
+            color:var(--gris-50); text-transform:uppercase; letter-spacing:.06em;
+            background:#FAFAFA; border-bottom:1px solid var(--gris-20);
+        }
+        td {
+            padding:13px 16px; border-bottom:1px solid var(--gris-10);
+            font-size:13px; vertical-align:middle;
+        }
+        tr:last-child td { border-bottom:none; }
+        tr:hover td { background:#FAFAFA; }
+
+        .td-nombre { font-weight:600; }
+        .td-sub    { font-size:11.5px; color:var(--gris-50); margin-top:2px; }
+
+        .badge {
+            display:inline-block; padding:3px 9px; border-radius:6px;
+            font-size:11px; font-weight:600;
+        }
+        .badge-verde   { background:var(--verde-bg);   color:var(--verde); }
+        .badge-naranja { background:var(--naranja-bg);  color:var(--naranja); }
+        .badge-azul    { background:var(--azul-bg);     color:var(--azul); }
+        .badge-rojo    { background:var(--rojo-light);  color:var(--rojo); }
+        .badge-gris    { background:var(--gris-10);     color:var(--gris-70); }
+
+        .td-actions { display:flex; gap:8px; }
+
+        .empty-row td { text-align:center; color:var(--gris-50); font-style:italic; padding:2rem; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="brand">
+        <div class="brand-logo">O</div>
+        <div>
+            <div class="brand-name">Oportunidades</div>
+            <div class="brand-sub">Administración</div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <a th:href="@{/calendario}" class="nav-link">Ver Calendario</a>
+        <a th:href="@{/admin}"      class="nav-link">Dashboard</a>
+        <span class="user-chip" sec:authentication="name">admin</span>
+        <a class="logout-link" th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">⚙️ Gestión de Calendario</div>
+            <h1 class="page-title">Administrar Calendario Académico</h1>
+        </div>
+        <a th:href="@{/calendario}" class="btn btn-secondary">← Ver calendario</a>
+    </div>
+
+    <!-- Flash messages -->
+    <div th:if="${exito}" class="flash flash-ok" th:text="${exito}"></div>
+    <div th:if="${error}"  class="flash flash-err" th:text="${error}"></div>
+
+    <!-- ══ PERÍODOS ESCOLARES ══ -->
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">📚 Períodos Escolares</h2>
+            <a th:href="@{/calendario/admin/periodos/nuevo}" class="btn btn-primary">+ Nuevo período</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${periodos.isEmpty()}" class="empty-row">
+                    <td colspan="5">No hay períodos registrados. Crea el primero.</td>
+                </tr>
+                <tr th:each="p : ${periodos}">
+                    <td>
+                        <div class="td-nombre" th:text="${p.nombre}">Período I</div>
+                        <div th:if="${p.descripcion != null and !p.descripcion.isEmpty()}"
+                             class="td-sub" th:text="${p.descripcion}"></div>
+                    </td>
+                    <td th:text="${#temporals.format(p.fechaInicio,'dd/MM/yyyy')}">01/01/2025</td>
+                    <td th:text="${#temporals.format(p.fechaFin,'dd/MM/yyyy')}">11/03/2025</td>
+                    <td>
+                        <span th:if="${p.activo}"    class="badge badge-verde">Activo</span>
+                        <span th:unless="${p.activo}" class="badge badge-gris">Inactivo</span>
+                    </td>
+                    <td>
+                        <div class="td-actions">
+                            <a th:href="@{/calendario/admin/periodos/editar/{id}(id=${p.idPeriodo})}"
+                               class="btn btn-ghost btn-sm">Editar</a>
+                            <a th:href="@{/calendario/admin/periodos/eliminar/{id}(id=${p.idPeriodo})}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Eliminar este período?')">Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══ DÍAS ESPECIALES ══ -->
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">🗓️ Días Especiales / Asueto</h2>
+            <a th:href="@{/calendario/admin/dias/nuevo}" class="btn btn-primary">+ Nuevo día especial</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Período</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${dias.isEmpty()}" class="empty-row">
+                    <td colspan="6">No hay días especiales registrados.</td>
+                </tr>
+                <tr th:each="d : ${dias}">
+                    <td>
+                        <div class="td-nombre" th:text="${d.nombre}">Semana Santa</div>
+                        <div class="td-sub" th:text="${d.bloqueaAsistencia} ? 'Asistencia: Bloqueada' : 'Asistencia: Permitida'"></div>
+                        <div th:if="${d.descripcion != null and !d.descripcion.isEmpty()}"
+                             class="td-sub" th:text="${d.descripcion}"></div>
+                    </td>
+                    <td>
+                        <span th:if="${d.tipo.name() == 'FESTIVO'}"        class="badge badge-rojo">🔴 Festivo</span>
+                        <span th:if="${d.tipo.name() == 'ASUETO'}"         class="badge badge-naranja">🟡 Asueto</span>
+                        <span th:if="${d.tipo.name() == 'SEMANA_PEDAGOGICA'}" class="badge badge-azul">🔵 Sem. Pedagógica</span>
+                    </td>
+                    <td th:text="${#temporals.format(d.fechaInicio,'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(d.fechaFin,'dd/MM/yyyy')}"></td>
+                    <td>
+                        <span th:if="${d.periodo != null}" th:text="${d.periodo.nombre}"
+                              class="badge badge-verde"></span>
+                        <span th:if="${d.periodo == null}" class="badge badge-gris">General</span>
+                    </td>
+                    <td>
+                        <div class="td-actions">
+                            <a th:href="@{/calendario/admin/dias/editar/{id}(id=${d.idDia})}"
+                               class="btn btn-ghost btn-sm">Editar</a>
+                            <a th:href="@{/calendario/admin/dias/eliminar/{id}(id=${d.idDia})}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Eliminar este día especial?')">Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

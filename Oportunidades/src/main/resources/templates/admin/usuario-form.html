@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Usuario — Programa Oportunidades</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Segoe UI',sans-serif;
+            background:#f8f9fa;
+            color:#333;
+        }
+
+        /* NAVBAR */
+        nav{
+            height:72px;
+            background:rgba(20,20,20,0.97);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 2.5rem;
+            position:sticky;
+            top:0;
+            z-index:100;
+            backdrop-filter:blur(10px);
+        }
+
+        .nav-left{ display:flex; align-items:center; gap:14px; }
+        .brand-info{ display:flex; flex-direction:column; }
+        .brand-name{ color:var(--blanco); font-size:14px; font-weight:600; letter-spacing:0.02em; }
+        .brand-sub{ color:#8D8D8D; font-size:11px; }
+
+        .nav-links{ display:flex; align-items:center; gap:12px; }
+
+        .nav-links a{
+            color:#B8B8B8; text-decoration:none;
+            font-size:13px; font-weight:500;
+            padding:10px 14px; border-radius:8px;
+            transition:0.15s ease;
+        }
+
+        .nav-links a:hover{ background:rgba(255,255,255,0.05); color:white; }
+
+        .nav-links a.active{
+            background:rgba(200,16,46,0.15);
+            color:white;
+            border:1px solid rgba(200,16,46,0.35);
+        }
+
+        .logout{
+            margin-left:10px;
+            border-left:1px solid rgba(255,255,255,0.08);
+            padding-left:18px;
+        }
+
+        /* CONTENEDOR */
+
+        .container{
+            max-width:760px;
+            margin:2.5rem auto;
+            padding:0 2rem;
+        }
+
+        .page-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:1.5rem;
+            gap:1rem;
+            flex-wrap:wrap;
+        }
+
+        .page-title h1{
+            font-size:1.6rem;
+            font-weight:600;
+            color:#2c3e50;
+        }
+
+        .page-title p{
+            color:#888;
+            font-size:0.88rem;
+            margin-top:0.25rem;
+        }
+
+        .btn-back{
+            text-decoration:none;
+            border:1px solid #ddd;
+            padding:0.55rem 1rem;
+            border-radius:8px;
+            color:#555;
+            background:white;
+            font-size:0.85rem;
+            transition:0.2s;
+        }
+
+        .btn-back:hover{
+            border-color:#2c3e50;
+            color:#2c3e50;
+        }
+
+        /* CARD */
+
+        .card{
+            background:white;
+            border-radius:14px;
+            border:1px solid #eee;
+            box-shadow:0 2px 6px rgba(0,0,0,0.04);
+            padding:2rem;
+        }
+
+        /* ALERTA */
+
+        .alert{
+            padding:0.9rem 1rem;
+            border-radius:10px;
+            font-size:0.88rem;
+            margin-bottom:1.3rem;
+        }
+
+        .alert-error{
+            background:#fff5f5;
+            border:1px solid #fecaca;
+            color:#b91c1c;
+        }
+
+        /* FORM */
+
+        .field{
+            margin-bottom:1.2rem;
+        }
+
+        .field label{
+            display:block;
+            font-size:0.85rem;
+            color:#555;
+            margin-bottom:0.45rem;
+            font-weight:500;
+        }
+
+        .field input,
+        .field select{
+            width:100%;
+            padding:11px 13px;
+            border:1px solid #d1d5db;
+            border-radius:10px;
+            font-size:0.9rem;
+            outline:none;
+            transition:0.2s;
+            background:white;
+            color:#333;
+        }
+
+        .field input:focus,
+        .field select:focus{
+            border-color:#2c3e50;
+            box-shadow:0 0 0 3px rgba(44,62,80,0.08);
+        }
+
+        .field .hint{
+            font-size:0.75rem;
+            color:#9ca3af;
+            margin-top:5px;
+        }
+
+        .field-row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:1rem;
+        }
+
+        /* CHECKBOX */
+
+        .checkbox-row{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-top:1rem;
+            padding:1rem;
+            border:1px solid #eee;
+            border-radius:10px;
+            background:#fafafa;
+        }
+
+        .checkbox-row input{
+            width:auto;
+            transform:scale(1.1);
+        }
+
+        .checkbox-row label{
+            font-size:0.88rem;
+            color:#444;
+        }
+
+        /* BOTONES */
+
+        .form-actions{
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-top:2rem;
+            padding-top:1.5rem;
+            border-top:1px solid #f0f0f0;
+            flex-wrap:wrap;
+        }
+
+        .btn{
+            padding:0.65rem 1.2rem;
+            border-radius:8px;
+            font-size:0.88rem;
+            font-weight:500;
+            text-decoration:none;
+            cursor:pointer;
+            border:none;
+            transition:0.2s;
+        }
+
+        .btn-primary{
+            background:#2c3e50;
+            color:white;
+        }
+
+        .btn-primary:hover{
+            background:#1f2d3a;
+        }
+
+        .btn-outline{
+            background:white;
+            border:1px solid #ddd;
+            color:#555;
+        }
+
+        .btn-outline:hover{
+            border-color:#2c3e50;
+            color:#2c3e50;
+        }
+
+        .btn-reset{
+            background:#fff5f5;
+            border:1px solid #fecaca;
+            color:#b91c1c;
+        }
+
+        .btn-reset:hover{
+            background:#fee2e2;
+        }
+
+        @media(max-width:700px){
+
+            .container{
+                padding:0 1rem;
+            }
+
+            .field-row{
+                grid-template-columns:1fr;
+            }
+
+            .form-actions{
+                flex-direction:column-reverse;
+            }
+
+            .form-actions .btn,
+            .form-actions a{
+                width:100%;
+                text-align:center;
+            }
+
+            .page-header{
+                align-items:flex-start;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<nav>
+    <div class="nav-left">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div class="brand-info">
+            <span class="brand-name">Programa Oportunidades</span>
+            <span class="brand-sub">Fundación Gloria Kriete</span>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a th:href="@{/admin/usuarios}" class="active">Usuarios</a>
+        <a th:href="@{/admin/secciones}">Secciones</a>
+        <a th:href="@{/admin/alumnos}">Alumnos</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+
+<div class="container">
+
+    <div class="page-header">
+
+        <div class="page-title">
+
+            <h1 th:text="${titulo}">
+                Usuario
+            </h1>
+
+            <p>
+                Gestión de usuarios del sistema
+            </p>
+
+        </div>
+
+        <a th:href="@{/admin/usuarios}"
+           class="btn-back">
+
+            ← Volver
+
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        <div class="alert alert-error"
+             th:if="${error}"
+             th:text="${error}">
+        </div>
+
+        <form th:action="@{/admin/usuarios/guardar}"
+              th:object="${usuario}"
+              method="post">
+
+            <input type="hidden"
+                   th:field="*{idUsuario}"/>
+
+            <div class="field-row">
+
+                <div class="field">
+
+                    <label>
+                        Nombre *
+                    </label>
+
+                    <input type="text"
+                           th:field="*{nombre}"
+                           placeholder="Nombre"
+                           required/>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Apellido
+                    </label>
+
+                    <input type="text"
+                           th:field="*{apellido}"
+                           placeholder="Apellido"/>
+
+                </div>
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    Username *
+                </label>
+
+                <input type="text"
+                       th:field="*{username}"
+                       placeholder="Ej. jperez"
+                       required/>
+
+            </div>
+
+            <div class="field"
+                 th:if="${usuario.idUsuario == null}">
+
+                <label>
+                    Contraseña *
+                </label>
+
+                <input type="password"
+                       th:field="*{password}"
+                       placeholder="••••••••"
+                       required/>
+
+            </div>
+
+            <div class="field-row">
+
+                <div class="field">
+
+                    <label>
+                        Teléfono
+                    </label>
+
+                    <input type="text"
+                           th:field="*{telefono}"
+                           placeholder="Ej. 7000-0000"/>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Correo electrónico *
+                    </label>
+
+                    <input type="email"
+                           th:field="*{email}"
+                           placeholder="usuario@email.com"
+                           required/>
+
+                </div>
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    Rol *
+                </label>
+
+                <select th:field="*{role}"
+                        required>
+
+                    <option value="">
+                        — Seleccioná un rol —
+                    </option>
+
+                    <option th:each="r : ${roles}"
+                            th:value="${r}"
+                            th:text="${r.name().replace('ROLE_', '')}">
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="checkbox-row">
+
+                <input type="checkbox"
+                       th:field="*{activo}"
+                       id="activo"/>
+
+                <label for="activo">
+                    Usuario activo
+                </label>
+
+            </div>
+
+            <div class="form-actions">
+
+                <a th:href="@{/admin/usuarios}"
+                   class="btn btn-outline">
+
+                    Cancelar
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Guardar usuario
+
+                </button>
+
+                <a th:if="${usuario.idUsuario != null}"
+                   th:href="@{/admin/usuarios/reset-password/{id}(id=${usuario.idUsuario})}"
+                   class="btn btn-reset">
+
+                    Resetear contraseña
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

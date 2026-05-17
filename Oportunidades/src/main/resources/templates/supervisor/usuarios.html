@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios — Supervisor</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+            background:#f4f4f0;
+            color:#1a1a1a;
+        }
+
+        nav{
+            background:#fff;
+            border-bottom:1px solid #e5e7eb;
+            padding:0 2rem;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            height:56px;
+        }
+
+        nav .brand{
+            font-size:15px;
+            font-weight:500;
+        }
+
+        .nav-links{
+            display:flex;
+            align-items:center;
+            gap:1rem;
+            font-size:13px;
+            color:#6b7280;
+        }
+
+        .nav-links a{
+            text-decoration:none;
+            color:#6b7280;
+            font-size:13px;
+        }
+
+        .nav-links a:hover{
+            color:#1a1a1a;
+        }
+
+        .username{
+            background:#f3f4f6;
+            padding:4px 10px;
+            border-radius:20px;
+            font-size:12px;
+            color:#374151;
+        }
+
+        .container{
+            max-width:1200px;
+            margin:2rem auto;
+            padding:0 1rem;
+        }
+
+        .page-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:1.5rem;
+            flex-wrap:wrap;
+            gap:1rem;
+        }
+
+        .page-header h1{
+            font-size:20px;
+            font-weight:500;
+            margin-bottom:4px;
+        }
+
+        .page-header p{
+            color:#6b7280;
+            font-size:13px;
+        }
+
+        .btn{
+            padding:8px 16px;
+            border-radius:8px;
+            font-size:13px;
+            font-weight:500;
+            text-decoration:none;
+            display:inline-block;
+            transition:all 0.15s;
+        }
+
+        .btn-ghost{
+            background:transparent;
+            color:#6b7280;
+            border:1px solid #d1d5db;
+        }
+
+        .btn-ghost:hover{
+            background:#f9fafb;
+            color:#1a1a1a;
+        }
+
+        .leyenda{
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            padding:1rem 1.25rem;
+            margin-bottom:1.5rem;
+
+            display:flex;
+            gap:1.5rem;
+            flex-wrap:wrap;
+            align-items:center;
+        }
+
+        .leyenda strong{
+            font-size:13px;
+            color:#374151;
+        }
+
+        .leyenda-item{
+            display:flex;
+            align-items:center;
+            gap:7px;
+            font-size:13px;
+            color:#6b7280;
+        }
+
+        .dot{
+            width:10px;
+            height:10px;
+            border-radius:50%;
+        }
+
+        .dot-critico{
+            background:#b91c1c;
+        }
+
+        .dot-alerta{
+            background:#d97706;
+        }
+
+        .dot-precaucion{
+            background:#ca8a04;
+        }
+
+        .dot-ok{
+            background:#15803d;
+        }
+
+        .table-wrapper{
+            background:#fff;
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid #e5e7eb;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        thead{
+            background:#f9fafb;
+        }
+
+        th{
+            padding:12px 16px;
+            text-align:left;
+            font-size:11px;
+            font-weight:500;
+            text-transform:uppercase;
+            letter-spacing:0.05em;
+            color:#9ca3af;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        td{
+            padding:13px 16px;
+            border-bottom:1px solid #f3f4f6;
+            font-size:14px;
+            vertical-align:middle;
+        }
+
+        tr:last-child td{
+            border-bottom:none;
+        }
+
+        tr:hover td{
+            background:#fafafa;
+        }
+
+        .fila-critico td{
+            background:#fef2f2;
+        }
+
+        .fila-alerta td{
+            background:#fff7ed;
+        }
+
+        .fila-precaucion td{
+            background:#fefce8;
+        }
+
+        .nombre-cell{
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .nivel-dot{
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            flex-shrink:0;
+        }
+
+        .badge{
+            display:inline-block;
+            padding:3px 10px;
+            border-radius:20px;
+            font-size:11px;
+            font-weight:500;
+        }
+
+        .badge-grupo{
+            background:#dbeafe;
+            color:#1d4ed8;
+        }
+
+        .badge-critico{
+            background:#fee2e2;
+            color:#b91c1c;
+        }
+
+        .badge-alerta{
+            background:#ffedd5;
+            color:#c2410c;
+        }
+
+        .badge-precaucion{
+            background:#fef3c7;
+            color:#92400e;
+        }
+
+        .badge-ok{
+            background:#d1fae5;
+            color:#065f46;
+        }
+
+        .empty{
+            text-align:center;
+            padding:3rem;
+            color:#9ca3af;
+            font-size:14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<nav>
+
+    <span class="brand">
+        Programa Oportunidades
+    </span>
+
+    <div class="nav-links">
+
+        <span class="username"
+              sec:authentication="name">
+            Usuario
+        </span>
+
+        <a th:href="@{/supervisor}">
+            Dashboard
+        </a>
+
+        <a th:href="@{/supervisor/asistencias}">
+            Asistencias
+        </a>
+
+        <a th:href="@{/supervisor/riesgo}">
+            Riesgo
+        </a>
+
+        <a th:href="@{/logout}">
+            Cerrar sesión
+        </a>
+
+    </div>
+
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Usuarios del sistema
+            </h1>
+
+            <p>
+                Vista completa de estudiantes y nivel de riesgo
+            </p>
+
+        </div>
+
+        <a th:href="@{/supervisor}"
+           class="btn btn-ghost">
+
+            ← Volver
+
+        </a>
+
+    </div>
+
+    <div class="leyenda">
+
+        <strong>
+            Riesgo:
+        </strong>
+
+        <div class="leyenda-item">
+            <div class="dot dot-critico"></div>
+            Crítico
+        </div>
+
+        <div class="leyenda-item">
+            <div class="dot dot-alerta"></div>
+            Alerta
+        </div>
+
+        <div class="leyenda-item">
+            <div class="dot dot-precaucion"></div>
+            Precaución
+        </div>
+
+        <div class="leyenda-item">
+            <div class="dot dot-ok"></div>
+            OK
+        </div>
+
+    </div>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>Estudiante</th>
+                <th>Código</th>
+                <th>Información</th>
+                <th>Dirección</th>
+                <th>Ausencias</th>
+                <th>Tardanzas</th>
+                <th>Estado</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            <tr th:each="e : ${estudiantes}"
+
+                th:with="
+                nombreCompleto=${e.nombre + ' ' + e.apellido},
+                riesgo=${riesgoMap[nombreCompleto]},
+                nivel=${riesgo != null ? riesgo.nivel : 'OK'}
+                "
+
+                th:classappend="
+                ${nivel == 'CRITICO'} ? 'fila-critico' :
+                (${nivel == 'ALERTA'} ? 'fila-alerta' :
+                (${nivel == 'PRECAUCION'} ? 'fila-precaucion' : '')
+                )">
+
+                <td>
+
+                    <div class="nombre-cell">
+
+                        <div class="nivel-dot"
+
+                             th:style="
+                             ${nivel == 'CRITICO'} ? 'background:#b91c1c' :
+                             (${nivel == 'ALERTA'} ? 'background:#d97706' :
+                             (${nivel == 'PRECAUCION'} ? 'background:#ca8a04' :
+                             'background:#15803d'))
+                             ">
+                        </div>
+
+                        <span th:text="${nombreCompleto}">
+                        </span>
+
+                    </div>
+
+                </td>
+
+                <td th:text="${e.codigoBarras}"
+                    style="color:#6b7280;">
+                </td>
+
+                <td>
+                    <span class="badge badge-grupo">
+                        Estudiante
+                    </span>
+                </td>
+
+                <td th:text="${e.direccion != null ? e.direccion : '—'}"
+                    style="color:#6b7280;">
+                </td>
+
+                <td>
+
+                    <span style="font-weight:600; color:#b91c1c;"
+                          th:text="${riesgo != null ? riesgo.ausencias : 0}">
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <span th:text="${riesgo != null ? riesgo.tardanzas : 0}">
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <span class="badge badge-critico"
+                          th:if="${nivel == 'CRITICO'}">
+
+                        🔴 CRÍTICO
+
+                    </span>
+
+                    <span class="badge badge-alerta"
+                          th:if="${nivel == 'ALERTA'}">
+
+                        🟠 ALERTA
+
+                    </span>
+
+                    <span class="badge badge-precaucion"
+                          th:if="${nivel == 'PRECAUCION'}">
+
+                        🟡 PRECAUCIÓN
+
+                    </span>
+
+                    <span class="badge badge-ok"
+                          th:if="${nivel == 'OK'}">
+
+                        ✓ OK
+
+                    </span>
+
+                </td>
+
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(estudiantes)}">
+
+                <td colspan="7"
+                    class="empty">
+
+                    No hay estudiantes registrados
+
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>
