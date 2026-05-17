@@ -34,9 +34,14 @@
         }
 
         nav .brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
             font-weight:600;
             color:#2c3e50;
         }
+
+        nav .brand img{ height:34px; width:auto; }
 
         nav .links{
             display:flex;
@@ -259,9 +264,10 @@
 
 <nav>
 
-    <span class="brand">
-        Programa Oportunidades
-    </span>
+    <div class="brand">
+        <img src="/images/opor.png" alt="Logo Oportunidades"/>
+        <span>Programa Oportunidades</span>
+    </div>
 
     <div class="links">
 

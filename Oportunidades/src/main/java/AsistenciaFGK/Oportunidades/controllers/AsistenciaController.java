@@ -78,19 +78,36 @@ public class AsistenciaController {
 
         Estudiante estudiante = opt.get();
 
-        // ── Validación por jornada: SABATINO solo puede marcar en sábado ───
+        // ── Validación por jornada ─────────────────────────────────────────
         LocalDate hoyLocal = LocalDate.now();
-        if (estudiante.getJornada() == Estudiante.Jornada.SABATINO
-                && hoyLocal.getDayOfWeek() != DayOfWeek.SATURDAY) {
+        DayOfWeek diaSemana = hoyLocal.getDayOfWeek();
+        Estudiante.Jornada jornada = estudiante.getJornada();
+
+        boolean esPermitido;
+        if (jornada == Estudiante.Jornada.SABATINO) {
+            esPermitido = (diaSemana == DayOfWeek.SATURDAY);
+        } else {
+            // FULL_TIME (default): solo entre semana (L-V)
+            esPermitido = (diaSemana != DayOfWeek.SATURDAY && diaSemana != DayOfWeek.SUNDAY);
+        }
+
+        if (!esPermitido) {
             model.addAttribute("ultimo", null);
             model.addAttribute("estado", "error");
             model.addAttribute("diaBloqueado", false);
-            model.addAttribute("error",
-                "Este alumno es SABATINO. Solo puede registrar asistencia en sábado.");
+
+            if (jornada == Estudiante.Jornada.SABATINO) {
+                model.addAttribute("error",
+                    "Este alumno es SABATINO. Solo puede registrar asistencia en sábado.");
+            } else {
+                model.addAttribute("error",
+                    "Este alumno es FULL TIME. Solo puede registrar asistencia de lunes a viernes.");
+            }
+
             return "asistencia/lector";
         }
 
-        Date hoy = java.sql.Date.valueOf(java.time.LocalDate.now());
+        Date hoy = java.sql.Date.valueOf(hoyLocal);
         List<Grupo> grupos = estudiante.getGrupos();
 
         if (grupos == null || grupos.isEmpty()) {

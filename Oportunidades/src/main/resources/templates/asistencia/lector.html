@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    lang="es">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -40,6 +42,38 @@
         }
 
         .logo span { color: var(--rojo); }
+
+        .topbar {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            width:100%;
+            max-width:480px;
+            gap: 1rem;
+        }
+
+        .topbrand {
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .topbrand img { height:42px; width:auto; }
+
+        .toplinks { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+        .toplinks a {
+            text-decoration:none;
+            font-size:12px;
+            color:#BABABA;
+            padding:8px 14px;
+            border:1px solid #333;
+            border-radius:8px;
+            transition:0.15s;
+            white-space:nowrap;
+        }
+
+        .toplinks a:hover { border-color:#555; color:white; }
 
         .card {
             background: #1e1e1e;
@@ -153,18 +187,19 @@
 </head>
 <body>
 
-   <div style="display:flex; align-items:center; justify-content:space-between; width:100%; max-width:480px;">
-    <div class="logo">Programa <span>Oportunidades</span></div>
-    <a href="/login" style="
-        text-decoration:none;
-        font-size:12px;
-        color:#555;
-        padding:8px 14px;
-        border:1px solid #333;
-        border-radius:8px;
-        transition:0.15s;
-    ">← Login</a>
-</div>
+   <div class="topbar">
+        <div class="topbrand">
+            <img src="/images/opor.png" alt="Logo Oportunidades"/>
+            <div class="logo">Programa <span>Oportunidades</span></div>
+        </div>
+        <div class="toplinks">
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">← Dashboard</a>
+            <a sec:authorize="hasRole('DOCENTE')" th:href="@{/docente}">← Dashboard</a>
+            <a sec:authorize="hasRole('SUPERVISOR')" th:href="@{/supervisor}">← Dashboard</a>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}">← Login</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/logout}">Cerrar sesión</a>
+        </div>
+    </div>
 
     <!-- Reloj en tiempo real -->
     <div class="hora" id="reloj">00:00:00</div>
