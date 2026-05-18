@@ -24,7 +24,7 @@ public class Asistencia {
     private String horaSalida;
 
     /**
-     * Estado: PRESENTE, AUSENTE, TARDANZA
+        * Estado: PRESENTE, AUSENTE, TARDANZA, PENDIENTE
      */
     @Column(nullable = false)
     private String estado;

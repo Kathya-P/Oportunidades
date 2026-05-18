@@ -212,6 +212,7 @@
         .badge-presente{ background:black; color:white; }
         .badge-ausente{ background:#FDEBEC; color:var(--rojo-dark); }
         .badge-tardanza{ background:#F1F1F1; color:#555; }
+        .badge-pendiente{ background:var(--gris-10); color:var(--gris-70); border:1px solid var(--gris-20); }
 
         .fecha-badge{ padding:4px 10px; border-radius:8px; background:#f4f4f4; font-size:12px; }
         .empty{ padding:3rem; text-align:center; color:var(--gris-50); }
@@ -419,6 +420,10 @@
             <div class="stat-label">Ausentes</div>
         </div>
                 <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PENDIENTE'])}">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+                <div class="stat-card">
             <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'TARDANZA'])}">0</div>
             <div class="stat-label">Tardanzas</div>
         </div>
@@ -505,6 +510,7 @@
             <option value="">Todos los estados</option>
             <option value="PRESENTE">Presente</option>
             <option value="AUSENTE">Ausente</option>
+            <option value="PENDIENTE">Pendiente</option>
             <option value="TARDANZA">Tardanza</option>
         </select>
         <select id="filterGrupo" class="filter-select">
@@ -553,6 +559,7 @@
         <span th:switch="${a.estado}">
             <span th:case="'PRESENTE'" class="badge badge-presente">Presente</span>
             <span th:case="'AUSENTE'"  class="badge badge-ausente">Ausente</span>
+            <span th:case="'PENDIENTE'" class="badge badge-pendiente">Pendiente</span>
             <span th:case="'TARDANZA'" class="badge badge-tardanza">Tardanza</span>
         </span>
     </td>

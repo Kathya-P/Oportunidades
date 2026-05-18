@@ -136,7 +136,13 @@ public class AsistenciaController {
                               .equals(estudiante.getIdEstudiante()))
                 .collect(java.util.stream.Collectors.toList());
 
-            if (registrosHoy.isEmpty()) {
+            // ── Si existe un registro PENDIENTE (creado por scheduler), se completa como primera marca ──
+            Asistencia existente = registrosHoy.isEmpty() ? null : registrosHoy.get(0);
+            boolean esPendienteSinEntrada = existente != null
+                    && "PENDIENTE".equalsIgnoreCase(existente.getEstado())
+                    && (existente.getHoraEntrada() == null || existente.getHoraEntrada().isBlank());
+
+            if (registrosHoy.isEmpty() || esPendienteSinEntrada) {
                 // ── Primera marca del día → determinar estado ─────────────────
                 String estadoAsistencia = "PRESENTE";
 
@@ -169,7 +175,7 @@ public class AsistenciaController {
                     estadoResultado = "entrada";
                 }
 
-                Asistencia asistencia = new Asistencia();
+                Asistencia asistencia = (existente != null) ? existente : new Asistencia();
                 asistencia.setEstudiante(estudiante);
                 asistencia.setGrupo(grupo);
                 asistencia.setFecha(hoy);
@@ -179,7 +185,6 @@ public class AsistenciaController {
 
             } else {
                 // ── Segunda marca → registrar salida ──────────────────────────
-                Asistencia existente = registrosHoy.get(0);
                 if (existente.getHoraSalida() == null) {
                     existente.setHoraSalida(horaActual);
                     asistenciaRepository.save(existente);
