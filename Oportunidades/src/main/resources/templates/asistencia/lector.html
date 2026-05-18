@@ -262,6 +262,12 @@
     </div>
 </div>
 
+<!-- Fuera de horario → Ausente -->
+<div class="resultado-error" style="background:rgba(220,38,38,0.07); border-color:rgba(220,38,38,0.4);"
+     th:if="${ultimo != null and estado == 'ausente'}">
+    ❌ <strong th:text="${ultimo}"></strong> — escaneo fuera del horario del grupo. Registrado como <strong>AUSENTE</strong>.
+</div>
+
 <!-- Ya completó -->
 <div class="resultado-error" th:if="${ultimo != null and estado == 'completo'}">
     ⛔ <strong th:text="${ultimo}"></strong> — ya tiene entrada y salida registradas hoy.
