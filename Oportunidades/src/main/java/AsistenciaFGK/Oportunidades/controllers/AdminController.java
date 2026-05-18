@@ -85,12 +85,14 @@ public class AdminController {
     }
 
     @GetMapping("/usuarios/nuevo")
-    public String nuevoUsuario(Model model) {
-        model.addAttribute("usuario", new Usuario());
-        model.addAttribute("roles",   Role.values());
-        model.addAttribute("titulo",  "Nuevo usuario");
-        return "admin/usuario-form";
-    }
+public String nuevoUsuario(Model model) {
+    model.addAttribute("usuario", new Usuario());
+    model.addAttribute("roles", java.util.Arrays.stream(Role.values())
+        .filter(r -> r != Role.ROLE_ALUMNO)
+        .toArray(Role[]::new));
+    model.addAttribute("titulo",  "Nuevo usuario");
+    return "admin/usuario-form";
+}
 
     @PostMapping("/usuarios/guardar")
     public String guardarUsuario(@ModelAttribute Usuario usuario,
@@ -105,14 +107,16 @@ public class AdminController {
     }
 
     @GetMapping("/usuarios/editar/{id}")
-    public String editarUsuario(@PathVariable Integer id, Model model) {
-        Usuario usuario = usuarioService.buscarPorId(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        model.addAttribute("usuario", usuario);
-        model.addAttribute("roles",   Role.values());
-        model.addAttribute("titulo",  "Editar usuario");
-        return "admin/usuario-form";
-    }
+public String editarUsuario(@PathVariable Integer id, Model model) {
+    Usuario usuario = usuarioService.buscarPorId(id)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    model.addAttribute("usuario", usuario);
+    model.addAttribute("roles", java.util.Arrays.stream(Role.values())
+        .filter(r -> r != Role.ROLE_ALUMNO)
+        .toArray(Role[]::new));
+    model.addAttribute("titulo",  "Editar usuario");
+    return "admin/usuario-form";
+}
 
     @GetMapping("/usuarios/reset-password/{id}")
     public String resetPassword(@PathVariable Integer id, RedirectAttributes redirectAttrs) {

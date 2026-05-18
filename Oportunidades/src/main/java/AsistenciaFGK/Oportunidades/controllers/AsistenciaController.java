@@ -6,12 +6,15 @@ import AsistenciaFGK.Oportunidades.models.Grupo;
 import AsistenciaFGK.Oportunidades.repositories.AsistenciaRepository;
 import AsistenciaFGK.Oportunidades.repositories.EstudianteRepository;
 import AsistenciaFGK.Oportunidades.repositories.GrupoRepository;
-import AsistenciaFGK.Oportunidades.services.CalendarioService; // ← NUEVO
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import AsistenciaFGK.Oportunidades.services.CalendarioService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,16 +34,24 @@ public class AsistenciaController {
     private GrupoRepository grupoRepository;
 
     @Autowired
-    private CalendarioService calendarioService; // ← NUEVO
+    private CalendarioService calendarioService;
+
+    // Mapeo DayOfWeek → nombre en BD
+    private static final Map<DayOfWeek, String> MAPA_DIAS = Map.of(
+        DayOfWeek.MONDAY,    "LUNES",
+        DayOfWeek.TUESDAY,   "MARTES",
+        DayOfWeek.WEDNESDAY, "MIERCOLES",
+        DayOfWeek.THURSDAY,  "JUEVES",
+        DayOfWeek.FRIDAY,    "VIERNES",
+        DayOfWeek.SATURDAY,  "SABADO",
+        DayOfWeek.SUNDAY,    "DOMINGO"
+    );
 
     // ── Página del lector ─────────────────────────────────────────────────────
     @GetMapping("/lector")
     public String paginaLector(Model model) {
-        // ── NUEVO: avisar si hoy está bloqueado ──────────────────────────────
-        boolean bloqueado = calendarioService.esHoyDiaBloqueado();
-        model.addAttribute("diaBloqueado", bloqueado);
+        model.addAttribute("diaBloqueado", calendarioService.esHoyDiaBloqueado());
         model.addAttribute("motivoBloqueo", calendarioService.motivoBloqueoHoy());
-        // ────────────────────────────────────────────────────────────────────
         model.addAttribute("ultimo", null);
         model.addAttribute("error",  null);
         return "asistencia/lector";
@@ -53,7 +64,7 @@ public class AsistenciaController {
 
         codigoBarras = codigoBarras.trim();
 
-        // ── NUEVO: bloquear si es festivo / asueto / semana pedagógica ────────
+        // ── Bloquear si es festivo / asueto / semana pedagógica ───────────────
         if (calendarioService.esHoyDiaBloqueado()) {
             String motivo = calendarioService.motivoBloqueoHoy();
             model.addAttribute("ultimo", null);
@@ -64,8 +75,8 @@ public class AsistenciaController {
                 "Hoy es un día no lectivo (" + motivo + "). No se puede registrar asistencia.");
             return "asistencia/lector";
         }
-        // ────────────────────────────────────────────────────────────────────
 
+        // ── Buscar estudiante ─────────────────────────────────────────────────
         Optional<Estudiante> opt = estudianteRepository.findByCodigoBarras(codigoBarras);
 
         if (opt.isEmpty()) {
@@ -77,37 +88,12 @@ public class AsistenciaController {
         }
 
         Estudiante estudiante = opt.get();
+        LocalDate  hoyLocal   = LocalDate.now();
+        DayOfWeek  diaSemana  = hoyLocal.getDayOfWeek();
+        String     diaHoy     = MAPA_DIAS.get(diaSemana);   // ej: "LUNES"
+        Date       hoy        = java.sql.Date.valueOf(hoyLocal);
 
-        // ── Validación por jornada ─────────────────────────────────────────
-        LocalDate hoyLocal = LocalDate.now();
-        DayOfWeek diaSemana = hoyLocal.getDayOfWeek();
-        Estudiante.Jornada jornada = estudiante.getJornada();
-
-        boolean esPermitido;
-        if (jornada == Estudiante.Jornada.SABATINO) {
-            esPermitido = (diaSemana == DayOfWeek.SATURDAY);
-        } else {
-            // FULL_TIME (default): solo entre semana (L-V)
-            esPermitido = (diaSemana != DayOfWeek.SATURDAY && diaSemana != DayOfWeek.SUNDAY);
-        }
-
-        if (!esPermitido) {
-            model.addAttribute("ultimo", null);
-            model.addAttribute("estado", "error");
-            model.addAttribute("diaBloqueado", false);
-
-            if (jornada == Estudiante.Jornada.SABATINO) {
-                model.addAttribute("error",
-                    "Este alumno es SABATINO. Solo puede registrar asistencia en sábado.");
-            } else {
-                model.addAttribute("error",
-                    "Este alumno es FULL TIME. Solo puede registrar asistencia de lunes a viernes.");
-            }
-
-            return "asistencia/lector";
-        }
-
-        Date hoy = java.sql.Date.valueOf(hoyLocal);
+        // ── Verificar que tenga grupos ────────────────────────────────────────
         List<Grupo> grupos = estudiante.getGrupos();
 
         if (grupos == null || grupos.isEmpty()) {
@@ -119,13 +105,30 @@ public class AsistenciaController {
             return "asistencia/lector";
         }
 
-        String nombreCompleto = estudiante.getNombre() + " " + estudiante.getApellido();
-        String horaActual = java.time.LocalTime.now()
-            .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+        // ── Filtrar solo los grupos que tienen clase hoy ──────────────────────
+        List<Grupo> gruposHoy = grupos.stream()
+            .filter(g -> {
+                String dias = g.getDias() != null ? g.getDias() : "";
+                return dias.contains(diaHoy);
+            })
+            .collect(java.util.stream.Collectors.toList());
 
+        if (gruposHoy.isEmpty()) {
+            model.addAttribute("ultimo", null);
+            model.addAttribute("estado", "error");
+            model.addAttribute("diaBloqueado", false);
+            model.addAttribute("error",
+                estudiante.getNombre() + " no tiene clase hoy (" + diaHoy + ").");
+            return "asistencia/lector";
+        }
+
+        // ── Registrar asistencia en cada grupo con clase hoy ──────────────────
+        String nombreCompleto = estudiante.getNombre() + " " + estudiante.getApellido();
+        String horaActual     = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
         String estadoResultado = "entrada";
 
-        for (Grupo grupo : grupos) {
+        for (Grupo grupo : gruposHoy) {
+
             List<Asistencia> registrosHoy = asistenciaRepository
                 .findByGrupoAndFecha(grupo, hoy)
                 .stream()
@@ -134,21 +137,34 @@ public class AsistenciaController {
                 .collect(java.util.stream.Collectors.toList());
 
             if (registrosHoy.isEmpty()) {
+                // ── Primera marca del día → determinar estado ─────────────────
                 String estadoAsistencia = "PRESENTE";
+
                 try {
-                    String horarioStr  = grupo.getHorario();
-                    String horasParte  = horarioStr.substring(horarioStr.lastIndexOf(" ") + 1);
-                    String horaInicioStr = horasParte.split("-")[0];
+                    LocalTime horaEntrada = LocalTime.now();
 
-                    java.time.LocalTime horaInicio  = java.time.LocalTime.parse(horaInicioStr);
-                    java.time.LocalTime horaEntrada = java.time.LocalTime.now();
-
-                    if (horaEntrada.isAfter(horaInicio.plusMinutes(5))) {
-                        estadoAsistencia = "TARDANZA";
-                        estadoResultado  = "tardanza";
-                    } else {
-                        estadoResultado  = "entrada";
+                    // ¿Llegó después del fin? → AUSENTE
+                    if (grupo.getHoraFin() != null && !grupo.getHoraFin().isBlank()) {
+                        LocalTime fin = LocalTime.parse(grupo.getHoraFin());
+                        if (horaEntrada.isAfter(fin)) {
+                            estadoAsistencia = "AUSENTE";
+                            estadoResultado  = "ausente";
+                        }
                     }
+
+                    // ¿Llegó tarde pero antes del fin? → TARDANZA
+                    if (!"AUSENTE".equals(estadoAsistencia)
+                            && grupo.getHoraInicio() != null
+                            && !grupo.getHoraInicio().isBlank()) {
+                        LocalTime inicio = LocalTime.parse(grupo.getHoraInicio());
+                        if (horaEntrada.isAfter(inicio.plusMinutes(5))) {
+                            estadoAsistencia = "TARDANZA";
+                            estadoResultado  = "tardanza";
+                        } else {
+                            estadoResultado  = "entrada";
+                        }
+                    }
+
                 } catch (Exception e) {
                     estadoResultado = "entrada";
                 }
@@ -162,6 +178,7 @@ public class AsistenciaController {
                 asistenciaRepository.save(asistencia);
 
             } else {
+                // ── Segunda marca → registrar salida ──────────────────────────
                 Asistencia existente = registrosHoy.get(0);
                 if (existente.getHoraSalida() == null) {
                     existente.setHoraSalida(horaActual);

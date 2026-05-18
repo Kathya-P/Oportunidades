@@ -1,538 +1,285 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
 
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Riesgo de Ausentismo — Programa Oportunidades</title>
 
-    <title>Riesgo de Ausentismo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 
     <style>
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
+        :root {
+            --rojo:       #C8102E;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFFFFF;
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans', sans-serif; background:var(--gris-10); color:var(--negro); }
 
-        body{
-            font-family:'Segoe UI',sans-serif;
-            background:#f8f9fa;
-            color:#333;
+        nav {
+            height:72px; background:rgba(20,20,20,0.98);
+            backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            padding:0 2.5rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
         }
-
-        /* NAVBAR IGUAL A LAS OTRAS */
-        nav{
-            background:white;
-            padding:1rem 2rem;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            border-bottom:1px solid #eee;
-            box-shadow:0 1px 4px rgba(0,0,0,0.06);
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand img { height:34px; width:auto; }
+        .brand-name { font-size:14px; font-weight:600; color:white; }
+        .brand-sub  { font-size:11px; color:#8D8D8D; margin-top:2px; }
+        .nav-right  { display:flex; align-items:center; gap:10px; }
+        .user-chip  {
+            padding:9px 14px; border-radius:999px;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.1);
+            font-size:12px; font-weight:500; color:#BABABA;
         }
-
-        nav .brand{
-            display:flex;
-            align-items:center;
-            gap:12px;
-            font-weight:600;
-            color:#2c3e50;
+        .nav-right a {
+            text-decoration:none; color:#7A7A7A; font-size:13px;
+            font-weight:500; padding:10px 14px; border-radius:10px; transition:0.15s;
         }
+        .nav-right a:hover { color:white; background:rgba(255,255,255,0.06); }
+        .nav-right a.active { background:rgba(255,255,255,0.1); color:white; }
+        .nav-right a.logout { color:var(--rojo); }
+        .nav-right a.logout:hover { background:rgba(200,16,46,0.12); color:#FF4D6A; }
 
-        nav .brand img{ height:34px; width:auto; }
+        .container { max-width:1000px; margin:2.5rem auto; padding:0 1.2rem; }
 
-        nav .links{
-            display:flex;
-            gap:1.5rem;
-            align-items:center;
+        .page-header {
+            display:flex; align-items:flex-end; justify-content:space-between;
+            gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;
         }
-
-        nav .links a{
-            text-decoration:none;
-            color:#555;
-            font-size:0.9rem;
-            transition:0.2s;
+        .eyebrow {
+            font-size:11px; font-weight:700; letter-spacing:.12em;
+            text-transform:uppercase; color:var(--rojo); margin-bottom:8px;
         }
-
-        nav .links a:hover{
-            color:#2c3e50;
+        .page-header h1 {
+            font-family:'DM Serif Display', serif;
+            font-size:2rem; line-height:1.1; color:var(--negro);
         }
+        .page-header p { margin-top:8px; color:var(--gris-50); font-size:13px; line-height:1.6; }
 
-        nav .links .chip{
-            background:#f0f0f0;
-            padding:0.3rem 0.8rem;
-            border-radius:20px;
-            font-size:0.82rem;
-            color:#444;
+        .criterios {
+            background:#FEF3F2; border:1px solid #F7C6C3;
+            border-left:4px solid var(--rojo);
+            border-radius:12px; padding:1rem 1.25rem;
+            margin-bottom:1.5rem; font-size:13px; color:#7F1D1D; line-height:1.8;
         }
+        .criterios strong { display:block; margin-bottom:2px; font-size:13px; }
 
-        nav .links .logout{
-            background:#2c3e50;
-            color:white !important;
-            padding:0.4rem 1rem;
-            border-radius:6px;
-            font-size:0.85rem;
-        }
-
-        .container{
-            max-width:1000px;
-            margin:2.5rem auto;
-            padding:0 2rem;
-        }
-
-        .header{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:0.5rem;
-            gap:1rem;
-            flex-wrap:wrap;
-        }
-
-        h1{
-            font-size:1.6rem;
-            font-weight:600;
-            color:#2c3e50;
-        }
-
-        .subtitle{
-            color:#888;
-            font-size:0.88rem;
+        .distribucion {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:16px; padding:1.25rem 1.5rem;
             margin-bottom:1.5rem;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
         }
+        .distribucion h3 { font-size:13px; font-weight:700; color:var(--negro); margin-bottom:1rem; }
+        .bar-row { display:flex; align-items:center; gap:12px; margin:0.5rem 0; }
+        .bar-label { width:90px; font-size:13px; color:var(--gris-70); }
+        .bar-track { flex:1; height:10px; background:var(--gris-10); border-radius:999px; overflow:hidden; }
+        .bar-fill  { height:100%; width:0%; border-radius:999px; transition:width 0.4s ease; }
+        .bar-count { width:30px; text-align:right; font-size:13px; color:var(--gris-50); font-weight:600; }
 
-        .btn-back{
-            border:1px solid #ddd;
-            color:#555;
-            padding:0.55rem 1rem;
-            border-radius:8px;
-            text-decoration:none;
-            font-size:0.85rem;
-            background:white;
-            transition:0.2s;
+        .export-bar {
+            display:flex; gap:8px; align-items:center;
+            margin-bottom:1.25rem; flex-wrap:wrap;
         }
-
-        .btn-back:hover{
-            border-color:#2c3e50;
-            color:#2c3e50;
+        .export-label {
+            font-size:11px; color:var(--gris-30); font-weight:700;
+            text-transform:uppercase; letter-spacing:.08em; margin-right:4px;
         }
-
-        /* ALERTA ROJA */
-        .alerta{
-            background:#fff1f2;
-            border:1px solid #fecdd3;
-            border-left:5px solid #dc2626;
-            border-radius:12px;
-            padding:1rem 1.2rem;
-            margin-bottom:1.5rem;
-            font-size:0.88rem;
-            color:#7f1d1d;
-            line-height:1.6;
+        .btn-pdf {
+            background:#FEF2F2; color:#B91C1C; border:1px solid #FECACA;
+            padding:9px 14px; border-radius:9px; text-decoration:none;
+            font-size:13px; font-weight:500; transition:0.15s;
         }
-
-        /* EXPORTAR */
-        .export-bar{
-            display:flex;
-            gap:10px;
-            align-items:center;
-            margin-bottom:1.5rem;
-            flex-wrap:wrap;
+        .btn-pdf:hover { background:#FEE2E2; }
+        .btn-excel {
+            background:#F0FDF4; color:#15803D; border:1px solid #BBF7D0;
+            padding:9px 14px; border-radius:9px; text-decoration:none;
+            font-size:13px; font-weight:500; transition:0.15s;
         }
+        .btn-excel:hover { background:#DCFCE7; }
 
-        .export-label{
-            font-size:0.75rem;
-            color:#9ca3af;
-            font-weight:600;
-            text-transform:uppercase;
-            letter-spacing:0.05em;
+        .table-wrap {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:18px; overflow:hidden;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
         }
-
-        .btn-pdf{
-            background:#fef2f2;
-            color:#b91c1c;
-            border:1px solid #fecaca;
-            padding:0.55rem 1rem;
-            border-radius:8px;
-            text-decoration:none;
-            font-size:0.85rem;
-            font-weight:500;
-            transition:0.2s;
+        table { width:100%; border-collapse:collapse; }
+        thead { background:#FAFAFA; }
+        th {
+            text-align:left; padding:13px 18px;
+            font-size:11px; font-weight:700; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--gris-50);
+            border-bottom:1px solid #ececec;
         }
+        td { padding:13px 18px; font-size:14px; border-bottom:1px solid #f1f1f1; vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr:hover td { background:#fcfcfc; }
 
-        .btn-pdf:hover{
-            background:#fee2e2;
+        .fila-critico td    { background:#FFF7F7; }
+        .fila-alerta td     { background:#FFFBF5; }
+        .fila-precaucion td { background:#FFFDE7; }
+
+        .danger-num { color:var(--rojo); font-weight:700; font-size:15px; }
+
+        .badge {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 11px; border-radius:999px;
+            font-size:11px; font-weight:700; letter-spacing:.04em;
         }
+        .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .badge-critico    { background:#FEE2E2; color:#B91C1C; }
+        .dot-critico      { background:#D92D20; }
+        .badge-alerta     { background:#FEF3C7; color:#92400E; }
+        .dot-alerta       { background:#F59E0B; }
+        .badge-precaucion { background:#FFF8E1; color:#78350F; }
+        .dot-precaucion   { background:#F2C94C; }
 
-        .btn-excel{
-            background:#f0fdf4;
-            color:#15803d;
-            border:1px solid #bbf7d0;
-            padding:0.55rem 1rem;
-            border-radius:8px;
-            text-decoration:none;
-            font-size:0.85rem;
-            font-weight:500;
-            transition:0.2s;
-        }
-
-        .btn-excel:hover{
-            background:#dcfce7;
-        }
-
-        /* TABLA */
-        .table-wrap{
-            background:white;
-            border-radius:12px;
-            border:1px solid #eee;
-            box-shadow:0 2px 6px rgba(0,0,0,0.04);
-            overflow:hidden;
-        }
-
-        table{
-            width:100%;
-            border-collapse:collapse;
-        }
-
-        th{
-            padding:0.8rem 1.2rem;
-            text-align:left;
-            font-size:0.72rem;
-            text-transform:uppercase;
-            letter-spacing:0.06em;
-            color:#999;
-            background:#fafafa;
-            border-bottom:1px solid #eee;
-        }
-
-        td{
-            padding:0.9rem 1.2rem;
-            font-size:0.88rem;
-            border-bottom:1px solid #f0f0f0;
-            color:#444;
-        }
-
-        tr:last-child td{
-            border-bottom:none;
-        }
-
-        tr:hover td{
-            background:#fafafa;
-        }
-
-        .danger-number{
-            color:#c0392b;
-            font-weight:700;
-        }
-
-        .badge{
-            display:inline-block;
-            padding:0.28rem 0.75rem;
-            border-radius:20px;
-            font-size:0.74rem;
-            font-weight:600;
-        }
-
-        .badge-critico{
-            background:#ffe0e0;
-            color:#c0392b;
-        }
-
-        .badge-alerta{
-            background:#ffe8cc;
-            color:#b94d00;
-        }
-
-        .badge-precaucion{
-            background:#fff3cd;
-            color:#d68910;
-        }
-
-        .empty{
-            text-align:center;
-            color:#aaa;
-            padding:2.5rem;
-            font-size:0.9rem;
-        }
-
-        .chart{
-            background:#fff;
-            border:1px solid #eee;
-            border-radius:12px;
-            padding:1rem 1.25rem;
-            margin:1.25rem 0 0;
-        }
-
-        .chart h3{
-            margin:0 0 0.75rem;
-            font-size:0.95rem;
-            font-weight:600;
-            color:#2c3e50;
-        }
-
-        .bar-row{
-            display:flex;
-            align-items:center;
-            gap:12px;
-            margin:0.55rem 0;
-        }
-
-        .bar-label{
-            width:110px;
-            font-size:0.85rem;
-            color:#555;
-            white-space:nowrap;
-        }
-
-        .bar-track{
-            flex:1;
-            height:10px;
-            background:#f3f4f6;
-            border-radius:999px;
-            overflow:hidden;
-        }
-
-        .bar-fill{
-            height:100%;
-            width:0%;
-            border-radius:999px;
-            transition:width 0.2s ease;
-        }
-
-        .bar-count{
-            width:40px;
-            text-align:right;
-            font-size:0.85rem;
-            color:#555;
-        }
-
+        .empty { text-align:center; color:var(--gris-50); padding:3rem; font-size:14px; }
     </style>
-
 </head>
 
 <body>
 
 <nav>
-
     <div class="brand">
-        <img src="/images/opor.png" alt="Logo Oportunidades"/>
-        <span>Programa Oportunidades</span>
+        <img src="/images/opor.png" alt="Logo"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel de supervisión FGK</div>
+        </div>
     </div>
-
-    <div class="links">
-
-        <span class="chip"
-              sec:authentication="name">
-            Usuario
-        </span>
-
-        <a th:href="@{/supervisor}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/supervisor/riesgo}">
-            Riesgo
-        </a>
-
-        <a th:href="@{/supervisor/usuarios}">
-            Usuarios
-        </a>
-
-        <a th:href="@{/logout}"
-           class="logout">
-            Cerrar sesión
-        </a>
-
+    <div class="nav-right">
+        <span class="user-chip" sec:authentication="name">Usuario</span>
+        <a th:href="@{/supervisor}">Dashboard</a>
+        <a th:href="@{/supervisor/riesgo}" class="active">Riesgo</a>
+        <a th:href="@{/supervisor/usuarios}">Usuarios</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
     </div>
-
 </nav>
 
 <div class="container">
 
-    <div class="header">
-
+    <div class="page-header">
         <div>
-            <h1>⚠ Riesgo de Ausentismo</h1>
+            <div class="eyebrow">⚠ Supervisión</div>
+            <h1>Riesgo de Ausentismo</h1>
+            <p>
+                Estudiantes con 1 o más ausencias en el período (máximo recomendado: 2)
+                <span th:if="${periodoActual}"> — <span th:text="${periodoActual.nombre}"></span></span>
+            </p>
         </div>
-
-        <a th:href="@{/supervisor}"
-           class="btn-back">
-
-            ← Volver
-
-        </a>
-
     </div>
 
-    <p class="subtitle">
-        Estudiantes con 1 o más ausencias en el período (máximo recomendado: 2)
-        <span th:if="${periodoActual}">
-            (<span th:text="${periodoActual.nombre}"></span>)
-        </span>
-    </p>
-
-    <!-- ALERTA -->
-    <div class="alerta">
-
-        <strong>
-            ⚠ Criterio de riesgo (por ausencias):
-        </strong>
-
-        <br><br>
-
-        1 ausencia = Precaución
-        &nbsp;|&nbsp;
-        2 ausencias = Alerta
-        &nbsp;|&nbsp;
-        3 o más = Crítico
-
+    <div class="criterios">
+        <strong>⚠ Criterio de riesgo (por ausencias):</strong>
+        1 ausencia = Precaución &nbsp;|&nbsp; 2 ausencias = Alerta &nbsp;|&nbsp; 3 o más = Crítico
     </div>
 
-    <!-- GRAFICO (distribución por nivel) -->
-    <div class="chart" th:if="${!#lists.isEmpty(enRiesgo)}">
+    <div class="distribucion" th:if="${!#lists.isEmpty(enRiesgo)}">
         <h3>Distribución de riesgo</h3>
         <div class="bar-row">
             <div class="bar-label">Precaución</div>
-            <div class="bar-track"><div id="barPrec" class="bar-fill" style="background:#fbbf24"></div></div>
+            <div class="bar-track"><div id="barPrec" class="bar-fill" style="background:#F2C94C"></div></div>
             <div id="countPrec" class="bar-count">0</div>
         </div>
         <div class="bar-row">
             <div class="bar-label">Alerta</div>
-            <div class="bar-track"><div id="barAlerta" class="bar-fill" style="background:#fb923c"></div></div>
+            <div class="bar-track"><div id="barAlerta" class="bar-fill" style="background:#F59E0B"></div></div>
             <div id="countAlerta" class="bar-count">0</div>
         </div>
         <div class="bar-row">
             <div class="bar-label">Crítico</div>
-            <div class="bar-track"><div id="barCrit" class="bar-fill" style="background:#ef4444"></div></div>
+            <div class="bar-track"><div id="barCrit" class="bar-fill" style="background:#D92D20"></div></div>
             <div id="countCrit" class="bar-count">0</div>
         </div>
     </div>
 
-    <!-- EXPORTAR -->
     <div class="export-bar">
-
-        <span class="export-label">
-            Exportar:
-        </span>
-
-        <a th:href="@{/supervisor/riesgo/exportar(formato='pdf')}"
-           class="btn-pdf">
-
-            ⬇ PDF
-
-        </a>
-
-        <a th:href="@{/supervisor/riesgo/exportar(formato='excel')}"
-           class="btn-excel">
-
-            ⬇ Excel
-
-        </a>
-
+        <span class="export-label">Exportar:</span>
+        <a th:href="@{/supervisor/riesgo/exportar(formato='pdf')}" class="btn-pdf">⬇ PDF</a>
+        <a th:href="@{/supervisor/riesgo/exportar(formato='excel')}" class="btn-excel">⬇ Excel</a>
     </div>
 
-    <!-- TABLA -->
     <div class="table-wrap">
-
         <table>
-
             <thead>
-
             <tr>
-
                 <th>Estudiante</th>
                 <th>Ausencias</th>
                 <th>Total registros</th>
                 <th>Nivel de riesgo</th>
-
             </tr>
-
             </thead>
-
             <tbody>
 
             <tr th:if="${#lists.isEmpty(enRiesgo)}">
-
-                <td colspan="4"
-                    class="empty">
-
-                    🎉 Ningún estudiante en riesgo actualmente
-
-                </td>
-
+                <td colspan="4" class="empty">🎉 Ningún estudiante en riesgo actualmente</td>
             </tr>
 
             <tr th:each="r : ${enRiesgo}"
-                th:attr="data-nivel=${r.nivel}">
+                th:attr="data-nivel=${r.nivel}"
+                th:classappend="${r.nivel == 'CRITICO'}    ? 'fila-critico' :
+                               (${r.nivel == 'ALERTA'}     ? 'fila-alerta' :
+                               (${r.nivel == 'PRECAUCION'} ? 'fila-precaucion' : ''))">
 
                 <td th:text="${r.nombre}"></td>
-
-                <td class="danger-number"
-                    th:text="${r.ausencias}">
-                </td>
-
-                <td th:text="${r.total}"></td>
-
+                <td><span class="danger-num" th:text="${r.ausencias}"></span></td>
+                <td th:text="${r.total}" style="color:var(--gris-50);"></td>
                 <td>
-
-                    <span class="badge badge-critico"
-                          th:if="${r.nivel == 'CRITICO'}">
-
-                        🔴 CRÍTICO
-
+                    <span class="badge badge-critico" th:if="${r.nivel == 'CRITICO'}">
+                        <span class="dot dot-critico"></span> CRÍTICO
                     </span>
-
-                    <span class="badge badge-alerta"
-                          th:if="${r.nivel == 'ALERTA'}">
-
-                        🟠 ALERTA
-
+                    <span class="badge badge-alerta" th:if="${r.nivel == 'ALERTA'}">
+                        <span class="dot dot-alerta"></span> ALERTA
                     </span>
-
-                    <span class="badge badge-precaucion"
-                          th:if="${r.nivel == 'PRECAUCION'}">
-
-                        🟡 PRECAUCIÓN
-
+                    <span class="badge badge-precaucion" th:if="${r.nivel == 'PRECAUCION'}">
+                        <span class="dot dot-precaucion"></span> PRECAUCIÓN
                     </span>
-
                 </td>
-
             </tr>
-
             </tbody>
-
         </table>
-
     </div>
 
-    <script>
-        (function(){
-            const rows = document.querySelectorAll('tbody tr[data-nivel]');
-            let prec = 0, alerta = 0, crit = 0;
-            rows.forEach(r => {
-                const n = (r.getAttribute('data-nivel') || '').toUpperCase();
-                if (n === 'PRECAUCION') prec++;
-                else if (n === 'ALERTA') alerta++;
-                else if (n === 'CRITICO') crit++;
-            });
-            const total = Math.max(prec + alerta + crit, 1);
-
-            const set = (idFill, idCount, value) => {
-                const fill = document.getElementById(idFill);
-                const count = document.getElementById(idCount);
-                if (count) count.textContent = String(value);
-                if (fill) fill.style.width = ((value * 100) / total).toFixed(0) + '%';
-            };
-
-            set('barPrec', 'countPrec', prec);
-            set('barAlerta', 'countAlerta', alerta);
-            set('barCrit', 'countCrit', crit);
-        })();
-    </script>
-
 </div>
+
+<script>
+    (function(){
+        const rows = document.querySelectorAll('tbody tr[data-nivel]');
+        let prec = 0, alerta = 0, crit = 0;
+        rows.forEach(r => {
+            const n = (r.getAttribute('data-nivel') || '').toUpperCase();
+            if (n === 'PRECAUCION') prec++;
+            else if (n === 'ALERTA') alerta++;
+            else if (n === 'CRITICO') crit++;
+        });
+        const total = Math.max(prec + alerta + crit, 1);
+        const set = (idFill, idCount, value) => {
+            const fill = document.getElementById(idFill);
+            const count = document.getElementById(idCount);
+            if (count) count.textContent = String(value);
+            if (fill) fill.style.width = ((value * 100) / total).toFixed(0) + '%';
+        };
+        set('barPrec',   'countPrec',   prec);
+        set('barAlerta', 'countAlerta', alerta);
+        set('barCrit',   'countCrit',   crit);
+    })();
+</script>
 
 </body>
 </html>

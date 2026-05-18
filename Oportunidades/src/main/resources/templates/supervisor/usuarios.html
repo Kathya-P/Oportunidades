@@ -4,570 +4,360 @@
       lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Usuarios — Supervisor</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Usuarios — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 
     <style>
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
+        :root {
+            --rojo:       #C8102E;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFFFFF;
+            --verde:      #1F8A4D;
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans', sans-serif; background:var(--gris-10); color:var(--negro); }
 
-        body{
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-            background:#f4f4f0;
-            color:#1a1a1a;
+        /* ── NAV ── */
+        nav {
+            height:72px; background:rgba(20,20,20,0.98);
+            backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            padding:0 2.5rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
         }
-
-        nav{
-            background:#fff;
-            border-bottom:1px solid #e5e7eb;
-            padding:0 2rem;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            height:56px;
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand img { height:34px; width:auto; }
+        .brand-name { font-size:14px; font-weight:600; color:white; }
+        .brand-sub  { font-size:11px; color:#8D8D8D; margin-top:2px; }
+        .nav-right  { display:flex; align-items:center; gap:10px; }
+        .user-chip  {
+            padding:9px 14px; border-radius:999px;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.1);
+            font-size:12px; font-weight:500; color:#BABABA;
         }
-
-        nav .brand{
-            display:flex;
-            align-items:center;
-            gap:12px;
-            font-size:15px;
-            font-weight:600;
+        .nav-right a {
+            text-decoration:none; color:#7A7A7A; font-size:13px;
+            font-weight:500; padding:10px 14px; border-radius:10px; transition:0.15s;
         }
+        .nav-right a:hover { color:white; background:rgba(255,255,255,0.06); }
+        .nav-right a.active { background:rgba(255,255,255,0.1); color:white; }
+        .nav-right a.logout { color:var(--rojo); }
+        .nav-right a.logout:hover { background:rgba(200,16,46,0.12); color:#FF4D6A; }
 
-        nav .brand img{ height:34px; width:auto; }
+        /* ── LAYOUT ── */
+        .container { max-width:1200px; margin:2.5rem auto; padding:0 1.2rem; }
 
-        .nav-links{
-            display:flex;
-            align-items:center;
-            gap:1rem;
-            font-size:13px;
-            color:#6b7280;
+        .page-header {
+            display:flex; align-items:flex-end; justify-content:space-between;
+            gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;
         }
-
-        .nav-links a{
-            text-decoration:none;
-            color:#6b7280;
-            font-size:13px;
+        .eyebrow {
+            font-size:11px; font-weight:700; letter-spacing:.12em;
+            text-transform:uppercase; color:var(--rojo); margin-bottom:8px;
         }
-
-        .nav-links a:hover{
-            color:#1a1a1a;
+        .page-header h1 {
+            font-family:'DM Serif Display', serif;
+            font-size:2rem; line-height:1.1; color:var(--negro);
         }
+        .page-header p { margin-top:8px; color:var(--gris-50); font-size:13px; }
 
-        .nav-links a.logout{
-            background:#111827;
-            color:#fff;
-            padding:6px 10px;
-            border-radius:8px;
+
+        /* ── FILTERS ── */
+        .filters-bar {
+            background:white; border-radius:16px; border:1px solid rgba(0,0,0,0.05);
+            padding:1rem 1.25rem; margin-bottom:1.25rem;
+            display:flex; gap:1rem; align-items:center; flex-wrap:wrap;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
         }
-
-        .nav-links a.logout:hover{
-            background:#0b1220;
-            color:#fff;
+        .search-wrap { position:relative; flex:1; min-width:220px; }
+        .search-wrap svg {
+            position:absolute; left:12px; top:50%; transform:translateY(-50%);
+            width:15px; height:15px; stroke:var(--gris-50); fill:none;
+            stroke-width:2; stroke-linecap:round; stroke-linejoin:round; pointer-events:none;
         }
-
-        .filters{
-            display:flex;
-            gap:0.75rem;
-            align-items:center;
-            flex-wrap:wrap;
-            background:#fff;
-            border:1px solid #e5e7eb;
-            border-radius:12px;
-            padding:0.75rem;
-            margin-bottom:1rem;
+        .search-wrap input {
+            width:100%; padding:10px 14px 10px 38px;
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            font-size:13px; font-family:'DM Sans', sans-serif;
+            color:var(--negro); background:var(--gris-10); outline:none; transition:0.15s;
         }
-
-        .filter-input, .filter-select{
-            border:1px solid #d1d5db;
-            background:#fff;
-            border-radius:10px;
-            padding:0.55rem 0.7rem;
-            font-size:13px;
-            color:#111827;
+        .search-wrap input:focus { border-color:var(--rojo); background:white; }
+        .filter-select {
+            padding:10px 14px; border:1.5px solid var(--gris-20); border-radius:10px;
+            font-size:13px; font-family:'DM Sans', sans-serif; color:var(--gris-70);
+            background:var(--gris-10); outline:none; cursor:pointer; transition:0.15s; min-width:140px;
         }
+        .filter-select:focus { border-color:var(--rojo); background:white; }
+        .filters-count { font-size:12px; color:var(--gris-50); white-space:nowrap; }
+        .filters-count span { font-weight:600; color:var(--negro); }
 
-        .filter-input{ min-width:260px; flex:1; }
-
-        .filters-count{
-            margin-left:auto;
-            color:#6b7280;
-            font-size:13px;
-            white-space:nowrap;
+        /* ── LEYENDA ── */
+        .leyenda {
+            background:white; border:1px solid #ececec; border-radius:14px;
+            padding:0.85rem 1.25rem; margin-bottom:1.25rem;
+            display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center;
         }
+        .leyenda strong { font-size:12px; color:var(--gris-70); }
+        .leyenda-item { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--gris-50); }
+        .dot { width:8px; height:8px; border-radius:50%; }
+        .dot-critico   { background:#D92D20; }
+        .dot-alerta    { background:#F59E0B; }
+        .dot-precaucion{ background:#F2C94C; }
+        .dot-ok        { background:#15803D; }
 
-        .username{
-            background:#f3f4f6;
-            padding:4px 10px;
-            border-radius:20px;
-            font-size:12px;
-            color:#374151;
+        /* ── TABLA ── */
+        .table-wrap {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:18px; overflow:hidden;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03); margin-bottom:2rem;
         }
-
-        .container{
-            max-width:1200px;
-            margin:2rem auto;
-            padding:0 1rem;
+        table { width:100%; border-collapse:collapse; }
+        thead { background:#FAFAFA; }
+        th {
+            text-align:left; padding:13px 16px;
+            font-size:11px; font-weight:700; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--gris-50);
+            border-bottom:1px solid #ececec;
         }
+        td { padding:13px 16px; font-size:13px; border-bottom:1px solid #f1f1f1; vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr { transition:background 0.15s; }
+        tbody tr:hover td { background:#fcfcfc; }
 
-        .page-header{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:1.5rem;
-            flex-wrap:wrap;
-            gap:1rem;
+        .fila-critico td    { background:#FFF7F7; }
+        .fila-alerta td     { background:#FFFBF5; }
+        .fila-precaucion td { background:#FFFDE7; }
+
+        .nombre-cell { display:flex; align-items:center; gap:9px; }
+        .nivel-dot   { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+        /* badge genérico */
+        .badge {
+            display:inline-flex; align-items:center; gap:4px;
+            padding:4px 10px; border-radius:999px;
+            font-size:11px; font-weight:700;
         }
+        .badge-estudiante  { background:#DBEAFE; color:#1D4ED8; }
+        .badge-critico     { background:#FEE2E2; color:#B91C1C; }
+        .badge-alerta      { background:#FEF3C7; color:#92400E; }
+        .badge-precaucion  { background:#FFF8E1; color:#78350F; }
+        .badge-ok          { background:#D1FAE5; color:#065F46; }
 
-        .page-header h1{
-            font-size:20px;
-            font-weight:500;
-            margin-bottom:4px;
-        }
+        /* modalidad */
+        .badge-fulltime  { background:#EDE9FE; color:#5B21B6; }
+        .badge-sabatino  { background:#E0F2FE; color:#0369A1; }
 
-        .page-header p{
-            color:#6b7280;
-            font-size:13px;
-        }
+        .muted { color:var(--gris-50); }
 
-        .btn{
-            padding:8px 16px;
-            border-radius:8px;
-            font-size:13px;
-            font-weight:500;
-            text-decoration:none;
-            display:inline-block;
-            transition:all 0.15s;
-        }
-
-        .btn-ghost{
-            background:transparent;
-            color:#6b7280;
-            border:1px solid #d1d5db;
-        }
-
-        .btn-ghost:hover{
-            background:#f9fafb;
-            color:#1a1a1a;
-        }
-
-        .leyenda{
-            background:#fff;
-            border:1px solid #e5e7eb;
-            border-radius:12px;
-            padding:1rem 1.25rem;
-            margin-bottom:1.5rem;
-
-            display:flex;
-            gap:1.5rem;
-            flex-wrap:wrap;
-            align-items:center;
-        }
-
-        .leyenda strong{
-            font-size:13px;
-            color:#374151;
-        }
-
-        .leyenda-item{
-            display:flex;
-            align-items:center;
-            gap:7px;
-            font-size:13px;
-            color:#6b7280;
-        }
-
-        .dot{
-            width:10px;
-            height:10px;
-            border-radius:50%;
-        }
-
-        .dot-critico{
-            background:#b91c1c;
-        }
-
-        .dot-alerta{
-            background:#d97706;
-        }
-
-        .dot-precaucion{
-            background:#ca8a04;
-        }
-
-        .dot-ok{
-            background:#15803d;
-        }
-
-        .table-wrapper{
-            background:#fff;
-            border-radius:12px;
-            overflow:hidden;
-            border:1px solid #e5e7eb;
-        }
-
-        table{
-            width:100%;
-            border-collapse:collapse;
-        }
-
-        thead{
-            background:#f9fafb;
-        }
-
-        th{
-            padding:12px 16px;
-            text-align:left;
-            font-size:11px;
-            font-weight:500;
-            text-transform:uppercase;
-            letter-spacing:0.05em;
-            color:#9ca3af;
-            border-bottom:1px solid #e5e7eb;
-        }
-
-        td{
-            padding:13px 16px;
-            border-bottom:1px solid #f3f4f6;
-            font-size:14px;
-            vertical-align:middle;
-        }
-
-        tr:last-child td{
-            border-bottom:none;
-        }
-
-        tr:hover td{
-            background:#fafafa;
-        }
-
-        .fila-critico td{
-            background:#fef2f2;
-        }
-
-        .fila-alerta td{
-            background:#fff7ed;
-        }
-
-        .fila-precaucion td{
-            background:#fefce8;
-        }
-
-        .nombre-cell{
-            display:flex;
-            align-items:center;
-            gap:8px;
-        }
-
-        .nivel-dot{
-            width:9px;
-            height:9px;
-            border-radius:50%;
-            flex-shrink:0;
-        }
-
-        .badge{
-            display:inline-block;
-            padding:3px 10px;
-            border-radius:20px;
-            font-size:11px;
-            font-weight:500;
-        }
-
-        .badge-grupo{
-            background:#dbeafe;
-            color:#1d4ed8;
-        }
-
-        .badge-critico{
-            background:#fee2e2;
-            color:#b91c1c;
-        }
-
-        .badge-alerta{
-            background:#ffedd5;
-            color:#c2410c;
-        }
-
-        .badge-precaucion{
-            background:#fef3c7;
-            color:#92400e;
-        }
-
-        .badge-ok{
-            background:#d1fae5;
-            color:#065f46;
-        }
-
-        .empty{
-            text-align:center;
-            padding:3rem;
-            color:#9ca3af;
-            font-size:14px;
-        }
-
+        .empty { text-align:center; padding:3rem; color:var(--gris-50); font-size:14px; }
     </style>
-
 </head>
 
 <body>
 
 <nav>
-
     <div class="brand">
-        <img src="/images/opor.png" alt="Logo Oportunidades"/>
-        <span>Programa Oportunidades</span>
+        <img src="/images/opor.png" alt="Logo"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel de supervisión FGK</div>
+        </div>
     </div>
-
-    <div class="nav-links">
-
-        <span class="username"
-              sec:authentication="name">
-            Usuario
-        </span>
-
+    <div class="nav-right">
+        <span class="user-chip" sec:authentication="name">Usuario</span>
         <a th:href="@{/supervisor}">Dashboard</a>
         <a th:href="@{/supervisor/riesgo}">Riesgo</a>
-        <a th:href="@{/supervisor/usuarios}">Usuarios</a>
+        <a th:href="@{/supervisor/usuarios}" class="active">Usuarios</a>
         <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
-
     </div>
 </nav>
 
 <div class="container">
 
     <div class="page-header">
-
         <div>
-
-            <h1>
-                Usuarios del sistema
-            </h1>
-
-            <p>
-                Vista completa de estudiantes y nivel de riesgo
-            </p>
-
+            <div class="eyebrow">Directorio</div>
+            <h1>Usuarios del sistema</h1>
+            <p>Vista completa de estudiantes y nivel de riesgo</p>
         </div>
-
-        <a th:href="@{/supervisor}"
-           class="btn btn-ghost">
-
-            ← Volver
-
-        </a>
-
     </div>
 
-    <div class="filters">
-        <input id="searchInput" class="filter-input" type="text" placeholder="Buscar por nombre o código…"/>
+    <!-- FILTROS -->
+    <div class="filters-bar">
+        <div class="search-wrap">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="searchInput" type="text" placeholder="Buscar por nombre o código…"/>
+        </div>
         <select id="nivelFilter" class="filter-select">
-            <option value="">Todos</option>
+            <option value="">Todos los estados</option>
             <option value="CRITICO">Crítico</option>
             <option value="ALERTA">Alerta</option>
             <option value="PRECAUCION">Precaución</option>
             <option value="OK">OK</option>
         </select>
+        <select id="modalidadFilter" class="filter-select">
+            <option value="">Todas las modalidades</option>
+            <option value="FULL_TIME">Full Time</option>
+            <option value="SABATINO">Sabatino</option>
+        </select>
         <div class="filters-count">Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span></div>
     </div>
 
+    <!-- LEYENDA -->
     <div class="leyenda">
-
-        <strong>
-            Riesgo:
-        </strong>
-
-        <div class="leyenda-item">
-            <div class="dot dot-critico"></div>
-            Crítico
-        </div>
-
-        <div class="leyenda-item">
-            <div class="dot dot-alerta"></div>
-            Alerta
-        </div>
-
-        <div class="leyenda-item">
-            <div class="dot dot-precaucion"></div>
-            Precaución
-        </div>
-
-        <div class="leyenda-item">
-            <div class="dot dot-ok"></div>
-            OK
-        </div>
-
+        <strong>Riesgo:</strong>
+        <div class="leyenda-item"><div class="dot dot-critico"></div> Crítico</div>
+        <div class="leyenda-item"><div class="dot dot-alerta"></div> Alerta</div>
+        <div class="leyenda-item"><div class="dot dot-precaucion"></div> Precaución</div>
+        <div class="leyenda-item"><div class="dot dot-ok"></div> OK</div>
     </div>
 
-    <div class="table-wrapper">
-
+    <!-- TABLA -->
+    <div class="table-wrap">
         <table>
-
             <thead>
-
             <tr>
-
                 <th>Estudiante</th>
                 <th>Código</th>
-                <th>Información</th>
+                <th>Modalidad</th>
                 <th>Dirección</th>
                 <th>Ausencias</th>
                 <th>Tardanzas</th>
                 <th>Estado</th>
-
             </tr>
-
             </thead>
-
             <tbody>
 
             <tr th:each="e : ${estudiantes}"
-
                 th:with="
-                nombreCompleto=${e.nombre + ' ' + e.apellido},
-                riesgo=${riesgoMap[e.idEstudiante]},
-                nivel=${riesgo != null ? riesgo.nivel : 'OK'}
+                    nombreCompleto=${e.nombre + ' ' + e.apellido},
+                    riesgo=${riesgoMap[e.idEstudiante]},
+                    nivel=${riesgo != null ? riesgo.nivel : 'OK'},
+                    jornada=${e.jornada != null ? e.jornada.name() : 'FULL_TIME'}
                 "
+                th:attr="data-nombre=${nombreCompleto},data-codigo=${e.codigoBarras},data-nivel=${nivel},data-modalidad=${jornada}"
+                th:classappend="${nivel == 'CRITICO'}    ? 'fila-critico' :
+                               (${nivel == 'ALERTA'}     ? 'fila-alerta' :
+                               (${nivel == 'PRECAUCION'} ? 'fila-precaucion' : ''))">
 
-                th:attr="data-nombre=${nombreCompleto},data-codigo=${e.codigoBarras},data-nivel=${nivel}"
-
-                th:classappend="
-                ${nivel == 'CRITICO'} ? 'fila-critico' :
-                (${nivel == 'ALERTA'} ? 'fila-alerta' :
-                (${nivel == 'PRECAUCION'} ? 'fila-precaucion' : '')
-                )">
-
+                <!-- Nombre -->
                 <td>
-
                     <div class="nombre-cell">
-
                         <div class="nivel-dot"
-
-                             th:style="
-                             ${nivel == 'CRITICO'} ? 'background:#b91c1c' :
-                             (${nivel == 'ALERTA'} ? 'background:#d97706' :
-                             (${nivel == 'PRECAUCION'} ? 'background:#ca8a04' :
-                             'background:#15803d'))
-                             ">
+                             th:style="${nivel == 'CRITICO'}    ? 'background:#D92D20' :
+                                       (${nivel == 'ALERTA'}    ? 'background:#F59E0B' :
+                                       (${nivel == 'PRECAUCION'}? 'background:#F2C94C' : 'background:#15803D'))">
                         </div>
-
-                        <span th:text="${nombreCompleto}">
-                        </span>
-
+                        <span th:text="${nombreCompleto}"></span>
                     </div>
-
                 </td>
 
-                <td th:text="${e.codigoBarras}"
-                    style="color:#6b7280;">
-                </td>
+                <!-- Código -->
+                <td class="muted" th:text="${e.codigoBarras}"></td>
 
+                <!-- Modalidad -->
                 <td>
-                    <span class="badge badge-grupo">
-                        Estudiante
+                    <span class="badge badge-fulltime"
+                          th:if="${e.jornada == null or e.jornada.name() == 'FULL_TIME'}">
+                        Full Time
+                    </span>
+                    <span class="badge badge-sabatino"
+                          th:if="${e.jornada != null and e.jornada.name() == 'SABATINO'}">
+                        Sabatino
                     </span>
                 </td>
 
-                <td th:text="${e.direccion != null ? e.direccion : '—'}"
-                    style="color:#6b7280;">
+                <!-- Dirección -->
+                <td class="muted" th:text="${e.direccion != null ? e.direccion : '—'}"></td>
+
+                <!-- Ausencias -->
+                <td th:text="${riesgo != null ? riesgo.ausencias : 0}"
+                    th:style="${(riesgo != null ? riesgo.ausencias : 0) > 0 ? 'color:#C8102E;font-weight:700;' : 'color:var(--gris-50);'}">
                 </td>
 
-                <td th:text="${riesgo != null ? riesgo.ausencias : 0}" style="color:#6b7280;"></td>
+                <!-- Tardanzas -->
+                <td th:text="${riesgo != null ? riesgo.tardanzas : 0}" class="muted"></td>
 
-                <td th:text="${riesgo != null ? riesgo.tardanzas : 0}" style="color:#6b7280;"></td>
-
+                <!-- Estado -->
                 <td>
-
-                    <span class="badge badge-critico"
-                          th:if="${nivel == 'CRITICO'}">
-
-                        🔴 CRÍTICO
-
+                    <span class="badge badge-critico"    th:if="${nivel == 'CRITICO'}">
+                        <span class="dot dot-critico" style="width:6px;height:6px;"></span> CRÍTICO
                     </span>
-
-                    <span class="badge badge-alerta"
-                          th:if="${nivel == 'ALERTA'}">
-
-                        🟠 ALERTA
-
+                    <span class="badge badge-alerta"     th:if="${nivel == 'ALERTA'}">
+                        <span class="dot dot-alerta" style="width:6px;height:6px;"></span> ALERTA
                     </span>
-
-                    <span class="badge badge-precaucion"
-                          th:if="${nivel == 'PRECAUCION'}">
-
-                        🟡 PRECAUCIÓN
-
+                    <span class="badge badge-precaucion" th:if="${nivel == 'PRECAUCION'}">
+                        <span class="dot dot-precaucion" style="width:6px;height:6px;"></span> PRECAUCIÓN
                     </span>
-
-                    <span class="badge badge-ok"
-                          th:if="${nivel == 'OK'}">
-
+                    <span class="badge badge-ok"         th:if="${nivel == 'OK'}">
                         ✓ OK
-
                     </span>
-
                 </td>
 
             </tr>
 
             <tr th:if="${#lists.isEmpty(estudiantes)}">
-
-                <td colspan="7"
-                    class="empty">
-
-                    No hay estudiantes registrados
-
-                </td>
-
+                <td colspan="7" class="empty">No hay estudiantes registrados</td>
             </tr>
 
             </tbody>
-
         </table>
-
     </div>
 
 </div>
 
 <script>
     (function(){
-        const searchInput = document.getElementById('searchInput');
-        const nivelFilter = document.getElementById('nivelFilter');
-        const rows = document.querySelectorAll('tbody tr[data-nombre]');
-        const countVisible = document.getElementById('countVisible');
-        const countTotal = document.getElementById('countTotal');
+        const searchInput    = document.getElementById('searchInput');
+        const nivelFilter    = document.getElementById('nivelFilter');
+        const modalidadFilter= document.getElementById('modalidadFilter');
+        const rows           = document.querySelectorAll('tbody tr[data-nombre]');
+        const countVisible   = document.getElementById('countVisible');
+        const countTotal     = document.getElementById('countTotal');
 
-        const normalize = (s) => (s || '').toString().toLowerCase();
+        const norm = s => (s || '').toString().toLowerCase();
 
         const applyFilters = () => {
-            const q = normalize(searchInput?.value);
-            const nivel = (nivelFilter?.value || '').toUpperCase();
-            let visible = 0;
+            const q        = norm(searchInput?.value);
+            const nivel    = (nivelFilter?.value || '').toUpperCase();
+            const modal    = (modalidadFilter?.value || '').toUpperCase();
+            let visible    = 0;
 
             rows.forEach(row => {
-                const nombre = normalize(row.getAttribute('data-nombre'));
-                const codigo = normalize(row.getAttribute('data-codigo'));
+                const nombre   = norm(row.getAttribute('data-nombre'));
+                const codigo   = norm(row.getAttribute('data-codigo'));
                 const rowNivel = (row.getAttribute('data-nivel') || '').toUpperCase();
+                const rowModal = (row.getAttribute('data-modalidad') || '').toUpperCase();
 
-                const matchText = !q || nombre.includes(q) || codigo.includes(q);
+                const matchText  = !q     || nombre.includes(q) || codigo.includes(q);
                 const matchNivel = !nivel || rowNivel === nivel;
+                const matchModal = !modal || rowModal === modal;
 
-                const show = matchText && matchNivel;
+                const show = matchText && matchNivel && matchModal;
                 row.style.display = show ? '' : 'none';
                 if (show) visible++;
             });
 
             if (countVisible) countVisible.textContent = String(visible);
-            if (countTotal) countTotal.textContent = String(rows.length);
+            if (countTotal)   countTotal.textContent   = String(rows.length);
         };
 
-        if (searchInput) searchInput.addEventListener('input', applyFilters);
-        if (nivelFilter) nivelFilter.addEventListener('change', applyFilters);
+        searchInput?.addEventListener('input',    applyFilters);
+        nivelFilter?.addEventListener('change',   applyFilters);
+        modalidadFilter?.addEventListener('change', applyFilters);
         applyFilters();
     })();
 </script>

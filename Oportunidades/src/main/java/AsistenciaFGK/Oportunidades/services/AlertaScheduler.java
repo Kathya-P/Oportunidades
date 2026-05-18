@@ -76,4 +76,76 @@ public class AlertaScheduler {
             }
         }
     }
+    @Autowired
+private AsistenciaFGK.Oportunidades.repositories.GrupoRepository grupoRepo;
+
+@Autowired
+private CalendarioService calendarioService;
+
+/**
+ * Corre todos los días a las 11:59 PM.
+ * Por cada grupo que tenía clase hoy, busca qué estudiantes
+ * no registraron asistencia y les crea un AUSENTE automático.
+ */
+@Scheduled(cron = "0 59 23 * * *")
+public void generarAusentesDelDia() {
+
+    java.time.LocalDate hoyLocal = java.time.LocalDate.now();
+
+    // No correr en días bloqueados (feriados, asuetos)
+    if (calendarioService.esHoyDiaBloqueado()) {
+        System.out.println("[Scheduler] Día bloqueado, no se generan ausentes.");
+        return;
+    }
+
+    String diaHoy = java.util.Map.of(
+        java.time.DayOfWeek.MONDAY,    "LUNES",
+        java.time.DayOfWeek.TUESDAY,   "MARTES",
+        java.time.DayOfWeek.WEDNESDAY, "MIERCOLES",
+        java.time.DayOfWeek.THURSDAY,  "JUEVES",
+        java.time.DayOfWeek.FRIDAY,    "VIERNES",
+        java.time.DayOfWeek.SATURDAY,  "SABADO",
+        java.time.DayOfWeek.SUNDAY,    "DOMINGO"
+    ).get(hoyLocal.getDayOfWeek());
+
+    java.util.Date hoy = java.sql.Date.valueOf(hoyLocal);
+
+    for (AsistenciaFGK.Oportunidades.models.Grupo grupo : grupoRepo.findAll()) {
+
+        // ¿Este grupo tiene clase hoy?
+        String dias = grupo.getDias() != null ? grupo.getDias() : "";
+        if (!dias.contains(diaHoy)) continue;
+
+        // Estudiantes inscritos en este grupo
+        List<AsistenciaFGK.Oportunidades.models.Estudiante> inscritos = grupo.getEstudiantes();
+        if (inscritos == null || inscritos.isEmpty()) continue;
+
+        for (AsistenciaFGK.Oportunidades.models.Estudiante est : inscritos) {
+
+            // ¿Ya tiene registro hoy en este grupo?
+            boolean yaRegistrado = asistenciaRepo
+                .findByGrupoAndFecha(grupo, hoy)
+                .stream()
+                .anyMatch(a -> a.getEstudiante().getIdEstudiante()
+                                .equals(est.getIdEstudiante()));
+
+            if (!yaRegistrado) {
+                AsistenciaFGK.Oportunidades.models.Asistencia ausente =
+                    new AsistenciaFGK.Oportunidades.models.Asistencia();
+                ausente.setEstudiante(est);
+                ausente.setGrupo(grupo);
+                ausente.setFecha(hoy);
+                ausente.setEstado("AUSENTE");
+                ausente.setHoraEntrada(null);
+                ausente.setHoraSalida(null);
+                asistenciaRepo.save(ausente);
+
+                System.out.println("[Scheduler] Ausente generado: "
+                    + est.getNombre() + " " + est.getApellido()
+                    + " | Grupo: " + grupo.getNombre()
+                    + " | Fecha: " + hoyLocal);
+            }
+        }
+    }
+}
 }

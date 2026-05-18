@@ -130,7 +130,7 @@
             font-weight:500;
         }
 
-        .field input{
+        .field input, .field select {
             width:100%;
             padding:11px 13px;
             border:1px solid #d1d5db;
@@ -192,6 +192,31 @@
             border-color:#2c3e50;
             color:#2c3e50;
         }
+        
+        .dias-grid {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+.dia-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: 0.15s;
+}
+.dia-check:has(input:checked) {
+    background: #2c3e50;
+    color: white;
+    border-color: #2c3e50;
+}
+.dia-check input { display: none; }
 
         @media(max-width:700px){
 
@@ -288,31 +313,42 @@
             </div>
 
             <div class="field-row">
-
                 <div class="field">
+    <label>Modalidad *</label>
+    <select th:field="*{modalidad}" required>
+        <option value="FULL_TIME">Full Time</option>
+        <option value="SABATINO">Sabatino</option>
+    </select>
+</div>
+                <!-- DÍAS -->
+<div class="field">
+    <label>Días de clase *</label>
+    <div class="dias-grid">
+        <label class="dia-check" th:each="dia : ${ {'LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'} }">
+            <input type="checkbox"
+                   name="diasSeleccionados"
+                   th:value="${dia}"
+                   th:checked="${seccion.dias != null && seccion.dias.contains(dia)}"/>
+            <span th:text="${dia}"></span>
+        </label>
+    </div>
+</div>
 
-                    <label>
-                        Horario
-                    </label>
-
-                    <input type="text"
-                           th:field="*{horario}"
-                           placeholder="Ej. Lunes 8:00 AM - 10:00 AM"/>
-
-                </div>
-
-                <div class="field">
-
-                    <label>
-                        Capacidad
-                    </label>
-
-                    <input type="number"
-                           th:field="*{capacidad}"
-                           placeholder="Ej. 25"
-                           min="1"/>
-
-                </div>
+<!-- HORAS + CAPACIDAD -->
+<div class="field-row">
+    <div class="field">
+        <label>Hora inicio</label>
+        <input type="time" th:field="*{horaInicio}"/>
+    </div>
+    <div class="field">
+        <label>Hora fin</label>
+        <input type="time" th:field="*{horaFin}"/>
+    </div>
+    <div class="field">
+        <label>Capacidad</label>
+        <input type="number" th:field="*{capacidad}" placeholder="Ej. 25" min="1"/>
+    </div>
+</div>
 
             </div>
 

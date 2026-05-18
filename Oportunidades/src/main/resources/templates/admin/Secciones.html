@@ -405,11 +405,18 @@
             </tr>
 
             <tr th:each="s : ${secciones}"
-                th:attr="data-nombre=${s.nombre}, data-horario=${s.horario}">
+                th:attr="data-nombre=${s.nombre}, data-horario=${s.horario}, data-modalidad=${s.modalidad}">
 
                 <td th:text="${s.nombre}"></td>
 
-                <td class="schedule" th:text="${s.horario}"></td>
+                <td class="schedule">
+    <span th:if="${s.dias != null and s.dias != ''}" th:text="${s.dias.replace(',', ' · ')}"></span>
+    <span th:if="${s.dias == null or s.dias == ''}">—</span>
+    <span th:if="${s.horaInicio != null and s.horaInicio != ''}"
+          style="color:#aaa; margin-left:6px;"
+          th:text="'(' + ${s.horaInicio} + ' - ' + ${s.horaFin} + ')'">
+    </span>
+</td>
 
                 <td>
                     <span class="capacity-badge" th:text="${s.capacidad}"></span>

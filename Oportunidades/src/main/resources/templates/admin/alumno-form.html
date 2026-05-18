@@ -365,26 +365,17 @@
             </div>
 
             <div class="field">
-
-                <label>
-                    Sección
-                </label>
-
-                <select name="grupos">
-
-                    <option value="">
-                        — Sin sección —
-                    </option>
-
-                    <option th:each="s : ${secciones}"
-                            th:value="${s.idGrupo}"
-                            th:text="${s.nombre}"
-                            th:selected="${alumno.grupos != null && alumno.grupos.contains(s)}">
-                    </option>
-
-                </select>
-
-            </div>
+    <label>Sección</label>
+    <select name="grupos" id="selectSeccion">
+        <option value="">— Sin sección —</option>
+        <option th:each="s : ${secciones}"
+                th:value="${s.idGrupo}"
+                th:text="${s.nombre + (s.dias != null ? ' (' + s.dias.replace(',', '·') + ')' : '')}"
+                th:attr="data-modalidad=${s.modalidad}"
+                th:selected="${alumno.grupos != null && alumno.grupos.contains(s)}">
+        </option>
+    </select>
+</div>
 
             <div class="form-actions">
 
@@ -409,6 +400,28 @@
     </div>
 
 </div>
+<script>
+(function(){
+    const jornadaSelect  = document.querySelector('select[name="jornada"], #jornada, [id*="jornada"]');
+    const seccionSelect  = document.getElementById('selectSeccion');
 
+    function filtrarSecciones() {
+        const jornada = jornadaSelect ? jornadaSelect.value : 'FULL_TIME';
+        Array.from(seccionSelect.options).forEach(opt => {
+            if (!opt.value) return; // opción vacía siempre visible
+            const mod = opt.getAttribute('data-modalidad') || 'FULL_TIME';
+            opt.hidden = (mod !== jornada);
+        });
+        // si la opción seleccionada quedó oculta, resetear
+        const seleccionada = seccionSelect.options[seccionSelect.selectedIndex];
+        if (seleccionada && seleccionada.hidden) seccionSelect.value = '';
+    }
+
+    if (jornadaSelect) {
+        jornadaSelect.addEventListener('change', filtrarSecciones);
+        filtrarSecciones(); // aplicar al cargar
+    }
+})();
+</script>
 </body>
 </html>

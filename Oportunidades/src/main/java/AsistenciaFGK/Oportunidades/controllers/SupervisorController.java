@@ -59,29 +59,6 @@ private ExportService exportService;
         return "supervisor/dashboard";
     }
 
-    // ── Ver todas las asistencias ──────────────────────────────
-    @GetMapping("/asistencias")
-public String verAsistencias(
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate fecha,
-        Model model) {
-
-    java.time.LocalDate fechaConsultada = fecha != null ? fecha : java.time.LocalDate.now();
-    boolean modoHistorial = fecha != null;
-
-    model.addAttribute("asistencias", supervisorService.listarAsistenciasPorFecha(fechaConsultada));
-    model.addAttribute("grupos", supervisorService.listarGrupos());
-    model.addAttribute("fechaConsultada", java.sql.Date.valueOf(fechaConsultada));
-    model.addAttribute("fechaSeleccionada", fechaConsultada.toString());
-    model.addAttribute("modoHistorial", modoHistorial);
-    // La plantilla viene de una versión "docente" y espera estas variables.
-    // El supervisor actualmente trabaja por fecha puntual (no rango).
-    model.addAttribute("modoRango", false);
-    model.addAttribute("fechaDesdeStr", "");
-    model.addAttribute("fechaHastaStr", "");
-    return "supervisor/asistencias";
-}
-
     // ── Riesgo de ausentismo ───────────────────────────────────
     @GetMapping("/riesgo")
     public String verRiesgo(Model model) {

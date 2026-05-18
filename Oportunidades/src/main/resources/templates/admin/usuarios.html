@@ -430,7 +430,6 @@
             <option value="ROLE_ADMIN">Admin</option>
             <option value="ROLE_DOCENTE">Docente</option>
             <option value="ROLE_SUPERVISOR">Supervisor</option>
-            <option value="ROLE_ALUMNO">Alumno</option>
         </select>
 
         <select class="filter-select" id="filterEstado">
@@ -548,7 +547,7 @@
     const countTotal   = document.getElementById('countTotal');
     const noResults    = document.getElementById('no-results');
 
-    countTotal.textContent = rows.length;
+    countTotal.textContent = Array.from(rows).filter(r => r.dataset.rol !== 'ROLE_ALUMNO').length;
 
     function applyFilters() {
         const q      = searchInput.value.toLowerCase().trim();
@@ -563,11 +562,12 @@
             const rowRol   = row.dataset.rol   || '';
             const rowEst   = row.dataset.estado || '';
 
+            const esAlumno    = rowRol === 'ROLE_ALUMNO';
             const matchQ      = !q      || nombre.includes(q) || username.includes(q);
             const matchRol    = !rol    || rowRol === rol;
             const matchEstado = !estado || rowEst === estado;
 
-            if (matchQ && matchRol && matchEstado) {
+            if (!esAlumno && matchQ && matchRol && matchEstado) {
                 row.style.display = '';
                 visible++;
             } else {
@@ -579,12 +579,11 @@
         noResults.style.display  = visible === 0 && rows.length > 0 ? 'block' : 'none';
     }
 
-    // Inicializar conteo
     applyFilters();
 
-    searchInput.addEventListener('input',  applyFilters);
-    filterRol.addEventListener('change',   applyFilters);
-    filterEstado.addEventListener('change',applyFilters);
+    searchInput.addEventListener('input',   applyFilters);
+    filterRol.addEventListener('change',    applyFilters);
+    filterEstado.addEventListener('change', applyFilters);
 </script>
 
 </body>

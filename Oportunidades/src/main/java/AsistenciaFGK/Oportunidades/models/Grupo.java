@@ -19,6 +19,10 @@ public class Grupo {
     private String nombre;
 
     private String horario;
+    private String dias;         // ej: "LUNES,MARTES,JUEVES"
+    private String modalidad; // "FULL_TIME" o "SABATINO"
+private String horaInicio;   // ej: "08:00"
+private String horaFin;      // ej: "12:00"
     private Integer capacidad;
 
     @ManyToOne
@@ -41,4 +45,14 @@ public class Grupo {
     public void setPrograma(Programa programa) { this.programa = programa; }
     public List<Estudiante> getEstudiantes() { return estudiantes; }
     public void setEstudiantes(List<Estudiante> estudiantes) { this.estudiantes = estudiantes; }
+    public String getDias() { return dias; }
+public void setDias(String dias) { this.dias = dias; }
+
+public String getHoraInicio() { return horaInicio; }
+public void setHoraInicio(String horaInicio) { this.horaInicio = horaInicio; }
+
+public String getHoraFin() { return horaFin; }
+public void setHoraFin(String horaFin) { this.horaFin = horaFin; }
+public String getModalidad() { return modalidad; }
+public void setModalidad(String modalidad) { this.modalidad = modalidad; }
 }

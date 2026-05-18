@@ -8,6 +8,7 @@ package AsistenciaFGK.Oportunidades.controllers;
 import AsistenciaFGK.Oportunidades.models.Grupo;
 import AsistenciaFGK.Oportunidades.services.SeccionService;
 import AsistenciaFGK.Oportunidades.services.UsuarioService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -40,11 +41,21 @@ public class SeccionController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Grupo grupo, RedirectAttributes redirectAttrs) {
-        seccionService.guardar(grupo);
-        redirectAttrs.addFlashAttribute("exito", "Sección guardada correctamente.");
-        return "redirect:/admin/secciones";
+public String guardar(@ModelAttribute Grupo grupo,
+                      @RequestParam(value = "diasSeleccionados", required = false)
+                      List<String> diasSeleccionados,
+                      RedirectAttributes redirectAttrs) {
+
+    if (diasSeleccionados != null && !diasSeleccionados.isEmpty()) {
+        grupo.setDias(String.join(",", diasSeleccionados));
+    } else {
+        grupo.setDias("");
     }
+
+    seccionService.guardar(grupo);
+    redirectAttrs.addFlashAttribute("exito", "Sección guardada correctamente.");
+    return "redirect:/admin/secciones";
+}
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Integer id, Model model) {
