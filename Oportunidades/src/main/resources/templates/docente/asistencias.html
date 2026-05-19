@@ -412,8 +412,8 @@
             <div class="stat-label">Total registros</div>
         </div>
                 <div class="stat-card">
-            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PRESENTE'])}">0</div>
-            <div class="stat-label">Presentes</div>
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PRESENTE' || estado == 'TARDANZA'])}">0</div>
+            <div class="stat-label">Llegaron</div>
         </div>
                 <div class="stat-card">
             <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'AUSENTE'])}">0</div>
@@ -424,15 +424,119 @@
             <div class="stat-label">Pendientes</div>
         </div>
                 <div class="stat-card">
-            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'TARDANZA'])}">0</div>
-            <div class="stat-label">Tardanzas</div>
+            <div class="stat-num" th:text="${#lists.size(gruposActivos)}">0</div>
+            <div class="stat-label">Secciones activas</div>
         </div>
             </div>
         </div>
     </div>
 
+    <!-- ══ PANELES HOY: LLEGARON / PENDIENTES ══ -->
+    <div th:if="${!modoHistorial and !modoRango}">
+
+        <!-- Info de secciones activas -->
+        <div th:if="${#lists.isEmpty(gruposActivos)}" style="background:#fff;border:1px solid #ececec;border-radius:18px;padding:2rem;text-align:center;margin-bottom:1.5rem;color:var(--gris-50);">
+            No hay secciones con horario activo en este momento.
+            Los grupos aparecerán aquí durante su horario de clase.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(gruposActivos)}" style="margin-bottom:1.5rem;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-50);margin-bottom:.6rem;">
+                Secciones en curso ahora
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+                <span th:each="g : ${gruposActivos}"
+                      style="background:white;border:1px solid #ececec;border-radius:10px;padding:6px 14px;font-size:13px;font-weight:600;"
+                      th:text="${g.nombre + ' (' + g.horaInicio + ' – ' + g.horaFin + ')'}">A1</span>
+            </div>
+        </div>
+
+        <!-- Paneles LLEGARON + PENDIENTES lado a lado -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.5rem;align-items:start;">
+
+            <!-- Panel LLEGARON -->
+            <div>
+                <div class="eyebrow" style="margin-bottom:.6rem;">
+                    &#10003; Ya llegaron
+                    <span style="font-size:12px;font-weight:600;background:black;color:white;border-radius:999px;padding:2px 9px;margin-left:6px;"
+                          th:text="${#lists.size(presentes)}">0</span>
+                </div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Grupo</th>
+                                <th>Entrada</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPresentes">
+                            <tr th:if="${#lists.isEmpty(presentes)}">
+                                <td colspan="3" class="empty">Ninguno ha llegado aún.</td>
+                            </tr>
+                            <tr th:each="a : ${presentes}"
+                                th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},data-grupo=${a.grupo.nombre},data-estado=${a.estado}">
+                                <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
+                                <td th:text="${a.grupo.nombre}"></td>
+                                <td>
+                                    <span th:text="${a.horaEntrada != null ? a.horaEntrada : '&mdash;'}"></span>
+                                    <span th:if="${a.estado == 'TARDANZA'}" class="badge badge-tardanza" style="margin-left:4px;font-size:10px;">Tarde</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel PENDIENTES -->
+            <div>
+                <div class="eyebrow" style="margin-bottom:.6rem;color:var(--gris-50);">
+                    &#9203; Pendientes de llegar
+                    <span style="font-size:12px;font-weight:600;background:var(--gris-20);color:var(--gris-70);border-radius:999px;padding:2px 9px;margin-left:6px;"
+                          th:text="${#lists.size(pendientes)}">0</span>
+                </div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Grupo</th>
+                                <th>Horario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPendientes">
+                            <tr th:if="${#lists.isEmpty(pendientes)}">
+                                <td colspan="3" class="empty">
+                                    <span th:if="${#lists.isEmpty(gruposActivos)}">Sin secciones activas ahora.</span>
+                                    <span th:unless="${#lists.isEmpty(gruposActivos)}">&#161;Todos han llegado! &#10003;</span>
+                                </td>
+                            </tr>
+                            <tr th:each="a : ${pendientes}"
+                                th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},data-grupo=${a.grupo.nombre},data-estado=${a.estado}">
+                                <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
+                                <td th:text="${a.grupo.nombre}"></td>
+                                <td th:text="${a.grupo.horaInicio + ' – ' + a.grupo.horaFin}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- fin grid paneles -->
+
+        <!-- Aviso: si hay secciones activas pero no hay registros, el scheduler puede tardar hasta 5 min -->
+        <div th:if="${!#lists.isEmpty(gruposActivos) and #lists.isEmpty(asistencias)}"
+             style="background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:12px 16px;font-size:13px;color:#7A5C00;margin-bottom:1.5rem;">
+            &#9201; Los registros se actualizan cada 5 minutos. Recarg&#225; la p&#225;gina en un momento.
+        </div>
+
+    </div><!-- fin paneles hoy -->
+
+    <!-- ══ SECCIÓN HISTORIAL ══ -->
+    <div th:if="${modoHistorial or modoRango}">
+
     <!-- HISTORIAL CARD -->
-    <div class="historial-card" th:if="${modoHistorial or modoRango}">
+    <div class="historial-card">
 
         <p class="historial-card-title">Seleccionar rango de fechas</p>
 
@@ -501,7 +605,7 @@
 
     </div>
 
-    <!-- FILTROS -->
+    <!-- FILTROS HISTORIAL -->
     <div class="filters-bar">
         <div class="search-wrap">
             <input type="text" id="searchInput" placeholder="Buscar estudiante o grupo..."/>
@@ -518,7 +622,7 @@
         </select>
     </div>
 
-    <!-- TABLA -->
+    <!-- TABLA HISTORIAL -->
     <div class="card">
         <table>
             <thead>
@@ -583,7 +687,9 @@
         </table>
     </div>
 
-</div>
+    </div><!-- fin sección historial -->
+
+</div><!-- fin .container -->
 
 <!-- ══════════════════════════════════════════
      MODAL — Exportar por alumno
@@ -691,24 +797,25 @@
 
 let alumnoIdActual = null;
 
-// Event delegation — un solo listener para todos los botones de la tabla
-document.getElementById('tablaAsistencias').addEventListener('click', function (e) {
-    const btn = e.target.closest('.btn-alumno');
-    if (!btn) return;
-
-    alumnoIdActual = btn.dataset.id;
-    const nombre   = btn.dataset.nombre || 'Alumno';
-
-    document.getElementById('modalNombreAlumno').textContent = nombre;
-
-    const hoy     = new Date().toISOString().split('T')[0];
-    const desdeEl = document.querySelector('input[name="desde"]');
-    const hastaEl = document.querySelector('input[name="hasta"]');
-    document.getElementById('modalDesde').value = desdeEl?.value || hoy;
-    document.getElementById('modalHasta').value = hastaEl?.value || hoy;
-
-    document.getElementById('modalAlumno').classList.add('open');
-});
+// Event delegation — cubre tablaPresentes, tablaPendientes y tablaAsistencias
+function attachExportListener(tbodyId) {
+    const el = document.getElementById(tbodyId);
+    if (!el) return;
+    el.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-alumno');
+        if (!btn) return;
+        alumnoIdActual = btn.dataset.id;
+        const nombre = btn.dataset.nombre || 'Alumno';
+        document.getElementById('modalNombreAlumno').textContent = nombre;
+        const hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('modalDesde').value = hoy;
+        document.getElementById('modalHasta').value = hoy;
+        document.getElementById('modalAlumno').classList.add('open');
+    });
+}
+attachExportListener('tablaPresentes');
+attachExportListener('tablaPendientes');
+attachExportListener('tablaAsistencias');
 
 function cerrarModal() {
     document.getElementById('modalAlumno').classList.remove('open');
@@ -745,7 +852,7 @@ function descargarAlumno() {
     const searchInput  = document.getElementById('searchInput');
     const filterEstado = document.getElementById('filterEstado');
     const filterGrupo  = document.getElementById('filterGrupo');
-    const rows         = document.querySelectorAll('#tablaAsistencias tr[data-estudiante]');
+    const rows = document.querySelectorAll('#tablaPresentes tr[data-estudiante], #tablaPendientes tr[data-estudiante], #tablaAsistencias tr[data-estudiante]');
 
     const gruposSet = new Set();
     rows.forEach(row => {

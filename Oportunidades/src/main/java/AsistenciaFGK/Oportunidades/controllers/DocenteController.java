@@ -21,50 +21,88 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/docente")
 @PreAuthorize("hasRole('DOCENTE')")
 public class DocenteController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private GrupoRepository grupoRepository;
+    @Autowired private AsistenciaRepository asistenciaRepository;
+    @Autowired private ExportService exportService;
+    @Autowired private CalendarioService calendarioService;
 
-    @Autowired
-    private GrupoRepository grupoRepository;
+    // ─────────────────────────────────────────────────────────────
+    // Mapa de DayOfWeek → string para comparar con grupo.getDias()
+    // ─────────────────────────────────────────────────────────────
+    private static final Map<DayOfWeek, String> DIA_MAP = Map.of(
+        DayOfWeek.MONDAY,    "LUNES",
+        DayOfWeek.TUESDAY,   "MARTES",
+        DayOfWeek.WEDNESDAY, "MIERCOLES",
+        DayOfWeek.THURSDAY,  "JUEVES",
+        DayOfWeek.FRIDAY,    "VIERNES",
+        DayOfWeek.SATURDAY,  "SABADO",
+        DayOfWeek.SUNDAY,    "DOMINGO"
+    );
 
-    @Autowired
-    private AsistenciaRepository asistenciaRepository;
+    // ─────────────────────────────────────────────────────────────
+    // Devuelve solo los grupos que tienen clase AHORA
+    // (el día coincide + la hora actual está dentro del rango)
+    // ─────────────────────────────────────────────────────────────
+    private List<Grupo> gruposActivosAhora() {
+        String diaHoy = DIA_MAP.get(LocalDate.now().getDayOfWeek());
+        LocalTime ahora = LocalTime.now();
 
-    @Autowired
-    private ExportService exportService;
-
-    @Autowired
-    private CalendarioService calendarioService;
+        return grupoRepository.findAll().stream()
+            .filter(g -> {
+                // ¿Tiene clase hoy?
+                if (g.getDias() == null || !g.getDias().toUpperCase().contains(diaHoy)) return false;
+                // ¿Tiene horario configurado?
+                if (g.getHoraInicio() == null || g.getHoraInicio().isBlank()
+                        || g.getHoraFin() == null || g.getHoraFin().isBlank()) return false;
+                try {
+                    LocalTime inicio = LocalTime.parse(g.getHoraInicio().trim());
+                    LocalTime fin    = LocalTime.parse(g.getHoraFin().trim());
+                    // El grupo está "activo" desde que empieza hasta que termina
+                    return !ahora.isBefore(inicio) && !ahora.isAfter(fin);
+                } catch (Exception e) {
+                    return false;
+                }
+            })
+            .toList();
+    }
 
     private void agregarWidgetCalendario(Model model) {
         YearMonth ym = YearMonth.now();
         LocalDate inicio = ym.atDay(1);
         LocalDate fin = ym.atEndOfMonth();
 
-        model.addAttribute("calHoy", LocalDate.now());
-        model.addAttribute("calAnio", ym.getYear());
-        model.addAttribute("calMes", ym.getMonthValue());
-        model.addAttribute("calDiasEnMes", ym.lengthOfMonth());
-        model.addAttribute("calPrimerDia", inicio.getDayOfWeek().getValue() % 7);
+        model.addAttribute("calHoy",          LocalDate.now());
+        model.addAttribute("calAnio",          ym.getYear());
+        model.addAttribute("calMes",           ym.getMonthValue());
+        model.addAttribute("calDiasEnMes",     ym.lengthOfMonth());
+        model.addAttribute("calPrimerDia",     inicio.getDayOfWeek().getValue() % 7);
         model.addAttribute("calPeriodoActual", calendarioService.periodoActual().orElse(null));
-        model.addAttribute("calDiasEsp", calendarioService.diasEnRango(inicio, fin));
-        model.addAttribute("calEsBloqueado", calendarioService.esHoyDiaBloqueado());
+        model.addAttribute("calDiasEsp",       calendarioService.diasEnRango(inicio, fin));
+        model.addAttribute("calEsBloqueado",   calendarioService.esHoyDiaBloqueado());
         model.addAttribute("calMotivoBloqueo", calendarioService.motivoBloqueoHoy());
     }
 
-    // ─────────────────────────────────────────────
-    // VISTA HOY
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    // VISTA HOY — filtra por grupos activos en este momento
+    // ─────────────────────────────────────────────────────────────
     @GetMapping
     public String vistaHoy(Model model, Principal principal) {
 
@@ -72,58 +110,59 @@ public class DocenteController {
                 .findByUsername(principal.getName())
                 .orElseThrow();
 
-        List<Grupo> grupos = grupoRepository.findAll();
+        // Solo los grupos que tienen clase AHORA (mañana o tarde según la hora)
+        List<Grupo> gruposDeAhora = gruposActivosAhora();
+
+        // Todos los grupos (para filtros y selector)
+        List<Grupo> todosLosGrupos = grupoRepository.findAll();
 
         Date hoy = java.sql.Date.valueOf(LocalDate.now());
 
-        List<Asistencia> asistencias = grupos.stream()
-                .flatMap(g ->
-                        asistenciaRepository
-                                .findByGrupoAndFecha(g, hoy)
-                                .stream()
-                )
+        // Asistencias de HOY solo de los grupos activos en este momento
+        List<Asistencia> asistencias = gruposDeAhora.stream()
+                .flatMap(g -> asistenciaRepository.findByGrupoAndFecha(g, hoy).stream())
                 .toList();
 
-        model.addAttribute("docente", docente);
-        model.addAttribute("grupos", grupos);
-        model.addAttribute("asistencias", asistencias);
+        // Separar presentes/tardanzas vs pendientes para la vista
+        List<Asistencia> presentes  = asistencias.stream()
+                .filter(a -> "PRESENTE".equals(a.getEstado()) || "TARDANZA".equals(a.getEstado()))
+                .toList();
+        List<Asistencia> pendientes = asistencias.stream()
+                .filter(a -> "PENDIENTE".equals(a.getEstado()))
+                .toList();
 
-        model.addAttribute("fechaConsultada", hoy);
+        model.addAttribute("docente",           docente);
+        model.addAttribute("grupos",            todosLosGrupos);
+        model.addAttribute("gruposActivos",     gruposDeAhora);
+        model.addAttribute("asistencias",       asistencias);
+        model.addAttribute("presentes",         presentes);
+        model.addAttribute("pendientes",        pendientes);
+
+        model.addAttribute("fechaConsultada",   hoy);
         model.addAttribute("fechaSeleccionada", LocalDate.now().toString());
 
-        model.addAttribute("modoHistorial", false);
-        model.addAttribute("modoRango", false);
+        model.addAttribute("modoHistorial",     false);
+        model.addAttribute("modoRango",         false);
 
-        model.addAttribute("fechaDesdeStr", null);
-        model.addAttribute("fechaHastaStr", null);
-
+        model.addAttribute("fechaDesdeStr",     null);
+        model.addAttribute("fechaHastaStr",     null);
         model.addAttribute("seccionesSeleccionadas", List.of());
 
         agregarWidgetCalendario(model);
 
         return "docente/asistencias";
     }
-    
-    // ─────────────────────────────────────────────
+
+    // ─────────────────────────────────────────────────────────────
     // HISTORIAL
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     @GetMapping("/historial")
     public String vistaHistorial(
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate desde,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate hasta,
-
-            @RequestParam(required = false)
-            List<Integer> secciones,
-
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(required = false) List<Integer> secciones,
             Model model,
-            Principal principal
-    ) {
+            Principal principal) {
 
         Usuario docente = usuarioRepository
                 .findByUsername(principal.getName())
@@ -134,198 +173,183 @@ public class DocenteController {
         boolean modoRango = (desde != null && hasta != null);
 
         List<Asistencia> asistencias;
-
         String desdeStr = null;
         String hastaStr = null;
 
         if (modoRango) {
-
             if (hasta.isBefore(desde)) {
-                LocalDate tmp = desde;
-                desde = hasta;
-                hasta = tmp;
+                LocalDate tmp = desde; desde = hasta; hasta = tmp;
             }
-
             desdeStr = desde.toString();
             hastaStr = hasta.toString();
 
             Date inicio = java.sql.Date.valueOf(desde);
-            Date fin = java.sql.Date.valueOf(hasta);
+            Date fin    = java.sql.Date.valueOf(hasta);
 
-            List<Grupo> gruposFiltrados;
+            List<Grupo> gruposFiltrados = (secciones != null && !secciones.isEmpty())
+                    ? grupoRepository.findAllById(secciones)
+                    : grupos;
 
-            if (secciones != null && !secciones.isEmpty()) {
-                gruposFiltrados = grupoRepository.findAllById(secciones);
-            } else {
-                gruposFiltrados = grupos;
-            }
+            // Asistencias reales en BD
+            List<Asistencia> reales = gruposFiltrados.stream()
+                    .flatMap(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, inicio, fin).stream())
+                    .collect(Collectors.toList());
 
-            asistencias = gruposFiltrados.stream()
-                    .flatMap(g ->
-                            asistenciaRepository
-                                    .findByGrupoAndFechaBetween(g, inicio, fin)
-                                    .stream()
-                    )
-                    .toList();
+            // Calcular ausentes virtuales: dias que el grupo tenia clase y el estudiante no tiene registro
+            List<Asistencia> virtuales = generarAusentesVirtuales(gruposFiltrados, desde, hasta, reales);
+
+            List<Asistencia> todos = new ArrayList<>(reales);
+            todos.addAll(virtuales);
+            asistencias = todos;
 
         } else {
-
             asistencias = List.of();
         }
 
-        model.addAttribute("docente", docente);
-        model.addAttribute("grupos", grupos);
-        model.addAttribute("asistencias", asistencias);
+        model.addAttribute("docente",       docente);
+        model.addAttribute("grupos",        grupos);
+        model.addAttribute("asistencias",   asistencias);
+        model.addAttribute("presentes",     List.of());
+        model.addAttribute("pendientes",    List.of());
+        model.addAttribute("gruposActivos", List.of());
 
         model.addAttribute("modoHistorial", true);
-        model.addAttribute("modoRango", modoRango);
+        model.addAttribute("modoRango",     modoRango);
 
         model.addAttribute("fechaDesdeStr", desdeStr);
         model.addAttribute("fechaHastaStr", hastaStr);
-
         model.addAttribute("fechaSeleccionada", desdeStr);
-
-        model.addAttribute(
-                "fechaConsultada",
-                desde != null
-                        ? java.sql.Date.valueOf(desde)
-                        : java.sql.Date.valueOf(LocalDate.now())
-        );
-
-        model.addAttribute(
-                "seccionesSeleccionadas",
-                secciones != null ? secciones : List.of()
-        );
+        model.addAttribute("fechaConsultada",
+                desde != null ? java.sql.Date.valueOf(desde) : java.sql.Date.valueOf(LocalDate.now()));
+        model.addAttribute("seccionesSeleccionadas",
+                secciones != null ? secciones : List.of());
 
         agregarWidgetCalendario(model);
 
         return "docente/asistencias";
     }
 
-    // ─────────────────────────────────────────────
-// EXPORTAR
-// ─────────────────────────────────────────────
-@GetMapping("/exportar")
-public void exportar(
+    // ─────────────────────────────────────────────────────────────
+    // EXPORTAR
+    // ─────────────────────────────────────────────────────────────
+    @GetMapping("/exportar")
+    public void exportar(
+            @RequestParam String filtro,
+            @RequestParam String formato,
+            @RequestParam(required = false) List<Integer> secciones,
+            @RequestParam(required = false) String grupo,
+            @RequestParam(required = false) Integer idEstudiante,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            HttpServletResponse response) throws Exception {
 
-        @RequestParam String filtro,
+        LocalDate hoy = LocalDate.now();
+        LocalDate inicio = hoy, fin = hoy;
 
-        @RequestParam String formato,
-
-        @RequestParam(required = false)
-        List<Integer> secciones,
-
-        @RequestParam(required = false)
-        String grupo,
-
-        @RequestParam(required = false)
-        Integer idEstudiante,
-
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate fecha,
-
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate desde,
-
-        @RequestParam(required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate hasta,
-
-        HttpServletResponse response
-
-) throws Exception {
-
-    LocalDate hoy = LocalDate.now();
-
-    LocalDate inicio = hoy;
-    LocalDate fin    = hoy;
-
-    switch (filtro) {
-
-        case "rango", "alumno" -> {
-            inicio = desde != null ? desde : hoy;
-            fin    = hasta != null ? hasta : hoy;
-            if (fin.isBefore(inicio)) {
-                LocalDate t = inicio;
-                inicio = fin;
-                fin = t;
+        switch (filtro) {
+            case "rango", "alumno" -> {
+                inicio = desde != null ? desde : hoy;
+                fin    = hasta != null ? hasta : hoy;
+                if (fin.isBefore(inicio)) { LocalDate t = inicio; inicio = fin; fin = t; }
+            }
+            default -> {
+                inicio = fecha != null ? fecha : hoy;
+                fin    = inicio;
             }
         }
 
-        default -> {
-            inicio = fecha != null ? fecha : hoy;
-            fin    = inicio;
+        Date dInicio = java.sql.Date.valueOf(inicio);
+        Date dFin    = java.sql.Date.valueOf(fin);
+
+        List<Asistencia> asistencias;
+        String etiqueta;
+
+        if (idEstudiante != null) {
+            asistencias = asistenciaRepository
+                    .findByEstudiante_IdEstudiante(idEstudiante).stream()
+                    .filter(a -> a.getFecha() != null
+                              && !a.getFecha().before(dInicio)
+                              && !a.getFecha().after(dFin))
+                    .toList();
+            etiqueta = "alumno-" + idEstudiante;
+
+        } else if (grupo != null && !grupo.isBlank()) {
+            asistencias = grupoRepository.findByNombre(grupo)
+                    .map(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, dInicio, dFin))
+                    .orElse(List.of());
+            etiqueta = "grupo-" + grupo;
+
+        } else if (secciones != null && !secciones.isEmpty()) {
+            asistencias = grupoRepository.findAllById(secciones).stream()
+                    .flatMap(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, dInicio, dFin).stream())
+                    .toList();
+            etiqueta = filtro;
+
+        } else {
+            asistencias = grupoRepository.findAll().stream()
+                    .flatMap(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, dInicio, dFin).stream())
+                    .toList();
+            etiqueta = filtro;
+        }
+
+        if ("excel".equals(formato)) {
+            exportService.exportarAsistenciasExcel(asistencias, etiqueta, inicio.toString(), fin.toString(), response);
+        } else {
+            exportService.exportarAsistenciasPDF(asistencias, etiqueta, inicio.toString(), fin.toString(), response);
         }
     }
+    // ─────────────────────────────────────────────────────────────
+    // HELPER: genera registros AUSENTE virtuales para el historial
+    // Para cada grupo, cada dia del rango en que tiene clase,
+    // si no existe registro real del estudiante → se crea un objeto
+    // Asistencia en memoria (sin guardar en BD) con estado AUSENTE.
+    // ─────────────────────────────────────────────────────────────
+    private List<Asistencia> generarAusentesVirtuales(
+            List<Grupo> grupos,
+            LocalDate desde,
+            LocalDate hasta,
+            List<Asistencia> reales) {
 
-    Date dInicio = java.sql.Date.valueOf(inicio);
-    Date dFin    = java.sql.Date.valueOf(fin);
+        // Índice de registros reales: grupoId + estudianteId + fecha → Asistencia
+        Set<String> claves = reales.stream()
+                .map(a -> a.getGrupo().getIdGrupo() + "_"
+                        + a.getEstudiante().getIdEstudiante() + "_"
+                        + a.getFecha().toString())
+                .collect(Collectors.toSet());
 
-    // ─────────────────────────────────────────
-    // RESOLVER ASISTENCIAS
-    // Prioridad: alumno > grupo > secciones > todos
-    // ─────────────────────────────────────────
-    List<Asistencia> asistencias;
-    String etiqueta;
+        List<Asistencia> virtuales = new ArrayList<>();
 
-    if (idEstudiante != null) {
-        // Exportar asistencia de un alumno específico en el rango
-        asistencias = asistenciaRepository
-                .findByEstudiante_IdEstudiante(idEstudiante)
-                .stream()
-                .filter(a -> a.getFecha() != null
-                          && !a.getFecha().before(dInicio)
-                          && !a.getFecha().after(dFin))
-                .toList();
-        etiqueta = "alumno-" + idEstudiante;
+        for (Grupo grupo : grupos) {
+            if (grupo.getEstudiantes() == null || grupo.getEstudiantes().isEmpty()) continue;
+            String diasGrupo = grupo.getDias() != null ? grupo.getDias().toUpperCase() : "";
 
-    } else if (grupo != null && !grupo.isBlank()) {
-        // Exportar un grupo específico por nombre
-        asistencias = grupoRepository.findByNombre(grupo)
-                .map(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, dInicio, dFin))
-                .orElse(List.of());
-        etiqueta = "grupo-" + grupo;
+            LocalDate dia = desde;
+            while (!dia.isAfter(hasta)) {
+                String diaStr = DIA_MAP.get(dia.getDayOfWeek());
+                if (diaStr != null && diasGrupo.contains(diaStr)) {
+                    Date fecha = java.sql.Date.valueOf(dia);
+                    String fechaStr = fecha.toString();
 
-    } else if (secciones != null && !secciones.isEmpty()) {
-        // Exportar secciones seleccionadas por ID
-        asistencias = grupoRepository.findAllById(secciones).stream()
-                .flatMap(g -> asistenciaRepository
-                        .findByGrupoAndFechaBetween(g, dInicio, dFin)
-                        .stream())
-                .toList();
-        etiqueta = filtro;
-
-    } else {
-        // Exportar todos los grupos
-        asistencias = grupoRepository.findAll().stream()
-                .flatMap(g -> asistenciaRepository
-                        .findByGrupoAndFechaBetween(g, dInicio, dFin)
-                        .stream())
-                .toList();
-        etiqueta = filtro;
+                    for (AsistenciaFGK.Oportunidades.models.Estudiante est : grupo.getEstudiantes()) {
+                        String clave = grupo.getIdGrupo() + "_" + est.getIdEstudiante() + "_" + fechaStr;
+                        if (!claves.contains(clave)) {
+                            // No hay registro real → ausente virtual
+                            Asistencia virtual = new Asistencia();
+                            virtual.setEstudiante(est);
+                            virtual.setGrupo(grupo);
+                            virtual.setFecha(fecha);
+                            virtual.setEstado("AUSENTE");
+                            virtual.setHoraEntrada(null);
+                            virtual.setHoraSalida(null);
+                            virtuales.add(virtual);
+                        }
+                    }
+                }
+                dia = dia.plusDays(1);
+            }
+        }
+        return virtuales;
     }
 
-    // ─────────────────────────────────────────
-    // EXPORTAR
-    // ─────────────────────────────────────────
-    if ("excel".equals(formato)) {
-        exportService.exportarAsistenciasExcel(
-                asistencias,
-                etiqueta,
-                inicio.toString(),
-                fin.toString(),
-                response
-        );
-    } else {
-        exportService.exportarAsistenciasPDF(
-                asistencias,
-                etiqueta,
-                inicio.toString(),
-                fin.toString(),
-                response
-        );
-    }
-}
 }
