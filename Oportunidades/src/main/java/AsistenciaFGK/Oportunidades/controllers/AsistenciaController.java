@@ -135,7 +135,8 @@ public class AsistenciaController {
 
         // ── Registrar asistencia en cada grupo con clase hoy ──────────────────
         String nombreCompleto = estudiante.getNombre() + " " + estudiante.getApellido();
-        String horaActual     = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        LocalTime ahoraLocal  = LocalTime.now();
+        String horaActual     = ahoraLocal.format(DateTimeFormatter.ofPattern("HH:mm"));
         String estadoResultado = "entrada";
 
         for (Grupo grupo : gruposHoy) {
@@ -197,6 +198,21 @@ public class AsistenciaController {
             } else {
                 // ── Segunda marca → registrar salida ──────────────────────────
                 if (existente.getHoraSalida() == null) {
+                    // Si todavía estamos en la ventana de entrada del grupo
+                    // (antes o muy cerca de la horaInicio), no registrar salida.
+                    try {
+                        if (grupo.getHoraInicio() != null && !grupo.getHoraInicio().isBlank()) {
+                            LocalTime inicio = LocalTime.parse(grupo.getHoraInicio().trim());
+                            if (!ahoraLocal.isAfter(inicio.plusMinutes(5))) {
+                                // Mantener como entrada (evita que un escaneo temprano convierta el de las 8 en salida)
+                                estadoResultado = "entrada";
+                                continue;
+                            }
+                        }
+                    } catch (Exception ignore) {
+                        // Si hay un formato de hora inválido, dejamos el comportamiento por defecto
+                    }
+
                     existente.setHoraSalida(horaActual);
                     asistenciaRepository.save(existente);
                     estadoResultado = "salida";

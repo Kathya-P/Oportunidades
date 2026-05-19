@@ -43,7 +43,8 @@ public class AdminController {
 
         long totalAlumnos  = estudianteRepository.count();
         long totalDocentes = usuarioService.listarTodos().stream()
-                                .filter(u -> u.getRole().name().equals("DOCENTE")).count();
+                    .filter(u -> u.getRole() == Role.ROLE_DOCENTE)
+                    .count();
         long totalGrupos   = grupoRepository.count();
         long totalUsuarios = usuarioService.listarTodos().size();
 

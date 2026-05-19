@@ -10,8 +10,14 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
@@ -107,32 +113,57 @@ public class EmailService {
                                              int totalAusentes) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Document document = new Document();
+            Document document = new Document(new Rectangle(595, 842), 48, 48, 54, 48); // A4 aprox
             PdfWriter.getInstance(document, baos);
             document.open();
 
-            Font titulo = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
-            Font subtitulo = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
-            Font texto = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
+            Font titulo = new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD);
+            Font meta = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
+            Font header = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
+            Font cell = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
 
-            document.add(new Paragraph("Programa Oportunidades — Resumen de faltas", titulo));
-            document.add(new Paragraph("Fecha: " + fecha, texto));
-            document.add(new Paragraph("Total de ausentes: " + totalAusentes, texto));
-            document.add(new Paragraph(" "));
+            Paragraph pTitulo = new Paragraph("Programa Oportunidades — Resumen de faltas", titulo);
+            pTitulo.setAlignment(Element.ALIGN_CENTER);
+            document.add(pTitulo);
 
+            Paragraph pMeta = new Paragraph("Fecha: " + fecha + "    |    Total de ausentes: " + totalAusentes, meta);
+            pMeta.setSpacingBefore(10);
+            pMeta.setSpacingAfter(14);
+            pMeta.setAlignment(Element.ALIGN_CENTER);
+            document.add(pMeta);
+
+            PdfPTable tabla = new PdfPTable(3);
+            tabla.setWidthPercentage(100);
+            tabla.setWidths(new float[]{5.5f, 1.2f, 7.3f});
+
+            tabla.addCell(crearHeaderCell("Sección", header));
+            tabla.addCell(crearHeaderCell("#", header));
+            tabla.addCell(crearHeaderCell("Alumno", header));
+
+            boolean zebra = false;
             for (Map.Entry<String, List<String>> entry : ausentesPorSeccion.entrySet()) {
                 String seccion = entry.getKey();
                 List<String> ausentes = entry.getValue();
+                if (ausentes == null || ausentes.isEmpty()) continue;
 
-                int count = ausentes != null ? ausentes.size() : 0;
-                document.add(new Paragraph(seccion + " (" + count + ")", subtitulo));
-                if (ausentes != null) {
-                    for (int i = 0; i < ausentes.size(); i++) {
-                        document.add(new Paragraph("  " + (i + 1) + ". " + ausentes.get(i), texto));
-                    }
+                for (int i = 0; i < ausentes.size(); i++) {
+                    String nombre = ausentes.get(i);
+                    BaseColor bg = zebra ? new BaseColor(250, 250, 250) : BaseColor.WHITE;
+
+                    tabla.addCell(crearBodyCell(i == 0 ? seccion : "", cell, bg));
+                    tabla.addCell(crearBodyCell(String.valueOf(i + 1), cell, bg));
+                    tabla.addCell(crearBodyCell(nombre, cell, bg));
+
+                    zebra = !zebra;
                 }
-                document.add(new Paragraph(" "));
             }
+
+            document.add(tabla);
+
+            Paragraph pie = new Paragraph("Generado automáticamente por el Sistema de Asistencia FGK.", meta);
+            pie.setSpacingBefore(16);
+            pie.setAlignment(Element.ALIGN_CENTER);
+            document.add(pie);
 
             document.close();
             return baos.toByteArray();
@@ -140,6 +171,23 @@ public class EmailService {
             System.err.println("Error generando PDF de resumen de faltas: " + e.getMessage());
             return null;
         }
+    }
+
+    private PdfPCell crearHeaderCell(String texto, Font font) {
+        PdfPCell c = new PdfPCell(new Phrase(texto, font));
+        c.setBackgroundColor(new BaseColor(238, 238, 238));
+        c.setPadding(8f);
+        c.setBorderColor(new BaseColor(220, 220, 220));
+        return c;
+    }
+
+    private PdfPCell crearBodyCell(String texto, Font font, BaseColor bg) {
+        PdfPCell c = new PdfPCell(new Phrase(texto != null ? texto : "", font));
+        c.setBackgroundColor(bg);
+        c.setPadding(7f);
+        c.setBorderColor(new BaseColor(235, 235, 235));
+        c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        return c;
     }
 
     // ─── Alerta de falta individual del día (notificación inmediata) ────────
