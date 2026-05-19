@@ -191,9 +191,22 @@ public class DocenteController {
                     : grupos;
 
             // Asistencias reales en BD
-            List<Asistencia> reales = gruposFiltrados.stream()
+            List<Asistencia> realesRaw = gruposFiltrados.stream()
                     .flatMap(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, inicio, fin).stream())
                     .collect(Collectors.toList());
+
+            // ── FILTRO DE PERÍODO ──────────────────────────────────────────────
+            // Descartar asistencias reales cuya fecha NO pertenece a ningún
+            // período escolar activo. Así, registros guardados antes de que
+            // existiera un período no aparecen en el historial.
+            List<Asistencia> reales = realesRaw.stream()
+                    .filter(a -> {
+                        if (a.getFecha() == null) return false;
+                        LocalDate fechaAsist = ((java.sql.Date) a.getFecha()).toLocalDate();
+                        return calendarioService.periodoParaFecha(fechaAsist).isPresent();
+                    })
+                    .collect(Collectors.toList());
+            // ──────────────────────────────────────────────────────────────────
 
             // Calcular ausentes virtuales: dias que el grupo tenia clase y el estudiante no tiene registro
             List<Asistencia> virtuales = generarAusentesVirtuales(gruposFiltrados, desde, hasta, reales);
@@ -326,6 +339,16 @@ public class DocenteController {
 
             LocalDate dia = desde;
             while (!dia.isAfter(hasta)) {
+                // ── VALIDACIÓN DE PERÍODO ──────────────────────────────────────
+                // Solo generar ausentes virtuales para fechas que pertenecen
+                // a un período escolar activo. Si el día cae fuera de todo
+                // período, se omite completamente (no se muestra como ausencia).
+                if (calendarioService.periodoParaFecha(dia).isEmpty()) {
+                    dia = dia.plusDays(1);
+                    continue;
+                }
+                // ──────────────────────────────────────────────────────────────
+
                 String diaStr = DIA_MAP.get(dia.getDayOfWeek());
                 if (diaStr != null && diasGrupo.contains(diaStr)) {
                     Date fecha = java.sql.Date.valueOf(dia);

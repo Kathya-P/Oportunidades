@@ -19,4 +19,6 @@ public interface AlertaRepository extends JpaRepository<Alerta, Integer> {
             java.util.Date inicio,
             java.util.Date fin
     );
+
+    void deleteByEstudiante(Estudiante estudiante);
 }

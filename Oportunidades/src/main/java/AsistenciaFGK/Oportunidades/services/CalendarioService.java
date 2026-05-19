@@ -4,11 +4,6 @@
  */
 package AsistenciaFGK.Oportunidades.services;
 
-/**
- *
- * @author kathy
- */
-
 import AsistenciaFGK.Oportunidades.models.DiaEspecial;
 import AsistenciaFGK.Oportunidades.models.PeriodoEscolar;
 import AsistenciaFGK.Oportunidades.repositories.DiaEspecialRepository;
@@ -64,6 +59,33 @@ public class CalendarioService {
         return periodoRepo
             .findFirstByActivoTrueAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(hoy, hoy);
     }
+
+    /** Periodo activo que contiene la fecha indicada (no necesariamente hoy). */
+    public Optional<PeriodoEscolar> periodoParaFecha(LocalDate fecha) {
+        if (fecha == null) return Optional.empty();
+        return periodoRepo
+            .findFirstByActivoTrueAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(fecha, fecha);
+    }
+
+    /**
+     * Devuelve el periodo activo que cubre TODO el rango [desde, hasta].
+     * Si el rango toca fechas fuera de cualquier periodo activo devuelve empty.
+     * Si desde y hasta pertenecen al mismo periodo, lo devuelve.
+     */
+    public Optional<PeriodoEscolar> periodoQueContieneRango(LocalDate desde, LocalDate hasta) {
+        if (desde == null || hasta == null) return Optional.empty();
+        // El periodo debe contener tanto el inicio como el fin del rango
+        Optional<PeriodoEscolar> periodoDesde = periodoParaFecha(desde);
+        Optional<PeriodoEscolar> periodoHasta = periodoParaFecha(hasta);
+        if (periodoDesde.isEmpty() || periodoHasta.isEmpty()) return Optional.empty();
+        // Ambos extremos deben pertenecer al mismo periodo
+        if (periodoDesde.get().getIdPeriodo().equals(periodoHasta.get().getIdPeriodo())) {
+            return periodoDesde;
+        }
+        return Optional.empty();
+    }
+
+
 
     // ── Días especiales ────────────────────────────────────────────────────
 

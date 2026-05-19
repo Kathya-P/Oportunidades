@@ -27,4 +27,28 @@ List<Asistencia> findByGrupoAndFechaBetween(Grupo grupo, Date inicio, Date fin);
     );
     
     List<Asistencia> findByEstudiante_IdEstudianteAndFechaBetween(Integer idEstudiante, Date fechaInicio, Date fechaFin);
+    /** Contar por grupo, estado y rango de fechas (para filtrar por periodo). */
+    @Query("SELECT COUNT(a) FROM Asistencia a WHERE a.grupo = :grupo AND a.estado = :estado AND a.fecha >= :inicio AND a.fecha <= :fin")
+    long countByGrupoAndEstadoAndFechaBetween(
+        @Param("grupo") Grupo grupo,
+        @Param("estado") String estado,
+        @Param("inicio") Date inicio,
+        @Param("fin") Date fin
+    );
+
+    /** Todas las asistencias dentro de un rango de fechas. */
+    @Query("SELECT a FROM Asistencia a WHERE a.fecha >= :inicio AND a.fecha <= :fin")
+    List<Asistencia> findByFechaBetween(
+        @Param("inicio") Date inicio,
+        @Param("fin") Date fin
+    );
+
+
+    /** Eliminar todas las asistencias de un estudiante (para borrado en cascada). */
+    void deleteByEstudiante_IdEstudiante(Integer idEstudiante);
+
+    /** Eliminar todas las asistencias de un grupo (para borrado en cascada). */
+    void deleteByGrupo(Grupo grupo);
+
+
 }

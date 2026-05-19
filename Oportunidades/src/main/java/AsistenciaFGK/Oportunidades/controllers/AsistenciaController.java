@@ -64,6 +64,17 @@ public class AsistenciaController {
 
         codigoBarras = codigoBarras.trim();
 
+        // ── Bloquear si no hay período escolar activo ────────────────────────
+        if (calendarioService.periodoActual().isEmpty()) {
+            model.addAttribute("ultimo", null);
+            model.addAttribute("estado", "bloqueado");
+            model.addAttribute("diaBloqueado", true);
+            model.addAttribute("motivoBloqueo", "Sin período asignado");
+            model.addAttribute("error",
+                "No hay ningún período escolar activo. No se puede registrar asistencia.");
+            return "asistencia/lector";
+        }
+
         // ── Bloquear si es festivo / asueto / semana pedagógica ───────────────
         if (calendarioService.esHoyDiaBloqueado()) {
             String motivo = calendarioService.motivoBloqueoHoy();
