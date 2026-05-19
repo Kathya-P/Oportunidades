@@ -1,12 +1,22 @@
 package AsistenciaFGK.Oportunidades.services;
 
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
@@ -16,6 +26,121 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    // ─── Resumen de faltas del día (una sola notificación + PDF) ───────────
+    public void enviarFaltasDelDiaResumen(String destino,
+                                          String fecha,
+                                          Map<String, List<String>> ausentesPorSeccion) {
+        try {
+            if (ausentesPorSeccion == null || ausentesPorSeccion.isEmpty()) return;
+
+            int totalAusentes = ausentesPorSeccion.values().stream().mapToInt(List::size).sum();
+
+            MimeMessage mensaje = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
+
+            helper.setTo(destino);
+            helper.setSubject("📋 Resumen de faltas — " + fecha + " (" + totalAusentes + ")");
+
+            String contenidoHtml = construirHtmlResumenFaltas(fecha, ausentesPorSeccion, totalAusentes);
+            helper.setText(contenidoHtml, true);
+
+            byte[] pdf = construirPdfResumenFaltas(fecha, ausentesPorSeccion, totalAusentes);
+            if (pdf != null && pdf.length > 0) {
+                helper.addAttachment("faltas-" + fecha + ".pdf", new ByteArrayResource(pdf));
+            }
+
+            mailSender.send(mensaje);
+
+        } catch (Exception e) {
+            System.err.println("Error enviando resumen de faltas: " + e.getMessage());
+        }
+    }
+
+    private String construirHtmlResumenFaltas(String fecha,
+                                              Map<String, List<String>> ausentesPorSeccion,
+                                              int totalAusentes) {
+        StringBuilder bloques = new StringBuilder();
+        for (Map.Entry<String, List<String>> entry : ausentesPorSeccion.entrySet()) {
+            String seccion = entry.getKey();
+            List<String> ausentes = entry.getValue();
+
+            bloques.append("<div style='margin-top:16px;padding:14px 14px;border:1px solid #f0f0f0;border-radius:10px;'>");
+            bloques.append("<div style='font-weight:700;color:#111;margin-bottom:8px;'>")
+                    .append(seccion)
+                    .append(" <span style='color:#666;font-weight:600;'>(")
+                    .append(ausentes != null ? ausentes.size() : 0)
+                    .append(")</span></div>");
+
+            bloques.append("<table style='width:100%;border-collapse:collapse;'>");
+            if (ausentes != null) {
+                for (int i = 0; i < ausentes.size(); i++) {
+                    String nombre = ausentes.get(i);
+                    bloques.append("<tr>")
+                            .append("<td style='padding:8px 10px;color:#888;font-size:13px;border-bottom:1px solid #f7f7f7;width:44px;'>")
+                            .append(i + 1)
+                            .append("</td>")
+                            .append("<td style='padding:8px 10px;border-bottom:1px solid #f7f7f7;font-weight:600;'>")
+                            .append(nombre)
+                            .append("</td>")
+                            .append("</tr>");
+                }
+            }
+            bloques.append("</table>");
+            bloques.append("</div>");
+        }
+
+        return "<div style='font-family:Segoe UI,sans-serif;max-width:720px;margin:auto;'>"
+                + "<div style='background:#C8102E;padding:18px 24px;border-radius:8px 8px 0 0;'>"
+                + "<h2 style='color:white;margin:0;font-size:16px;'>Programa Oportunidades — Resumen de faltas</h2>"
+                + "</div>"
+                + "<div style='border:1px solid #eee;border-top:none;padding:20px 24px;border-radius:0 0 8px 8px;'>"
+                + "<p style='color:#444;margin-bottom:10px;'>Se registraron <strong>" + totalAusentes + "</strong> faltas el <strong>" + fecha + "</strong>.</p>"
+                + "<p style='color:#666;margin-top:0;margin-bottom:14px;'>Detalle por sección:</p>"
+                + bloques
+                + "<p style='color:#999;font-size:12px;margin-top:20px;'>Este mensaje fue generado automáticamente por el Sistema de Asistencia FGK.</p>"
+                + "</div></div>";
+    }
+
+    private byte[] construirPdfResumenFaltas(String fecha,
+                                             Map<String, List<String>> ausentesPorSeccion,
+                                             int totalAusentes) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            Font titulo = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
+            Font subtitulo = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
+            Font texto = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
+
+            document.add(new Paragraph("Programa Oportunidades — Resumen de faltas", titulo));
+            document.add(new Paragraph("Fecha: " + fecha, texto));
+            document.add(new Paragraph("Total de ausentes: " + totalAusentes, texto));
+            document.add(new Paragraph(" "));
+
+            for (Map.Entry<String, List<String>> entry : ausentesPorSeccion.entrySet()) {
+                String seccion = entry.getKey();
+                List<String> ausentes = entry.getValue();
+
+                int count = ausentes != null ? ausentes.size() : 0;
+                document.add(new Paragraph(seccion + " (" + count + ")", subtitulo));
+                if (ausentes != null) {
+                    for (int i = 0; i < ausentes.size(); i++) {
+                        document.add(new Paragraph("  " + (i + 1) + ". " + ausentes.get(i), texto));
+                    }
+                }
+                document.add(new Paragraph(" "));
+            }
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            System.err.println("Error generando PDF de resumen de faltas: " + e.getMessage());
+            return null;
+        }
+    }
 
     // ─── Alerta de falta individual del día (notificación inmediata) ────────
     public void enviarFaltaDelDia(String destino, String nombreEstudiante,
@@ -51,6 +176,64 @@ public class EmailService {
 
         } catch (Exception e) {
             System.err.println("Error enviando correo de falta del día: " + e.getMessage());
+        }
+    }
+
+    // ─── Alerta de faltas del día (agrupada por grupo) ──────────────────────
+    public void enviarFaltasDelDiaAgrupadas(String destino,
+                                            String nombreGrupo,
+                                            String fecha,
+                                            List<String> estudiantesAusentes) {
+        try {
+            if (estudiantesAusentes == null || estudiantesAusentes.isEmpty()) return;
+
+            MimeMessage mensaje = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
+
+            helper.setTo(destino);
+            helper.setSubject("📋 Faltas registradas — " + nombreGrupo + " (" + estudiantesAusentes.size() + ")");
+
+            StringBuilder filas = new StringBuilder();
+            for (int i = 0; i < estudiantesAusentes.size(); i++) {
+                String nombre = estudiantesAusentes.get(i);
+                filas.append("<tr>")
+                    .append("<td style='padding:8px 12px;color:#888;font-size:13px;border-bottom:1px solid #f0f0f0;'>")
+                    .append(i + 1)
+                    .append("</td>")
+                    .append("<td style='padding:8px 12px;font-weight:600;border-bottom:1px solid #f0f0f0;'>")
+                    .append(nombre)
+                    .append("</td>")
+                    .append("</tr>");
+            }
+
+            String contenido = "<div style='font-family:Segoe UI,sans-serif;max-width:620px;margin:auto;'>"
+                + "<div style='background:#C8102E;padding:18px 24px;border-radius:8px 8px 0 0;'>"
+                + "<h2 style='color:white;margin:0;font-size:16px;'>Programa Oportunidades — Faltas del día</h2>"
+                + "</div>"
+                + "<div style='border:1px solid #eee;border-top:none;padding:20px 24px;border-radius:0 0 8px 8px;'>"
+                + "<p style='color:#444;margin-bottom:12px;'>Se registraron <strong>" + estudiantesAusentes.size() + "</strong> faltas al cierre del horario del grupo:</p>"
+                + "<table style='width:100%;border-collapse:collapse;margin-bottom:14px;'>"
+                + "<tr><td style='padding:8px 12px;color:#888;font-size:13px;border-bottom:1px solid #f0f0f0;'>Sección / Grupo</td>"
+                + "<td style='padding:8px 12px;font-weight:600;border-bottom:1px solid #f0f0f0;'>" + nombreGrupo + "</td></tr>"
+                + "<tr><td style='padding:8px 12px;color:#888;font-size:13px;'>Fecha</td>"
+                + "<td style='padding:8px 12px;'>" + fecha + "</td></tr>"
+                + "</table>"
+                + "<div style='margin:10px 0 6px;color:#444;font-weight:600;'>Estudiantes ausentes</div>"
+                + "<table style='width:100%;border-collapse:collapse;'>"
+                + "<thead><tr>"
+                + "<th style='text-align:left;padding:8px 12px;font-size:12px;color:#9CA3AF;border-bottom:1px solid #f0f0f0;'>#</th>"
+                + "<th style='text-align:left;padding:8px 12px;font-size:12px;color:#9CA3AF;border-bottom:1px solid #f0f0f0;'>Nombre</th>"
+                + "</tr></thead>"
+                + "<tbody>" + filas + "</tbody>"
+                + "</table>"
+                + "<p style='color:#999;font-size:12px;margin-top:20px;'>Este mensaje fue generado automáticamente por el Sistema de Asistencia FGK al cierre del horario de la sección.</p>"
+                + "</div></div>";
+
+            helper.setText(contenido, true);
+            mailSender.send(mensaje);
+
+        } catch (Exception e) {
+            System.err.println("Error enviando correo agrupado de faltas: " + e.getMessage());
         }
     }
 

@@ -20,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +70,9 @@ public class AlertaScheduler {
 
         List<Usuario> supervisores = usuarioRepo.findByRole(Role.ROLE_SUPERVISOR);
 
+        // Acumulado global de faltas (una sola notificación por supervisor)
+        Map<String, List<String>> ausentesPorSeccion = new LinkedHashMap<>();
+
         for (Grupo grupo : grupoRepo.findAll()) {
 
             // ¿Tiene clase hoy?
@@ -91,6 +96,10 @@ public class AlertaScheduler {
             if (ahora.isBefore(inicio)) continue;
 
             boolean duranteClase = !ahora.isAfter(fin);
+
+            // Cuando la clase ya terminó: acumulamos ausentes nuevos y enviamos un solo correo
+            // con todos los que faltaron (en vez de uno por alumno).
+            List<String> ausentesNuevos = duranteClase ? List.of() : new ArrayList<>();
 
             List<Estudiante> inscritos = grupo.getEstudiantes();
             if (inscritos == null || inscritos.isEmpty()) continue;
@@ -124,9 +133,8 @@ public class AlertaScheduler {
                     nuevo.setEstado(duranteClase ? "PENDIENTE" : "AUSENTE");
                     asistenciaRepo.save(nuevo);
 
-                    // Si se crea directo como AUSENTE (clase ya terminó), notificar
                     if (!duranteClase) {
-                        notificarFaltaASupervisores(supervisores, est, grupo, hoyLocal);
+                        ausentesNuevos.add(est.getNombre() + " " + est.getApellido());
                     }
 
                 } else {
@@ -134,10 +142,47 @@ public class AlertaScheduler {
                     if (!duranteClase && "PENDIENTE".equalsIgnoreCase(existente.getEstado())) {
                         existente.setEstado("AUSENTE");
                         asistenciaRepo.save(existente);
-                        notificarFaltaASupervisores(supervisores, est, grupo, hoyLocal);
+                        ausentesNuevos.add(est.getNombre() + " " + est.getApellido());
                     }
                 }
             }
+
+            if (!duranteClase && !ausentesNuevos.isEmpty()) {
+                StringBuilder etiqueta = new StringBuilder();
+                etiqueta.append(grupo.getNombre() != null ? grupo.getNombre() : "(Sin nombre)");
+
+                String diasEtiq = (grupo.getDias() != null && !grupo.getDias().isBlank())
+                        ? grupo.getDias().replace(",", " · ")
+                        : null;
+                String horasEtiq = (grupo.getHoraInicio() != null && !grupo.getHoraInicio().isBlank()
+                        && grupo.getHoraFin() != null && !grupo.getHoraFin().isBlank())
+                        ? grupo.getHoraInicio() + " - " + grupo.getHoraFin()
+                        : null;
+
+                if (diasEtiq != null || horasEtiq != null) {
+                    etiqueta.append(" — ");
+                    if (diasEtiq != null) etiqueta.append(diasEtiq);
+                    if (diasEtiq != null && horasEtiq != null) etiqueta.append(" ");
+                    if (horasEtiq != null) etiqueta.append("(").append(horasEtiq).append(")");
+                }
+
+                ausentesPorSeccion.put(etiqueta.toString(), ausentesNuevos);
+            }
+        }
+
+        if (!ausentesPorSeccion.isEmpty()) {
+            String fechaStr = hoyLocal.toString();
+            for (Usuario sup : supervisores) {
+                if (sup.getEmail() == null || sup.getEmail().isBlank()) continue;
+                try {
+                    emailService.enviarFaltasDelDiaResumen(sup.getEmail(), fechaStr, ausentesPorSeccion);
+                } catch (Exception e) {
+                    System.err.println("[Scheduler] Error enviando correo resumen de faltas a " + sup.getEmail() + ": " + e.getMessage());
+                }
+            }
+
+            int totalAusentes = ausentesPorSeccion.values().stream().mapToInt(List::size).sum();
+            System.out.println("[Scheduler] Resumen de faltas enviado (secciones=" + ausentesPorSeccion.size() + ", ausentes=" + totalAusentes + ")");
         }
     }
 
@@ -201,29 +246,4 @@ public class AlertaScheduler {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // HELPER: correo al supervisor cuando un estudiante falta hoy
-    // ─────────────────────────────────────────────────────────────────────────
-    private void notificarFaltaASupervisores(List<Usuario> supervisores,
-                                              Estudiante est,
-                                              Grupo grupo,
-                                              LocalDate fecha) {
-        String nombreEstudiante = est.getNombre() + " " + est.getApellido();
-        String fechaStr = fecha.toString();
-
-        for (Usuario sup : supervisores) {
-            if (sup.getEmail() == null || sup.getEmail().isBlank()) continue;
-            try {
-                emailService.enviarFaltaDelDia(
-                    sup.getEmail(),
-                    nombreEstudiante,
-                    grupo.getNombre(),
-                    fechaStr
-                );
-            } catch (Exception e) {
-                System.err.println("[Scheduler] Error enviando correo de falta a " + sup.getEmail() + ": " + e.getMessage());
-            }
-        }
-        System.out.println("[Scheduler] Falta registrada y notificada: " + nombreEstudiante + " - " + grupo.getNombre());
-    }
 }

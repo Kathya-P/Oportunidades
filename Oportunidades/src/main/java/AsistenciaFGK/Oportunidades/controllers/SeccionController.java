@@ -9,6 +9,7 @@ import AsistenciaFGK.Oportunidades.models.Grupo;
 import AsistenciaFGK.Oportunidades.services.SeccionService;
 import AsistenciaFGK.Oportunidades.services.UsuarioService;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -45,6 +46,15 @@ public String guardar(@ModelAttribute Grupo grupo,
                       @RequestParam(value = "diasSeleccionados", required = false)
                       List<String> diasSeleccionados,
                       RedirectAttributes redirectAttrs) {
+
+    // La capacidad ya no es editable desde UI.
+    // Protege el valor existente al editar para no sobrescribirlo con null.
+    if (grupo.getIdGrupo() != null) {
+        Optional<Grupo> existente = seccionService.buscarPorId(grupo.getIdGrupo());
+        existente.ifPresent(g -> grupo.setCapacidad(g.getCapacidad()));
+    } else {
+        grupo.setCapacidad(null);
+    }
 
     if (diasSeleccionados != null && !diasSeleccionados.isEmpty()) {
         grupo.setDias(String.join(",", diasSeleccionados));
