@@ -42,30 +42,41 @@ public class SeccionController {
     }
 
     @PostMapping("/guardar")
-public String guardar(@ModelAttribute Grupo grupo,
-                      @RequestParam(value = "diasSeleccionados", required = false)
-                      List<String> diasSeleccionados,
-                      RedirectAttributes redirectAttrs) {
+    public String guardar(@ModelAttribute Grupo grupo,
+                          @RequestParam(value = "diasSeleccionados", required = false)
+                          List<String> diasSeleccionados,
+                          RedirectAttributes redirectAttrs) {
 
-    // La capacidad ya no es editable desde UI.
-    // Protege el valor existente al editar para no sobrescribirlo con null.
-    if (grupo.getIdGrupo() != null) {
-        Optional<Grupo> existente = seccionService.buscarPorId(grupo.getIdGrupo());
-        existente.ifPresent(g -> grupo.setCapacidad(g.getCapacidad()));
-    } else {
-        grupo.setCapacidad(null);
+        // La capacidad ya no es editable desde UI.
+        // Protege el valor existente al editar para no sobrescribirlo con null.
+        if (grupo.getIdGrupo() != null) {
+            Optional<Grupo> existente = seccionService.buscarPorId(grupo.getIdGrupo());
+            existente.ifPresent(g -> grupo.setCapacidad(g.getCapacidad()));
+        } else {
+            grupo.setCapacidad(null);
+        }
+
+        if (diasSeleccionados != null && !diasSeleccionados.isEmpty()) {
+            grupo.setDias(String.join(",", diasSeleccionados));
+        } else {
+            grupo.setDias("");
+        }
+
+        // Validar duplicado: mismo nombre + misma modalidad no está permitido
+        if (seccionService.existeDuplicado(grupo)) {
+            redirectAttrs.addFlashAttribute("error",
+                "Ya existe una sección \"" + grupo.getNombre() + "\" con modalidad "
+                + grupo.getModalidad() + ". Cambia el nombre o la modalidad.");
+            if (grupo.getIdGrupo() != null) {
+                return "redirect:/admin/secciones/editar/" + grupo.getIdGrupo();
+            }
+            return "redirect:/admin/secciones/nueva";
+        }
+
+        seccionService.guardar(grupo);
+        redirectAttrs.addFlashAttribute("exito", "Sección guardada correctamente.");
+        return "redirect:/admin/secciones";
     }
-
-    if (diasSeleccionados != null && !diasSeleccionados.isEmpty()) {
-        grupo.setDias(String.join(",", diasSeleccionados));
-    } else {
-        grupo.setDias("");
-    }
-
-    seccionService.guardar(grupo);
-    redirectAttrs.addFlashAttribute("exito", "Sección guardada correctamente.");
-    return "redirect:/admin/secciones";
-}
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Integer id, Model model) {

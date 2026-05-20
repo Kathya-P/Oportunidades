@@ -382,6 +382,7 @@
             <tr>
                 <th>Nombre</th>
                 <th>Horario</th>
+                <th>Modalidad</th>
                 <th>Acciones</th>
             </tr>
             </thead>
@@ -389,7 +390,7 @@
             <tbody id="tablaSecciones">
 
             <tr th:if="${#lists.isEmpty(secciones)}">
-                <td colspan="3">
+                <td colspan="4">
                     <div class="empty">
                         <svg viewBox="0 0 24 24">
                             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -416,6 +417,20 @@
           th:text="'(' + ${s.horaInicio} + ' - ' + ${s.horaFin} + ')'">
     </span>
 </td>
+
+
+                <td>
+                    <span th:if="${s.modalidad == 'SABATINO'}"
+                          style="background:#EEF2FF;color:#4338CA;border:1px solid #C7D2FE;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600;">
+                        Sabatino
+                    </span>
+                    <span th:if="${s.modalidad == 'FULL_TIME'}"
+                          style="background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600;">
+                        Full Time
+                    </span>
+                    <span th:if="${s.modalidad == null or s.modalidad == ''}"
+                          style="color:#aaa;font-size:0.82rem;">—</span>
+                </td>
 
                 <td>
                     <div class="actions">

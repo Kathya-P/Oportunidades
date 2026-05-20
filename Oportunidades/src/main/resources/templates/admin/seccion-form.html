@@ -315,7 +315,7 @@
             <div class="field-row">
                 <div class="field">
     <label>Modalidad *</label>
-    <select th:field="*{modalidad}" required>
+    <select th:field="*{modalidad}" id="modalidadSelect" required>
         <option value="FULL_TIME">Full Time</option>
         <option value="SABATINO">Sabatino</option>
     </select>
@@ -323,7 +323,7 @@
                 <!-- DÍAS -->
 <div class="field">
     <label>Días de clase *</label>
-    <div class="dias-grid">
+    <div class="dias-grid" id="diasGrid">
         <label class="dia-check" th:each="dia : ${ {'LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'} }">
             <input type="checkbox"
                    name="diasSeleccionados"
@@ -371,6 +371,43 @@
     </div>
 
 </div>
+
+
+<script>
+function aplicarFiltroModalidad() {
+    const modalidad = document.getElementById('modalidadSelect').value;
+    const labels = document.querySelectorAll('#diasGrid .dia-check');
+
+    labels.forEach(label => {
+        const input = label.querySelector('input[type="checkbox"]');
+        const dia = input.value;
+
+        if (modalidad === 'SABATINO') {
+            // Solo mostrar SABADO
+            if (dia === 'SABADO') {
+                label.style.display = '';
+                input.checked = true;   // auto-seleccionar sabado
+            } else {
+                label.style.display = 'none';
+                input.checked = false;  // desmarcar los otros
+            }
+        } else {
+            // FULL_TIME: mostrar todos menos SABADO
+            if (dia === 'SABADO') {
+                label.style.display = 'none';
+                input.checked = false;
+            } else {
+                label.style.display = '';
+            }
+        }
+    });
+}
+
+document.getElementById('modalidadSelect').addEventListener('change', aplicarFiltroModalidad);
+
+// Aplicar al cargar (modo edición o al volver con valor preseleccionado)
+document.addEventListener('DOMContentLoaded', aplicarFiltroModalidad);
+</script>
 
 </body>
 </html>

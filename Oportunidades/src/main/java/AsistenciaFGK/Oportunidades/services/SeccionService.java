@@ -35,6 +35,18 @@ public class SeccionService {
         return grupoRepository.findById(id);
     }
 
+    /**
+     * Verifica si ya existe otra sección con el mismo nombre Y modalidad.
+     * Retorna true si hay duplicado (excluyendo el propio registro al editar).
+     */
+    public boolean existeDuplicado(Grupo grupo) {
+        Optional<Grupo> encontrado = grupoRepository.findByNombreAndModalidad(
+                grupo.getNombre(), grupo.getModalidad());
+        if (encontrado.isEmpty()) return false;
+        // Si es edición, se permite que coincida consigo mismo
+        return !encontrado.get().getIdGrupo().equals(grupo.getIdGrupo());
+    }
+
     public void guardar(Grupo grupo) {
         grupoRepository.save(grupo);
     }

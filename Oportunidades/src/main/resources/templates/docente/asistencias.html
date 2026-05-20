@@ -329,6 +329,157 @@
         .multi-option:hover{ background:#fafafa; }
         .multi-option input{ width:16px; height:16px; accent-color:var(--rojo); }
 
+
+        /* ── BURBUJA FLOTANTE ── */
+        .bubble-float {
+            position: fixed;
+            top: 50%;
+            right: 24px;
+            transform: translateY(-50%);
+            z-index: 500;
+            background: var(--negro);
+            color: white;
+            border-radius: 20px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity .2s;
+            min-width: 90px;
+        }
+        .bubble-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .bubble-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .bubble-lbl {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #aaa;
+        }
+        .bubble-sep {
+            width: 60px;
+            height: 1px;
+            background: rgba(255,255,255,0.12);
+        }
+        .bubble-num.verde  { color: #4ade80; }
+        .bubble-num.amarillo { color: #fbbf24; }
+        .bubble-num.rojo   { color: #f87171; }
+
+        /* ── FILTROS HOY ── */
+        .filters-hoy {
+            background: white;
+            border: 1px solid #ececec;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            gap: .8rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filters-hoy input,
+        .filters-hoy select {
+            border: 1.5px solid var(--gris-20);
+            border-radius: 10px;
+            padding: 10px 13px;
+            background: #fafafa;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+        }
+        .filters-hoy input { flex: 1; min-width: 200px; }
+        .filters-hoy input:focus,
+        .filters-hoy select:focus {
+            outline: none;
+            border-color: var(--rojo);
+            background: white;
+        }
+
+
+        /* ── PANEL SECCIÓN ACTUAL ── */
+        .bubble-seccion-btn {
+            width: 100%;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            text-align: center;
+            transition: .15s;
+        }
+        .bubble-seccion-btn:hover { background: var(--rojo-dark); }
+
+        .seccion-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            right: 130px;
+            transform: translateY(-50%);
+            background: white;
+            border: 1px solid #ececec;
+            border-radius: 18px;
+            padding: 1.4rem;
+            min-width: 260px;
+            max-width: 320px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+            z-index: 499;
+        }
+        .seccion-panel.open { display: block; }
+        .seccion-panel-title {
+            font-size: 10px; font-weight: 700; letter-spacing: .08em;
+            text-transform: uppercase; color: var(--rojo); margin-bottom: 8px;
+        }
+        .seccion-panel-name {
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;
+        }
+        .seccion-panel-row {
+            display: flex; justify-content: space-between;
+            font-size: 12px; color: var(--gris-50); padding: 5px 0;
+            border-bottom: 1px solid #f3f3f3;
+        }
+        .seccion-panel-row:last-child { border-bottom: none; }
+        .seccion-panel-row span:last-child { color: var(--negro); font-weight: 600; }
+
+        /* ── TABLA ÚNICA HOY ── */
+        .table-hoy-wrap { background: white; border: 1px solid #ececec; border-radius: 18px; overflow: hidden; }
+
+        /* filtro de estado pills */
+        .estado-pills {
+            display: flex; gap: 6px; flex-wrap: wrap;
+        }
+        .pill {
+            padding: 7px 14px; border-radius: 999px;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            border: 1.5px solid transparent; transition: .15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .pill-all    { background: #f3f3f3; color: #555; border-color: #ddd; }
+        .pill-pres   { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+        .pill-pend   { background: #fefce8; color: #a16207; border-color: #fde68a; }
+        .pill-aus    { background: #fef2f2; color: var(--rojo-dark); border-color: #fecaca; }
+        .pill.active, .pill:hover { opacity: .8; transform: scale(1.02); }
+        .pill-all.active  { background: var(--negro); color: white; border-color: var(--negro); }
+        .pill-pres.active { background: #15803d; color: white; border-color: #15803d; }
+        .pill-pend.active { background: #a16207; color: white; border-color: #a16207; }
+        .pill-aus.active  { background: var(--rojo); color: white; border-color: var(--rojo); }
+
         @media(max-width:768px){
             nav{ padding:0 1rem; }
             table{ min-width:760px; }
@@ -382,23 +533,6 @@
     </a>
 </div>
 
-    <!-- EXPORTAR — solo vista Hoy -->
-    <div class="export-bar" th:if="${!modoHistorial and !modoRango}">
-        <span class="export-label">Exportar</span>
-        <select class="export-select" id="formatoHoy">
-            <option value="pdf">PDF</option>
-            <option value="excel">Excel</option>
-        </select>
-        <button class="btn-download" onclick="descargarHoy()">
-            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Descargar
-        </button>
-        <span id="fechaHoyStr" th:text="${fechaSeleccionada}" style="display:none;"></span>
-    </div>
 
     <!-- CALENDARIO + STATS (separados) -->
     <div class="dash-grid">
@@ -434,99 +568,88 @@
     <!-- ══ PANELES HOY: LLEGARON / PENDIENTES ══ -->
     <div th:if="${!modoHistorial and !modoRango}">
 
-        <!-- Info de secciones activas -->
-        <div th:if="${#lists.isEmpty(gruposActivos)}" style="background:#fff;border:1px solid #ececec;border-radius:18px;padding:2rem;text-align:center;margin-bottom:1.5rem;color:var(--gris-50);">
-            No hay secciones con horario activo en este momento.
-            Los grupos aparecerán aquí durante su horario de clase.
+
+        <!-- ── EXPORTAR HOY (sincronizado con filtros) ── -->
+        <div class="export-bar">
+            <span class="export-label">Exportar vista</span>
+            <select class="export-select" id="formatoHoy">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+            </select>
+            <button class="btn-download" onclick="descargarHoy()">
+                <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar
+            </button>
+            <span id="fechaHoyStr" th:text="${fechaSeleccionada}" style="display:none;"></span>
         </div>
 
-        <div th:unless="${#lists.isEmpty(gruposActivos)}" style="margin-bottom:1.5rem;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-50);margin-bottom:.6rem;">
-                Secciones en curso ahora
-            </div>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-                <span th:each="g : ${gruposActivos}"
-                      style="background:white;border:1px solid #ececec;border-radius:10px;padding:6px 14px;font-size:13px;font-weight:600;"
-                      th:text="${g.nombre + ' (' + g.horaInicio + ' – ' + g.horaFin + ')'}">A1</span>
-            </div>
+        <!-- ── FILTROS HOY ── -->
+        <div class="filters-hoy">
+            <input type="text" id="searchHoy" placeholder="Buscar por nombre…"/>
+            <select id="filterSeccionHoy">
+                <option value="">Todas las secciones</option>
+                <option th:each="g : ${grupos}" th:value="${g.nombre}" th:text="${g.nombre}">A1</option>
+            </select>
+            <select id="filterEstadoHoy">
+                <option value="">Todos los estados</option>
+                <option value="PRESENTE,TARDANZA">Presentes</option>
+                <option value="PENDIENTE">Pendientes</option>
+                <option value="AUSENTE">Ausentes</option>
+            </select>
         </div>
 
-        <!-- Paneles LLEGARON + PENDIENTES lado a lado -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.5rem;align-items:start;">
 
-            <!-- Panel LLEGARON -->
-            <div>
-                <div class="eyebrow" style="margin-bottom:.6rem;">
-                    &#10003; Ya llegaron
-                    <span style="font-size:12px;font-weight:600;background:black;color:white;border-radius:999px;padding:2px 9px;margin-left:6px;"
-                          th:text="${#lists.size(presentes)}">0</span>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Estudiante</th>
-                                <th>Grupo</th>
-                                <th>Entrada</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPresentes">
-                            <tr th:if="${#lists.isEmpty(presentes)}">
-                                <td colspan="3" class="empty">Ninguno ha llegado aún.</td>
-                            </tr>
-                            <tr th:each="a : ${presentes}"
-                                th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},data-grupo=${a.grupo.nombre},data-estado=${a.estado}">
-                                <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
-                                <td th:text="${a.grupo.nombre}"></td>
-                                <td>
-                                    <span th:text="${a.horaEntrada != null ? a.horaEntrada : '&mdash;'}"></span>
-                                    <span th:if="${a.estado == 'TARDANZA'}" class="badge badge-tardanza" style="margin-left:4px;font-size:10px;">Tarde</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- ── TABLA ÚNICA HOY ── -->
+        <div class="table-hoy-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Sección</th>
+                        <th>Modalidad</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaHoy">
+                    <tr th:if="${#lists.isEmpty(asistencias)}">
+                        <td colspan="6" class="empty">Sin registros por hoy.</td>
+                    </tr>
+                    <tr th:each="a : ${asistencias}"
+                        th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},
+                                 data-grupo=${a.grupo.nombre},
+                                 data-estado=${a.estado}">
+                        <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
+                        <td th:text="${a.grupo.nombre}"></td>
+                        <td>
+                            <span th:if="${a.grupo.modalidad == 'SABATINO'}"
+                                  style="background:#EEF2FF;color:#4338CA;border:1px solid #C7D2FE;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;">Sabatino</span>
+                            <span th:if="${a.grupo.modalidad == 'FULL_TIME'}"
+                                  style="background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;">Full Time</span>
+                        </td>
+                        <td th:text="${a.horaEntrada != null ? a.horaEntrada : '—'}"></td>
+                        <td th:text="${a.horaSalida  != null ? a.horaSalida  : '—'}"></td>
+                        <td>
+                            <span th:switch="${a.estado}">
+                                <span th:case="'PRESENTE'"  class="badge badge-presente">Presente</span>
+                                <span th:case="'TARDANZA'"  class="badge badge-tardanza">Tardanza</span>
+                                <span th:case="'PENDIENTE'" class="badge badge-pendiente">Pendiente</span>
+                                <span th:case="'AUSENTE'"   class="badge badge-ausente">Ausente</span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <!-- Panel PENDIENTES -->
-            <div>
-                <div class="eyebrow" style="margin-bottom:.6rem;color:var(--gris-50);">
-                    &#9203; Pendientes de llegar
-                    <span style="font-size:12px;font-weight:600;background:var(--gris-20);color:var(--gris-70);border-radius:999px;padding:2px 9px;margin-left:6px;"
-                          th:text="${#lists.size(pendientes)}">0</span>
-                </div>
-                <div class="card">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Estudiante</th>
-                                <th>Grupo</th>
-                                <th>Horario</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPendientes">
-                            <tr th:if="${#lists.isEmpty(pendientes)}">
-                                <td colspan="3" class="empty">
-                                    <span th:if="${#lists.isEmpty(gruposActivos)}">Sin secciones activas ahora.</span>
-                                    <span th:unless="${#lists.isEmpty(gruposActivos)}">&#161;Todos han llegado! &#10003;</span>
-                                </td>
-                            </tr>
-                            <tr th:each="a : ${pendientes}"
-                                th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},data-grupo=${a.grupo.nombre},data-estado=${a.estado}">
-                                <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
-                                <td th:text="${a.grupo.nombre}"></td>
-                                <td th:text="${a.grupo.horaInicio + ' – ' + a.grupo.horaFin}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div><!-- fin grid paneles -->
-
-        <!-- Aviso: si hay secciones activas pero no hay registros, el scheduler puede tardar hasta 5 min -->
-        <div th:if="${!#lists.isEmpty(gruposActivos) and #lists.isEmpty(asistencias)}"
-             style="background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:12px 16px;font-size:13px;color:#7A5C00;margin-bottom:1.5rem;">
+        <!-- Aviso scheduler -->
+        <div th:if="${#lists.isEmpty(asistencias)}"
+             style="background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:12px 16px;font-size:13px;color:#7A5C00;margin-top:1rem;">
             &#9201; Los registros se actualizan cada 5 minutos. Recarg&#225; la p&#225;gina en un momento.
         </div>
 
@@ -739,141 +862,234 @@
     </div>
 </div>
 
+
+<!-- PANEL SECCIÓN ACTUAL (oculto por defecto) -->
+<div class="seccion-panel" id="seccionPanel" th:if="${!modoHistorial and !modoRango and !#lists.isEmpty(grupos)}">
+    <div class="seccion-panel-title">Secciones de hoy</div>
+    <div th:each="g, gStat : ${grupos}">
+        <div class="seccion-panel-name" th:text="${g.nombre}">A1</div>
+        <div class="seccion-panel-row">
+            <span>Modalidad</span>
+            <span th:text="${g.modalidad == 'SABATINO' ? 'Sabatino' : 'Full Time'}">—</span>
+        </div>
+        <div class="seccion-panel-row">
+            <span>Horario</span>
+            <span th:text="${(g.horaInicio != null ? g.horaInicio : '—') + ' – ' + (g.horaFin != null ? g.horaFin : '—')}">—</span>
+        </div>
+        <div class="seccion-panel-row">
+            <span>Días</span>
+            <span th:text="${g.dias != null and !#strings.isEmpty(g.dias) ? g.dias.replace(',', ' · ') : '—'}">—</span>
+        </div>
+        <hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0;" th:if="${!gStat.last}"/>
+    </div>
+</div>
+
+<!-- BURBUJA FLOTANTE -->
+<div class="bubble-float" id="bubbleFloat" th:if="${!modoHistorial and !modoRango}">
+    <div class="bubble-stat">
+        <span class="bubble-num verde" id="bubbleLlegaron" th:text="${#lists.size(presentes)}">0</span>
+        <span class="bubble-lbl">Llegaron</span>
+    </div>
+    <div class="bubble-sep"></div>
+    <div class="bubble-stat">
+        <span class="bubble-num amarillo" id="bubblePendientes" th:text="${#lists.size(pendientes)}">0</span>
+        <span class="bubble-lbl">Pendientes</span>
+    </div>
+    <div class="bubble-sep"></div>
+    <div class="bubble-stat">
+        <span class="bubble-num rojo" id="bubbleAusentes" th:text="${#lists.size(ausentes)}">0</span>
+        <span class="bubble-lbl">Ausentes</span>
+    </div>
+    <div class="bubble-sep" th:if="${!#lists.isEmpty(grupos)}"></div>
+    <button class="bubble-seccion-btn" id="btnSeccionActual"
+            onclick="toggleSeccionPanel()"
+            th:if="${!#lists.isEmpty(grupos)}">
+        <span th:if="${#lists.size(grupos) == 1}"
+              th:text="${grupos[0].nombre}">A1</span>
+        <span th:if="${#lists.size(grupos) > 1}">
+            <th:block th:each="g, i : ${grupos}">
+                <span th:text="${g.nombre}">A1</span><br th:if="${!i.last}"/>
+            </th:block>
+        </span>
+    </button>
+</div>
+
 <script>
 
-    // ── MULTISELECT ───────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// FUNCIONES GLOBALES — llamadas desde onclick en el HTML
+// ═══════════════════════════════════════════════════════════════
 
+function descargarHoy() {
+    const formato = document.getElementById('formatoHoy').value;
+    const fecha   = document.getElementById('fechaHoyStr').textContent.trim()
+                    || new Date().toISOString().split('T')[0];
+    const seccion = document.getElementById('filterSeccionHoy')?.value || '';
+    const estadoV = document.getElementById('filterEstadoHoy')?.value  || '';
+    let url = `/docente/exportar?filtro=dia&formato=${formato}&fecha=${fecha}`;
+    if (seccion) url += `&grupo=${encodeURIComponent(seccion)}`;
+    if (estadoV) url += `&estadoFiltro=${encodeURIComponent(estadoV)}`;
+    window.location.href = url;
+}
+
+function toggleSeccionPanel() {
+    const panel = document.getElementById('seccionPanel');
+    if (panel) panel.classList.toggle('open');
+}
+
+function cerrarModal() {
+    document.getElementById('modalAlumno').classList.remove('open');
+    window._alumnoIdActual = null;
+}
+
+function descargarAlumno() {
+    if (!window._alumnoIdActual) return;
+    const desde   = document.getElementById('modalDesde').value;
+    const hasta   = document.getElementById('modalHasta').value;
+    const formato = document.getElementById('modalFormato').value;
+    if (!desde || !hasta) { alert('Seleccioná ambas fechas.'); return; }
+    if (hasta < desde) { alert('La fecha "Hasta" no puede ser anterior a "Desde".'); return; }
+    window.location.href =
+        `/docente/exportar?filtro=alumno&formato=${formato}&idEstudiante=${window._alumnoIdActual}&desde=${desde}&hasta=${hasta}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOM LISTENERS — ejecutar cuando el DOM esté listo
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── MULTISELECT (Historial) ───────────────────────────────────
     const multiBtn      = document.getElementById('multiSelectBtn');
     const multiDropdown = document.getElementById('multiSelectDropdown');
     const multiText     = document.getElementById('multiSelectText');
 
-    if (multiBtn) {
-
+    if (multiBtn && multiDropdown && multiText) {
         multiBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             multiDropdown.classList.toggle('show');
         });
-
         document.addEventListener('click', function (e) {
             if (!multiDropdown.contains(e.target) && !multiBtn.contains(e.target)) {
                 multiDropdown.classList.remove('show');
             }
         });
-
         const checks = multiDropdown.querySelectorAll('input[type="checkbox"]');
-        updateText();
-        checks.forEach(chk => chk.addEventListener('change', updateText));
-
-        function updateText() {
+        updateMultiText();
+        checks.forEach(chk => chk.addEventListener('change', updateMultiText));
+        function updateMultiText() {
             const selected = [];
             checks.forEach(chk => {
                 if (chk.checked) selected.push(chk.parentElement.innerText.trim());
             });
             multiText.textContent = selected.length > 0 ? selected.join(', ') : 'Seleccionar secciones';
-
             const hiddenExport = document.getElementById('hiddenSeccionesExport');
             if (hiddenExport) {
                 hiddenExport.innerHTML = '';
                 checks.forEach(chk => {
-                    if (chk.checked) {
-                        hiddenExport.innerHTML +=
-                            `<input type="hidden" name="secciones" value="${chk.value}">`;
-                    }
+                    if (chk.checked)
+                        hiddenExport.innerHTML += `<input type="hidden" name="secciones" value="${chk.value}">`;
                 });
             }
         }
     }
 
-    // ── DESCARGA VISTA HOY ────────────────────────────────────────────────────
+    // ── FILTROS VISTA HOY ─────────────────────────────────────────
+    const searchHoy        = document.getElementById('searchHoy');
+    const filterSeccionHoy = document.getElementById('filterSeccionHoy');
+    const filterEstadoHoy  = document.getElementById('filterEstadoHoy');
 
-    function descargarHoy() {
-        const formato = document.getElementById('formatoHoy').value;
-        const fecha   = document.getElementById('fechaHoyStr').textContent.trim()
-                        || new Date().toISOString().split('T')[0];
-        window.location.href = `/docente/exportar?filtro=dia&formato=${formato}&fecha=${fecha}`;
+    function applyFiltersHoy() {
+        const q       = (searchHoy?.value || '').toLowerCase().trim();
+        const seccion = filterSeccionHoy?.value || '';
+        const estadoV = filterEstadoHoy?.value  || '';
+        const activos = estadoV ? estadoV.split(',') : [];
+        let cntP = 0, cntN = 0, cntA = 0;
+        document.querySelectorAll('#tablaHoy tr[data-estudiante]').forEach(row => {
+            const matchQ = !q       || (row.dataset.estudiante||'').toLowerCase().includes(q)
+                                    || (row.dataset.grupo||'').toLowerCase().includes(q);
+            const matchS = !seccion || (row.dataset.grupo||'') === seccion;
+            const estado = row.dataset.estado || '';
+            const matchE = activos.length === 0 || activos.includes(estado);
+            const show   = matchQ && matchS && matchE;
+            row.style.display = show ? '' : 'none';
+            if (show) {
+                if (estado === 'PRESENTE' || estado === 'TARDANZA') cntP++;
+                else if (estado === 'PENDIENTE') cntN++;
+                else if (estado === 'AUSENTE')   cntA++;
+            }
+        });
+        const bubLleg = document.getElementById('bubbleLlegaron');
+        const bubPend = document.getElementById('bubblePendientes');
+        const bubAus  = document.getElementById('bubbleAusentes');
+        if (bubLleg) bubLleg.textContent = cntP;
+        if (bubPend) bubPend.textContent = cntN;
+        if (bubAus)  bubAus.textContent  = cntA;
     }
 
-    // ── MODAL ALUMNO ──────────────────────────────────────────────────────────
+    if (searchHoy)        searchHoy.addEventListener('input',   applyFiltersHoy);
+    if (filterSeccionHoy) filterSeccionHoy.addEventListener('change', applyFiltersHoy);
+    if (filterEstadoHoy)  filterEstadoHoy.addEventListener('change',  applyFiltersHoy);
 
-let alumnoIdActual = null;
-
-// Event delegation — cubre tablaPresentes, tablaPendientes y tablaAsistencias
-function attachExportListener(tbodyId) {
-    const el = document.getElementById(tbodyId);
-    if (!el) return;
-    el.addEventListener('click', function (e) {
-        const btn = e.target.closest('.btn-alumno');
-        if (!btn) return;
-        alumnoIdActual = btn.dataset.id;
-        const nombre = btn.dataset.nombre || 'Alumno';
-        document.getElementById('modalNombreAlumno').textContent = nombre;
-        const hoy = new Date().toISOString().split('T')[0];
-        document.getElementById('modalDesde').value = hoy;
-        document.getElementById('modalHasta').value = hoy;
-        document.getElementById('modalAlumno').classList.add('open');
+    // ── CERRAR PANEL SECCIÓN al click fuera ───────────────────────
+    document.addEventListener('click', function (e) {
+        const panel = document.getElementById('seccionPanel');
+        const btn   = document.getElementById('btnSeccionActual');
+        if (panel && panel.classList.contains('open')
+            && !panel.contains(e.target)
+            && btn && !btn.contains(e.target)) {
+            panel.classList.remove('open');
+        }
     });
-}
-attachExportListener('tablaPresentes');
-attachExportListener('tablaPendientes');
-attachExportListener('tablaAsistencias');
 
-function cerrarModal() {
-    document.getElementById('modalAlumno').classList.remove('open');
-    alumnoIdActual = null;
-}
-
-document.getElementById('modalAlumno').addEventListener('click', function (e) {
-    if (e.target === this) cerrarModal();
-});
-
-function descargarAlumno() {
-    if (!alumnoIdActual) return;
-
-    const desde   = document.getElementById('modalDesde').value;
-    const hasta   = document.getElementById('modalHasta').value;
-    const formato = document.getElementById('modalFormato').value;
-
-    if (!desde || !hasta) {
-        alert('Seleccioná ambas fechas.');
-        return;
+    // ── MODAL ALUMNO ──────────────────────────────────────────────
+    function attachExportListener(tbodyId) {
+        const el = document.getElementById(tbodyId);
+        if (!el) return;
+        el.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-alumno');
+            if (!btn) return;
+            window._alumnoIdActual = btn.dataset.id;
+            document.getElementById('modalNombreAlumno').textContent = btn.dataset.nombre || 'Alumno';
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('modalDesde').value = hoy;
+            document.getElementById('modalHasta').value = hoy;
+            document.getElementById('modalAlumno').classList.add('open');
+        });
     }
+    attachExportListener('tablaHoy');
+    attachExportListener('tablaAsistencias');
 
-    if (hasta < desde) {
-        alert('La fecha "Hasta" no puede ser anterior a "Desde".');
-        return;
-    }
+    const modalEl = document.getElementById('modalAlumno');
+    if (modalEl) modalEl.addEventListener('click', function (e) {
+        if (e.target === this) cerrarModal();
+    });
 
-    window.location.href =
-        `/docente/exportar?filtro=alumno&formato=${formato}&idEstudiante=${alumnoIdActual}&desde=${desde}&hasta=${hasta}`;
-}
-
-    // ── FILTROS TABLA ─────────────────────────────────────────────────────────
-
+    // ── FILTROS TABLA HISTORIAL ───────────────────────────────────
     const searchInput  = document.getElementById('searchInput');
     const filterEstado = document.getElementById('filterEstado');
     const filterGrupo  = document.getElementById('filterGrupo');
-    const rows = document.querySelectorAll('#tablaPresentes tr[data-estudiante], #tablaPendientes tr[data-estudiante], #tablaAsistencias tr[data-estudiante]');
 
-    const gruposSet = new Set();
-    rows.forEach(row => {
-        const g = (row.dataset.grupo || '').trim();
-        if (g) gruposSet.add(g);
-    });
-
-    gruposSet.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g;
-        opt.textContent = g;
-        filterGrupo.appendChild(opt);
-    });
+    if (filterGrupo) {
+        const gruposSet = new Set();
+        document.querySelectorAll('#tablaAsistencias tr[data-estudiante]').forEach(row => {
+            const g = (row.dataset.grupo || '').trim();
+            if (g) gruposSet.add(g);
+        });
+        gruposSet.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g; opt.textContent = g;
+            filterGrupo.appendChild(opt);
+        });
+    }
 
     function applyFilters() {
-        const q      = (searchInput.value || '').toLowerCase().trim();
-        const estado = filterEstado.value;
-        const grupo  = filterGrupo.value;
-
-        rows.forEach(row => {
-            const matchQ      = !q      || (row.dataset.estudiante||'').toLowerCase().includes(q) || (row.dataset.grupo||'').toLowerCase().includes(q);
+        const q      = (searchInput?.value || '').toLowerCase().trim();
+        const estado = filterEstado?.value || '';
+        const grupo  = filterGrupo?.value  || '';
+        document.querySelectorAll('#tablaAsistencias tr[data-estudiante]').forEach(row => {
+            const matchQ      = !q      || (row.dataset.estudiante||'').toLowerCase().includes(q)
+                                        || (row.dataset.grupo||'').toLowerCase().includes(q);
             const matchEstado = !estado || (row.dataset.estado||'') === estado;
             const matchGrupo  = !grupo  || (row.dataset.grupo||'')  === grupo;
             row.style.display = matchQ && matchEstado && matchGrupo ? '' : 'none';
@@ -883,6 +1099,8 @@ function descargarAlumno() {
     if (searchInput)  searchInput.addEventListener('input',   applyFilters);
     if (filterEstado) filterEstado.addEventListener('change', applyFilters);
     if (filterGrupo)  filterGrupo.addEventListener('change',  applyFilters);
+
+}); // fin DOMContentLoaded
 
 </script>
 

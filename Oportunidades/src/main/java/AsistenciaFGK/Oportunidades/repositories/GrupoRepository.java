@@ -10,4 +10,6 @@ public interface GrupoRepository extends JpaRepository<Grupo, Integer> {
 
     Optional<Grupo> findByNombre(String nombre);
 
+    Optional<Grupo> findByNombreAndModalidad(String nombre, String modalidad);
+
 }

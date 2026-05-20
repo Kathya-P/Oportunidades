@@ -58,28 +58,16 @@ public class DocenteController {
     );
 
     // ─────────────────────────────────────────────────────────────
-    // Devuelve solo los grupos que tienen clase AHORA
-    // (el día coincide + la hora actual está dentro del rango)
+    // Devuelve los grupos que tienen clase HOY (el día coincide),
+    // sin importar si la hora actual está dentro del rango o no.
     // ─────────────────────────────────────────────────────────────
-    private List<Grupo> gruposActivosAhora() {
+    private List<Grupo> gruposActivosHoy() {
         String diaHoy = DIA_MAP.get(LocalDate.now().getDayOfWeek());
-        LocalTime ahora = LocalTime.now();
 
         return grupoRepository.findAll().stream()
             .filter(g -> {
-                // ¿Tiene clase hoy?
-                if (g.getDias() == null || !g.getDias().toUpperCase().contains(diaHoy)) return false;
-                // ¿Tiene horario configurado?
-                if (g.getHoraInicio() == null || g.getHoraInicio().isBlank()
-                        || g.getHoraFin() == null || g.getHoraFin().isBlank()) return false;
-                try {
-                    LocalTime inicio = LocalTime.parse(g.getHoraInicio().trim());
-                    LocalTime fin    = LocalTime.parse(g.getHoraFin().trim());
-                    // El grupo está "activo" desde que empieza hasta que termina
-                    return !ahora.isBefore(inicio) && !ahora.isAfter(fin);
-                } catch (Exception e) {
-                    return false;
-                }
+                if (g.getDias() == null || diaHoy == null) return false;
+                return g.getDias().toUpperCase().contains(diaHoy);
             })
             .toList();
     }
@@ -110,25 +98,51 @@ public class DocenteController {
                 .findByUsername(principal.getName())
                 .orElseThrow();
 
-        // Solo los grupos que tienen clase AHORA (mañana o tarde según la hora)
-        List<Grupo> gruposDeAhora = gruposActivosAhora();
+        // Grupos que tienen clase HOY (para el botón flotante)
+        List<Grupo> gruposDeAhora = gruposActivosHoy();
 
         // Todos los grupos (para filtros y selector)
         List<Grupo> todosLosGrupos = grupoRepository.findAll();
 
         Date hoy = java.sql.Date.valueOf(LocalDate.now());
+        LocalTime ahora = LocalTime.now();
 
-        // Asistencias de HOY solo de los grupos activos en este momento
-        List<Asistencia> asistencias = gruposDeAhora.stream()
+        // Asistencias de TODOS los grupos del día
+        List<Asistencia> asistenciasRaw = todosLosGrupos.stream()
                 .flatMap(g -> asistenciaRepository.findByGrupoAndFecha(g, hoy).stream())
-                .toList();
+                .collect(Collectors.toList());
 
-        // Separar presentes/tardanzas vs pendientes para la vista
+        // Auto-ausente: si el horario de la sección ya terminó y el alumno
+        // sigue en PENDIENTE, se trata como AUSENTE en la vista (sin tocar BD).
+        List<Asistencia> asistencias = asistenciasRaw.stream().map(a -> {
+            if (!"PENDIENTE".equals(a.getEstado())) return a;
+            Grupo g = a.getGrupo();
+            if (g.getHoraFin() == null || g.getHoraFin().isBlank()) return a;
+            try {
+                LocalTime fin = LocalTime.parse(g.getHoraFin().trim());
+                if (ahora.isAfter(fin)) {
+                    // Crear copia virtual con estado AUSENTE
+                    Asistencia virtual = new Asistencia();
+                    virtual.setEstudiante(a.getEstudiante());
+                    virtual.setGrupo(a.getGrupo());
+                    virtual.setFecha(a.getFecha());
+                    virtual.setEstado("AUSENTE");
+                    virtual.setHoraEntrada(null);
+                    virtual.setHoraSalida(null);
+                    return virtual;
+                }
+            } catch (Exception e) { /* ignorar */ }
+            return a;
+        }).collect(Collectors.toList());
+
         List<Asistencia> presentes  = asistencias.stream()
                 .filter(a -> "PRESENTE".equals(a.getEstado()) || "TARDANZA".equals(a.getEstado()))
                 .toList();
         List<Asistencia> pendientes = asistencias.stream()
                 .filter(a -> "PENDIENTE".equals(a.getEstado()))
+                .toList();
+        List<Asistencia> ausentes   = asistencias.stream()
+                .filter(a -> "AUSENTE".equals(a.getEstado()))
                 .toList();
 
         model.addAttribute("docente",           docente);
@@ -137,6 +151,7 @@ public class DocenteController {
         model.addAttribute("asistencias",       asistencias);
         model.addAttribute("presentes",         presentes);
         model.addAttribute("pendientes",        pendientes);
+        model.addAttribute("ausentes",          ausentes);
 
         model.addAttribute("fechaConsultada",   hoy);
         model.addAttribute("fechaSeleccionada", LocalDate.now().toString());
@@ -251,6 +266,7 @@ public class DocenteController {
             @RequestParam String formato,
             @RequestParam(required = false) List<Integer> secciones,
             @RequestParam(required = false) String grupo,
+            @RequestParam(required = false) String estadoFiltro,
             @RequestParam(required = false) Integer idEstudiante,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
@@ -274,6 +290,11 @@ public class DocenteController {
 
         Date dInicio = java.sql.Date.valueOf(inicio);
         Date dFin    = java.sql.Date.valueOf(fin);
+
+        // Estados permitidos según el filtro de vista (ej: "PRESENTE,TARDANZA" o "AUSENTE")
+        final List<String> estadosPermitidos = (estadoFiltro != null && !estadoFiltro.isBlank())
+                ? List.of(estadoFiltro.split(","))
+                : List.of();
 
         List<Asistencia> asistencias;
         String etiqueta;
@@ -304,6 +325,13 @@ public class DocenteController {
                     .flatMap(g -> asistenciaRepository.findByGrupoAndFechaBetween(g, dInicio, dFin).stream())
                     .toList();
             etiqueta = filtro;
+        }
+
+        // Aplicar filtro de estado si viene de la vista Hoy
+        if (!estadosPermitidos.isEmpty()) {
+            asistencias = asistencias.stream()
+                    .filter(a -> estadosPermitidos.contains(a.getEstado()))
+                    .toList();
         }
 
         if ("excel".equals(formato)) {
