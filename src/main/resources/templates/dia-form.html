@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${titulo} + ' — Oportunidades'">Día Especial</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --rojo:#C8102E; --rojo-dark:#A00E25; --rojo-light:#FCE7EB;
+            --negro:#141414; --gris-70:#4A4A4A; --gris-50:#7A7A7A;
+            --gris-20:#D6D6D6; --gris-10:#F4F3F1; --blanco:#FFF;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--gris-10); color:var(--negro); min-height:100vh; }
+
+        nav {
+            height:72px; background:var(--negro); padding:0 2rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .brand { display:flex; align-items:center; }
+        .brand-logo { width:38px; height:38px; border-radius:8px; background:var(--rojo); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:15px; margin-right:14px; }
+        .brand-name { color:white; font-size:14px; font-weight:700; }
+        .nav-right { display:flex; align-items:center; gap:1rem; }
+        .user-chip { padding:9px 14px; border-radius:999px; background:rgba(255,255,255,.07); color:#BABABA; font-size:12px; }
+        .nav-link  { color:#BABABA; text-decoration:none; font-size:13px; padding:6px 12px; border-radius:6px; }
+        .nav-link:hover { background:rgba(255,255,255,.08); color:white; }
+        .logout-link { color:#888; text-decoration:none; font-size:13px; }
+
+        .container { max-width:640px; margin:2.5rem auto; padding:0 1.5rem; }
+
+        .card { background:white; border-radius:16px; border:1px solid var(--gris-20); padding:2rem; }
+        .card-title { font-size:20px; font-weight:700; margin-bottom:1.5rem; }
+
+        .tipo-info {
+            background:#FAFAFA; border-radius:10px; padding:12px 14px;
+            margin-bottom:1.5rem; font-size:12.5px; color:var(--gris-70);
+            border-left:3px solid var(--rojo);
+        }
+        .tipo-info strong { color:var(--negro); }
+
+        .form-group { margin-bottom:1.25rem; }
+        label { display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--gris-70); }
+        label span { color:var(--rojo); }
+
+        input[type=text], input[type=date], select, textarea {
+            width:100%; padding:10px 12px; border-radius:8px;
+            border:1px solid var(--gris-20); font-size:13.5px;
+            font-family:inherit; background:white; color:var(--negro);
+            transition:border-color .15s; appearance:auto;
+        }
+        input:focus, select:focus, textarea:focus { outline:none; border-color:var(--rojo); }
+        textarea { resize:vertical; min-height:80px; }
+
+        .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .hint { font-size:11.5px; color:var(--gris-50); margin-top:4px; }
+
+        .form-actions { display:flex; gap:10px; margin-top:1.75rem; }
+        .btn { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; border:none; }
+        .btn-primary { background:var(--rojo); color:white; }
+        .btn-primary:hover { background:var(--rojo-dark); }
+        .btn-ghost { background:white; color:var(--gris-70); border:1px solid var(--gris-20); }
+        .btn-ghost:hover { border-color:var(--gris-50); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="brand">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto; margin-right:14px;"/>
+        <div class="brand-name">Oportunidades</div>
+    </div>
+    <div class="nav-right">
+        <a th:href="@{/calendario/admin}" class="nav-link">← Calendario</a>
+        <span class="user-chip" sec:authentication="name">admin</span>
+        <a class="logout-link" th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2 class="card-title" th:text="${titulo}">Nuevo día especial</h2>
+
+        <div th:if="${error}" style="background:var(--rojo-light); border:1px solid var(--rojo); color:var(--rojo-dark); padding:10px 12px; border-radius:10px; font-size:13px; margin-bottom:14px;"
+             th:text="${error}"></div>
+
+        <div class="tipo-info">
+            <strong>Importante:</strong> Puedes decidir si este evento <strong>bloquea</strong> o <strong>permite</strong>
+            el registro de asistencia durante esas fechas.
+        </div>
+
+        <form th:action="@{/calendario/admin/dias/guardar}" method="post">
+            <input type="hidden" name="idDia"
+                   th:if="${dia.idDia != null}" th:value="${dia.idDia}"/>
+
+            <div class="form-group">
+                <label>Nombre <span>*</span></label>
+                <input type="text" name="nombre" required
+                       th:value="${dia.nombre}"
+                       placeholder="Ej: Día del Maestro, Semana Santa…"/>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo <span>*</span></label>
+                <select name="tipo" required>
+                    <option value="" disabled>Selecciona un tipo</option>
+                    <option th:each="t : ${tipos}"
+                            th:value="${t.name()}"
+                            th:text="${t.name() == 'FESTIVO' ? '🔴 Festivo (feriado nacional)' : (t.name() == 'ASUETO' ? '🟡 Asueto institucional' : '🔵 Semana Pedagógica / Pausa')}"
+                            th:selected="${dia.tipo != null and dia.tipo == t}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="row-2">
+                <div class="form-group">
+                    <label>Fecha inicio <span>*</span></label>
+                    <input type="date" name="fechaInicio" required
+                           th:value="${dia.fechaInicio}"
+                           id="fechaInicio"/>
+                </div>
+                <div class="form-group">
+                    <label>Fecha fin</label>
+                    <input type="date" name="fechaFin"
+                           th:value="${dia.fechaFin}"
+                           id="fechaFin"/>
+                    <p class="hint">Dejar igual al inicio si es un solo día.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Asistencia</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="bloqueaAsistencia" name="bloqueaAsistencia"
+                           th:checked="${dia.bloqueaAsistencia}"/>
+                    <label for="bloqueaAsistencia" style="margin:0; font-size:13.5px; color:var(--negro);">Bloquear asistencia en estas fechas</label>
+                </div>
+                <p class="hint">Si no se marca, el evento aparece en el calendario pero se permite marcar asistencia.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Período escolar (opcional)</label>
+                <select name="periodoId">
+                    <option value="">— Sin período específico (aplica en general) —</option>
+                    <option th:each="p : ${periodos}"
+                            th:value="${p.idPeriodo}"
+                            th:text="${p.nombre}"
+                            th:selected="${dia.periodo != null and dia.periodo.idPeriodo == p.idPeriodo}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Descripción / nota</label>
+                <textarea name="descripcion"
+                          placeholder="Información adicional (opcional)"
+                          th:text="${dia.descripcion}"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                <a th:href="@{/calendario/admin}" class="btn btn-ghost">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    /* Auto-rellenar fechaFin cuando se elige inicio y fin está vacío */
+    document.getElementById('fechaInicio').addEventListener('change', function () {
+        const fin = document.getElementById('fechaFin');
+        if (!fin.value) fin.value = this.value;
+    });
+</script>
+</body>
+</html>

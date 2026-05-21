@@ -1,0 +1,203 @@
+/*
+ * AdminController.java — MODIFICADO para incluir datos del calendario
+ * en el dashboard.
+ *
+ * Cambios respecto al original:
+ *   1. Se inyecta CalendarioService.
+ *   2. El método dashboard() añade los atributos calXxx al modelo.
+ */
+package AsistenciaFGK.Oportunidades.controllers;
+
+import AsistenciaFGK.Oportunidades.models.Role;
+import AsistenciaFGK.Oportunidades.models.Usuario;
+import AsistenciaFGK.Oportunidades.models.PeriodoEscolar;
+import AsistenciaFGK.Oportunidades.models.Grupo;
+import AsistenciaFGK.Oportunidades.services.CalendarioService;
+import AsistenciaFGK.Oportunidades.services.EmailService;
+import AsistenciaFGK.Oportunidades.services.UsuarioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
+
+@Controller
+@RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminController {
+
+    @Autowired private UsuarioService usuarioService;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private EmailService emailService;
+    @Autowired private AsistenciaFGK.Oportunidades.repositories.EstudianteRepository estudianteRepository;
+    @Autowired private AsistenciaFGK.Oportunidades.repositories.GrupoRepository grupoRepository;
+    @Autowired private AsistenciaFGK.Oportunidades.repositories.AsistenciaRepository asistenciaRepository;
+    @Autowired private CalendarioService calendarioService; // ← NUEVO
+
+    // ── Dashboard ──────────────────────────────────────────────────────────
+    @GetMapping
+    public String dashboard(Model model) {
+
+        long totalAlumnos  = estudianteRepository.count();
+        long totalDocentes = usuarioService.listarTodos().stream()
+                    .filter(u -> u.getRole() == Role.ROLE_DOCENTE)
+                    .count();
+        long totalGrupos   = grupoRepository.count();
+        long totalUsuarios = usuarioService.listarTodos().size();
+
+        java.util.Date hoy = java.sql.Date.valueOf(LocalDate.now());
+        long asistenciasHoy = grupoRepository.findAll().stream()
+                                .flatMap(g -> asistenciaRepository.findByGrupoAndFecha(g, hoy).stream())
+                                .count();
+
+        model.addAttribute("totalAlumnos",   totalAlumnos);
+        model.addAttribute("totalDocentes",  totalDocentes);
+        model.addAttribute("totalGrupos",    totalGrupos);
+        model.addAttribute("totalUsuarios",  totalUsuarios);
+        model.addAttribute("asistenciasHoy", asistenciasHoy);
+
+        // ── NUEVO: datos del widget de calendario ─────────────────────────
+        YearMonth ym      = YearMonth.now();
+        LocalDate inicio  = ym.atDay(1);
+        LocalDate fin     = ym.atEndOfMonth();
+
+        model.addAttribute("calHoy",          LocalDate.now());
+        model.addAttribute("calAnio",         ym.getYear());
+        model.addAttribute("calMes",          ym.getMonthValue());
+        model.addAttribute("calDiasEnMes",    ym.lengthOfMonth());
+        model.addAttribute("calPrimerDia",    inicio.getDayOfWeek().getValue() % 7);
+        model.addAttribute("calPeriodoActual", calendarioService.periodoActual().orElse(null));
+        model.addAttribute("calDiasEsp",      calendarioService.diasEnRango(inicio, fin));
+        model.addAttribute("calEsBloqueado",  calendarioService.esHoyDiaBloqueado());
+        model.addAttribute("calMotivoBloqueo", calendarioService.motivoBloqueoHoy());
+        // ─────────────────────────────────────────────────────────────────
+
+        return "admin/dashboard";
+    }
+
+    // ── Lista de usuarios ──────────────────────────────────────────────────
+    @GetMapping("/usuarios")
+    public String listarUsuarios(Model model) {
+        model.addAttribute("usuarios", usuarioService.listarTodos());
+        return "admin/usuarios";
+    }
+
+    @GetMapping("/usuarios/nuevo")
+public String nuevoUsuario(Model model) {
+    model.addAttribute("usuario", new Usuario());
+    model.addAttribute("roles", java.util.Arrays.stream(Role.values())
+        .filter(r -> r != Role.ROLE_ALUMNO)
+        .toArray(Role[]::new));
+    model.addAttribute("titulo",  "Nuevo usuario");
+    return "admin/usuario-form";
+}
+
+    @PostMapping("/usuarios/guardar")
+    public String guardarUsuario(@ModelAttribute Usuario usuario,
+                                  RedirectAttributes redirectAttrs) {
+        if (usuario.getIdUsuario() == null && usuarioService.existeUsername(usuario.getUsername())) {
+            redirectAttrs.addFlashAttribute("error", "El username ya existe.");
+            return "redirect:/admin/usuarios/nuevo";
+        }
+        usuarioService.guardar(usuario);
+        redirectAttrs.addFlashAttribute("exito", "Usuario guardado correctamente.");
+        return "redirect:/admin/usuarios";
+    }
+
+    @GetMapping("/usuarios/editar/{id}")
+public String editarUsuario(@PathVariable Integer id, Model model) {
+    Usuario usuario = usuarioService.buscarPorId(id)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    model.addAttribute("usuario", usuario);
+    model.addAttribute("roles", java.util.Arrays.stream(Role.values())
+        .filter(r -> r != Role.ROLE_ALUMNO)
+        .toArray(Role[]::new));
+    model.addAttribute("titulo",  "Editar usuario");
+    return "admin/usuario-form";
+}
+
+    @GetMapping("/usuarios/reset-password/{id}")
+    public String resetPassword(@PathVariable Integer id, RedirectAttributes redirectAttrs) {
+        Usuario usuario = usuarioService.buscarPorId(id)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        String nueva = java.util.UUID.randomUUID().toString().substring(0, 8);
+        usuario.setPassword(passwordEncoder.encode(nueva));
+        usuario.setDebeCambiarPassword(true);
+        usuarioService.guardar(usuario);
+        emailService.enviarPassword(usuario.getEmail(), nueva, usuario.getNombre());
+        redirectAttrs.addFlashAttribute("exito", "Contraseña enviada al correo del usuario");
+        return "redirect:/admin/usuarios";
+    }
+
+    @GetMapping("/usuarios/eliminar/{id}")
+    public String eliminarUsuario(@PathVariable Integer id, RedirectAttributes redirectAttrs) {
+        usuarioService.eliminar(id);
+        redirectAttrs.addFlashAttribute("exito", "Usuario eliminado.");
+        return "redirect:/admin/usuarios";
+    }
+
+    @GetMapping("/estadisticas")
+    public String estadisticas(Model model) {
+        Optional<PeriodoEscolar> periodoActual = calendarioService.periodoActual();
+        
+        if (periodoActual.isEmpty()) {
+            return "redirect:/admin/dashboard";
+        }
+        
+        PeriodoEscolar periodo = periodoActual.get();
+        LocalDate fechaInicio = periodo.getFechaInicio();
+        LocalDate fechaFin = periodo.getFechaFin();
+        
+        // Convertir LocalDate a java.util.Date
+        Date fechaInicioUtil = Date.from(fechaInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date fechaFinUtil = Date.from(fechaFin.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        
+        List<Grupo> grupos = grupoRepository.findAll();
+        List<String> nombresGrupos = grupos.stream().map(Grupo::getNombre).toList();
+        
+        List<Long> presentes = new ArrayList<>();
+        List<Long> ausentes = new ArrayList<>();
+        List<Long> tardanzas = new ArrayList<>();
+        
+        for (Grupo grupo : grupos) {
+            Long presentesCount = asistenciaRepository.countByGrupoAndEstadoAndFechaBetween(
+                grupo, "Presente", fechaInicioUtil, fechaFinUtil
+            );
+            Long ausentesCount = asistenciaRepository.countByGrupoAndEstadoAndFechaBetween(
+                grupo, "Ausente", fechaInicioUtil, fechaFinUtil
+            );
+            Long tardanzasCount = asistenciaRepository.countByGrupoAndEstadoAndFechaBetween(
+                grupo, "Tardanza", fechaInicioUtil, fechaFinUtil
+            );
+            
+            presentes.add(presentesCount != null ? presentesCount : 0);
+            ausentes.add(ausentesCount != null ? ausentesCount : 0);
+            tardanzas.add(tardanzasCount != null ? tardanzasCount : 0);
+        }
+        
+        Long totalPresentes = presentes.stream().mapToLong(Long::longValue).sum();
+        Long totalAusentes = ausentes.stream().mapToLong(Long::longValue).sum();
+        Long totalRegistros = totalPresentes + totalAusentes;
+        double porcentajeGeneral = totalRegistros > 0 ? (totalPresentes * 100.0) / totalRegistros : 0;
+        
+        model.addAttribute("nombresGrupos", nombresGrupos);
+        model.addAttribute("presentes", presentes);
+        model.addAttribute("ausentes", ausentes);
+        model.addAttribute("tardanzas", tardanzas);
+        model.addAttribute("totalPresentes", totalPresentes);
+        model.addAttribute("totalAusentes", totalAusentes);
+        model.addAttribute("porcentajeGeneral", porcentajeGeneral);
+        
+        return "admin/estadisticas";
+    }
+}

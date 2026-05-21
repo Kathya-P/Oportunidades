@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap"
+          rel="stylesheet"/>
+
+    <style>
+
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #FCE7EB;
+            --negro:      #141414;
+            --gris-90:    #222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFF;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--gris-10);
+            color: var(--negro);
+            min-height: 100vh;
+        }
+
+        /* ── NAV ── */
+        nav {
+            height: 72px;
+            background: var(--negro);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand-name { color:white; font-size:14px; font-weight:700; }
+        .brand-sub  { color:#8D8D8D; font-size:11px; }
+
+        .nav-right { display:flex; align-items:center; gap:2rem; }
+
+        .nav-links { display:flex; align-items:center; gap:1.5rem; }
+
+        .nav-links a {
+            color: #BABABA;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color .2s;
+        }
+
+        .nav-links a:hover { color: white; }
+
+        .nav-links a.active {
+            color: var(--rojo);
+            font-weight: 600;
+        }
+
+        .user-chip {
+            padding: 9px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.07);
+            color: #BABABA;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .logout-link { color:#888; text-decoration:none; font-size:13px; }
+        .logout-link:hover { color:var(--rojo); }
+
+        /* ── LAYOUT ── */
+        .container {
+            max-width: 1200px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ── HEADER ── */
+        .page-header { margin-bottom: 2.4rem; }
+
+        .eyebrow {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--rojo);
+            font-weight: 700;
+            letter-spacing: .12em;
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.6rem;
+            line-height: 1.1;
+        }
+
+        .page-header p {
+            margin-top: 8px;
+            color: var(--gris-50);
+            font-size: 14px;
+        }
+
+        /* ── Dashboard layout (calendario separado de stats) ── */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 1.2rem;
+            align-items: start;
+            margin-bottom: 2rem;
+        }
+
+        .dash-calendar {
+            width: 100%;
+        }
+
+        .dash-stats {
+            width: 100%;
+        }
+
+        @media (max-width: 1000px) {
+            .dash-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Un poco más grande el widget en admin */
+        .dash-calendar .cal-widget-header { padding: 16px 18px; }
+        .dash-calendar .cal-widget-title { font-size: 14px; }
+        .dash-calendar .mini-day { padding: 7px 2px; font-size: 12.5px; }
+        .dash-calendar .mini-day-name { font-size: 10.5px; padding: 6px 0; }
+
+        /* ── STATS GRID ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--blanco);
+            border: 1px solid #ececec;
+            border-radius: 20px;
+            padding: 1.6rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: box-shadow .2s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 28px rgba(0,0,0,.07);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon svg { width:20px; height:20px; }
+
+        .icon-rojo   { background: var(--rojo-light); }
+        .icon-negro  { background: #f0f0f0; }
+        .icon-verde  { background: #E6F9F0; }
+        .icon-azul   { background: #E8F0FE; }
+        .icon-naranja{ background: #FFF3E0; }
+
+        .stat-num {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--gris-50);
+            font-weight: 600;
+        }
+
+        /* ── SECCIÓN GESTIONAR ── */
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--gris-50);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .manage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .manage-card {
+            background: var(--blanco);
+            border: 1px solid #ececec;
+            border-radius: 20px;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: box-shadow .2s, transform .2s;
+        }
+
+        .manage-card:hover {
+            box-shadow: 0 12px 32px rgba(0,0,0,.08);
+            transform: translateY(-2px);
+        }
+
+        .manage-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .manage-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .manage-icon svg { width:22px; height:22px; }
+
+        .manage-card-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .manage-card-desc {
+            font-size: 13px;
+            color: var(--gris-50);
+            line-height: 1.5;
+        }
+
+        .manage-card-footer {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--negro);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: .15s;
+        }
+
+        .btn-primary:hover { opacity: .88; }
+
+        .btn-secondary {
+            background: var(--gris-10);
+            color: var(--gris-70);
+            border: 1.5px solid var(--gris-20);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: .15s;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: var(--gris-50);
+            color: var(--negro);
+        }
+
+        /* ── FLASH ── */
+        .flash {
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-ok    { background:#E6F9F0; color:#1A7A4A; border:1px solid #B2EDD0; }
+        .flash-error { background:var(--rojo-light); color:var(--rojo-dark); border:1px solid #F5C2CA; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            .page-header h1 { font-size: 2rem; }
+            .manage-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+    <div class="brand">
+        <img src="/images/opor.png" style="height:42px;width:auto;" alt="Logo"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel administrativo</div>
+        </div>
+    </div>
+    <div class="nav-right">
+        <div class="nav-links">
+            <a th:href="@{/admin/usuarios}">Usuarios</a>
+            <a th:href="@{/admin/secciones}">Secciones</a>
+            <a th:href="@{/admin/alumnos}">Alumnos</a>
+            <a th:href="@{/admin/estadisticas}">Estadísticas</a>
+        </div>
+        <div class="user-chip">Administrador</div>
+        <a th:href="@{/logout}" class="logout-link">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- FLASH -->
+    <div class="flash flash-ok" th:if="${exito}">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#1A7A4A;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span th:text="${exito}"></span>
+    </div>
+
+    <div class="flash flash-error" th:if="${error}">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--rojo-dark);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="eyebrow">Panel administrativo</div>
+        <h1>Dashboard</h1>
+        <p>Resumen general del programa al día de hoy.</p>
+    </div>
+
+    <!-- CALENDARIO + STATS (separados) -->
+    <div class="dash-grid">
+        <div class="dash-calendar">
+            <div th:replace="~{calendario/widget-calendario :: widget}"></div>
+        </div>
+
+        <div class="dash-stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+            <div class="stat-icon icon-rojo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--rojo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${totalAlumnos}">0</div>
+            <div class="stat-label">Alumnos</div>
+        </div>
+
+                <div class="stat-card">
+            <div class="stat-icon icon-negro">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--gris-70)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${totalDocentes}">0</div>
+            <div class="stat-label">Docentes</div>
+        </div>
+
+                <div class="stat-card">
+            <div class="stat-icon icon-azul">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#4A7CF7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${totalGrupos}">0</div>
+            <div class="stat-label">Grupos</div>
+        </div>
+
+                <div class="stat-card">
+            <div class="stat-icon icon-verde">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1A7A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 11 12 14 22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${asistenciasHoy}">0</div>
+            <div class="stat-label">Asistencias hoy</div>
+        </div>
+
+            <div class="stat-card">
+            <div class="stat-icon icon-naranja">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#E67E00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${totalUsuarios}">0</div>
+            <div class="stat-label">Usuarios del sistema</div>
+        </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+</body>
+</html>
