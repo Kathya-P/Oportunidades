@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Calendario Académico — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root{
+            --rojo:#C8102E;
+            --rojo-dark:#A00E25;
+            --rojo-light:#FCE7EB;
+            --negro:#141414;
+            --gris-90:#222;
+            --gris-70:#4A4A4A;
+            --gris-50:#7A7A7A;
+            --gris-30:#B0B0B0;
+            --gris-20:#D6D6D6;
+            --gris-10:#F4F3F1;
+            --blanco:#FFF;
+            --verde:#027A48;
+            --verde-bg:#ECFDF3;
+            --naranja:#B54708;
+            --naranja-bg:#FFF5E7;
+            --azul:#175CD3;
+            --azul-bg:#EFF8FF;
+        }
+
+        *{ margin:0; padding:0; box-sizing:border-box; }
+        body{ font-family:'DM Sans', sans-serif; background:var(--gris-10); color:var(--negro); }
+
+        nav{
+            height:72px; background:rgba(20,20,20,0.98); backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            padding:0 2.5rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .brand{ display:flex; align-items:center; gap:14px; }
+        .brand-name{ color:white; font-size:14px; font-weight:700; }
+        .brand-sub{ color:#8D8D8D; font-size:11px; margin-top:2px; }
+        .nav-right{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .nav-link{ text-decoration:none; color:#7A7A7A; font-size:13px; font-weight:600; padding:10px 14px; border-radius:10px; transition:0.15s; }
+        .nav-link:hover{ color:white; background:rgba(255,255,255,0.06); }
+        .nav-link.logout{ color:var(--rojo); }
+        .nav-link.logout:hover{ background:rgba(200,16,46,0.12); color:#FF4D6A; }
+        .user-chip{ padding:9px 14px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); font-size:12px; font-weight:500; color:#BABABA; }
+
+        .container{ max-width:1200px; margin:2.5rem auto; padding:0 1.2rem; }
+
+        .page-header{ display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1.8rem; }
+        .eyebrow{ font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--rojo); margin-bottom:10px; }
+        .page-header h1{ font-family:'DM Serif Display', serif; font-size:2.4rem; line-height:1.1; }
+        .page-header p{ margin-top:10px; color:var(--gris-50); font-size:14px; line-height:1.7; max-width:700px; }
+
+        .month-nav{ display:flex; align-items:center; gap:10px; }
+        .btn{ border:none; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:11px 16px; border-radius:10px; font-family:'DM Sans', sans-serif; font-size:13px; font-weight:700; transition:0.15s; }
+        .btn-dark{ background:var(--negro); color:white; }
+        .btn-dark:hover{ background:var(--gris-90); }
+        .btn-outline{ background:white; color:var(--gris-70); border:1px solid var(--gris-20); }
+        .btn-outline:hover{ border-color:var(--negro); color:var(--negro); }
+
+        .layout{ display:grid; grid-template-columns: 1.2fr .8fr; gap:1rem; align-items:start; }
+        @media (max-width:980px){ .layout{ grid-template-columns:1fr; } }
+
+        .card{ background:var(--blanco); border:1px solid #ececec; border-radius:18px; overflow:hidden; }
+        .card-h{ padding:16px 18px; border-bottom:1px solid #f1f1f1; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+        .card-title{ font-size:12px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); }
+        .card-body{ padding:16px 18px; }
+
+        .legend{ display:flex; gap:8px; flex-wrap:wrap; }
+        .chip{ display:inline-flex; align-items:center; gap:7px; padding:7px 12px; border-radius:999px; font-size:12px; font-weight:700; border:1px solid var(--gris-20); color:var(--gris-70); background:var(--blanco); }
+        .dot{ width:9px; height:9px; border-radius:50%; }
+        .dot-hoy{ background:var(--rojo); }
+        .dot-per{ background:#6CE9A6; }
+        .dot-bloq{ background:#FDB022; }
+
+        .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:8px; }
+        .dow{ text-align:center; font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); padding:4px 0; }
+        .day{ border:1px solid #f1f1f1; border-radius:14px; padding:10px; min-height:66px; background:#fff; }
+        .day.vacio{ border-color:transparent; background:transparent; }
+        .day.hoy{ border-color:rgba(200,16,46,0.25); outline:3px solid rgba(200,16,46,0.10); }
+        .num{ font-size:12px; font-weight:900; color:var(--negro); }
+        .day.hoy .num{ color:var(--rojo); }
+
+        .tag{ margin-top:7px; display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:11px; font-weight:900; letter-spacing:.02em; }
+        .tag-per{ background:var(--verde-bg); color:var(--verde); border:1px solid #6CE9A6; }
+        .tag-bloq{ background:var(--naranja-bg); color:var(--naranja); border:1px solid #FEC84B; }
+
+        .list{ display:flex; flex-direction:column; gap:10px; }
+        .item{ padding:12px 12px; border-radius:14px; border:1px solid #f1f1f1; }
+        .item-title{ font-weight:900; font-size:13px; }
+        .item-sub{ margin-top:4px; color:var(--gris-50); font-size:12.5px; line-height:1.4; }
+        .badge{ display:inline-flex; align-items:center; justify-content:center; padding:5px 10px; border-radius:999px; font-size:11px; font-weight:900; letter-spacing:.02em; }
+        .badge-f{ background:rgba(249,112,102,.14); color:#B42318; border:1px solid rgba(249,112,102,.25); }
+        .badge-a{ background:var(--naranja-bg); color:var(--naranja); border:1px solid #FEC84B; }
+        .badge-s{ background:var(--azul-bg); color:var(--azul); border:1px solid rgba(83,177,253,.35); }
+        .empty{ color:var(--gris-50); font-style:italic; }
+
+        @media (max-width:900px) {
+            nav{ padding:0 1rem; height:auto; flex-direction:column; gap:1rem; align-items:flex-start; padding:1rem; }
+            .page-header h1{ font-size:2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="brand">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Calendario académico</div>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Dashboard</a>
+        <a class="nav-link" sec:authorize="hasRole('DOCENTE')" th:href="@{/docente}">Dashboard</a>
+        <a class="nav-link" sec:authorize="hasRole('SUPERVISOR')" th:href="@{/supervisor}">Dashboard</a>
+
+        <a class="nav-link" sec:authorize="hasRole('ADMIN')" th:href="@{/calendario/admin}">Administrar</a>
+
+        <span class="user-chip" sec:authentication="name">usuario</span>
+        <a class="nav-link logout" th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">Calendario</div>
+            <h1>Calendario Académico</h1>
+            <p>Mostrando el mes seleccionado. Los días especiales (festivos/asueto/semana pedagógica) bloquean el registro de asistencia.</p>
+        </div>
+
+        <div class="month-nav">
+            <a class="btn btn-outline" th:href="@{/calendario(anio=${anioAnterior},mes=${mesAnterior})}">←</a>
+            <a class="btn btn-dark" th:href="@{/calendario}">Mes actual</a>
+            <a class="btn btn-outline" th:href="@{/calendario(anio=${anioSiguiente},mes=${mesSiguiente})}">→</a>
+
+            <a class="btn btn-outline"
+               sec:authorize="hasRole('ADMIN')"
+               th:href="@{/calendario/admin}">Administrar calendario</a>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="card">
+            <div class="card-h">
+                <div class="card-title" th:text="'Mes ' + ${mes} + '/' + ${anio}">Mes</div>
+                <div class="legend">
+                    <span class="chip"><span class="dot dot-hoy"></span>Hoy</span>
+                    <span class="chip"><span class="dot dot-per"></span>En período</span>
+                    <span class="chip"><span class="dot dot-bloq"></span>Día especial</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="cal-grid">
+                    <div class="dow">D</div><div class="dow">L</div><div class="dow">M</div><div class="dow">X</div><div class="dow">J</div><div class="dow">V</div><div class="dow">S</div>
+
+                    <th:block th:if="${primerDiaSemana > 0}" th:each="i : ${#numbers.sequence(0, primerDiaSemana - 1)}">
+                        <div class="day vacio"></div>
+                    </th:block>
+
+                    <th:block th:each="d : ${#numbers.sequence(1, diasEnMes)}">
+                        <th:block th:with="
+                            fecha=${T(java.time.LocalDate).of(anio, mes, d)},
+                            esHoy=${fecha.equals(hoy)},
+                            bloqueos=${diasEspeciales != null ? diasEspeciales.?[bloqueaAsistencia and !fechaInicio.isAfter(#vars.fecha) and (fechaFin == null or !fechaFin.isBefore(#vars.fecha))] : null},
+                            esBlq=${bloqueos != null and !bloqueos.isEmpty()},
+                            motivo=${esBlq ? bloqueos.get(0).nombre : null},
+                            enPer=${periodoActual != null and !periodoActual.fechaInicio.isAfter(fecha) and !periodoActual.fechaFin.isBefore(fecha)}
+                        ">
+                            <div class="day" th:classappend="${esHoy ? ' hoy' : ''}">
+                                <div class="num" th:text="${d}">1</div>
+
+                                <div th:if="${enPer}" class="tag tag-per">📚 Período</div>
+                                <div th:if="${esBlq}" class="tag tag-bloq">🚫 <span th:text="${motivo}">Asueto</span></div>
+                            </div>
+                        </th:block>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-h">
+                <div class="card-title">Detalle</div>
+            </div>
+            <div class="card-body">
+
+                <div class="list" style="margin-bottom:14px;">
+                    <div class="item" th:if="${periodoActual != null}">
+                        <div class="item-title">📚 Período activo: <span th:text="${periodoActual.nombre}">Período</span></div>
+                        <div class="item-sub" th:text="${#temporals.format(periodoActual.fechaInicio,'dd/MM/yyyy')} + ' – ' + ${#temporals.format(periodoActual.fechaFin,'dd/MM/yyyy')}"></div>
+                    </div>
+                    <div class="item" th:if="${periodoActual == null}">
+                        <div class="item-title">📚 Período activo</div>
+                        <div class="item-sub empty">No hay un período activo para hoy.</div>
+                    </div>
+                </div>
+
+                <div class="list" style="margin-bottom:14px;">
+                    <div class="item" th:if="${diasEspeciales != null and !diasEspeciales.isEmpty()}" th:each="de : ${diasEspeciales}">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                            <div class="item-title" th:text="${de.nombre}">Evento</div>
+                            <span class="badge"
+                                  th:classappend="${de.tipo.name() == 'FESTIVO' ? ' badge-f' : (de.tipo.name() == 'ASUETO' ? ' badge-a' : ' badge-s')}"
+                                  th:text="${de.tipo.name() == 'FESTIVO' ? 'FESTIVO' : (de.tipo.name() == 'ASUETO' ? 'ASUETO' : 'SEM. PEDAGÓGICA')}">TIPO</span>
+                        </div>
+                        <div class="item-sub" th:text="${#temporals.format(de.fechaInicio,'dd/MM/yyyy')} + (${de.fechaFin == null or de.fechaInicio.equals(de.fechaFin)} ? '' : ' – ' + ${#temporals.format(de.fechaFin,'dd/MM/yyyy')})"></div>
+                        <div class="item-sub" th:if="${de.descripcion != null and !de.descripcion.isEmpty()}" th:text="${de.descripcion}"></div>
+                    </div>
+                    <div class="item" th:if="${diasEspeciales == null or diasEspeciales.isEmpty()}">
+                        <div class="item-title">Días especiales</div>
+                        <div class="item-sub empty">No hay días especiales en este mes.</div>
+                    </div>
+                </div>
+
+                <div class="list">
+                    <div class="item" th:if="${periodos != null and !periodos.isEmpty()}" th:each="p : ${periodos}">
+                        <div class="item-title" th:text="${p.nombre}">Período</div>
+                        <div class="item-sub" th:text="${#temporals.format(p.fechaInicio,'dd/MM/yyyy')} + ' – ' + ${#temporals.format(p.fechaFin,'dd/MM/yyyy')}"></div>
+                        <div class="item-sub" th:if="${p.descripcion != null and !p.descripcion.isEmpty()}" th:text="${p.descripcion}"></div>
+                    </div>
+                    <div class="item" th:if="${periodos == null or periodos.isEmpty()}">
+                        <div class="item-title">Períodos escolares</div>
+                        <div class="item-sub empty">Aún no hay períodos creados.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
