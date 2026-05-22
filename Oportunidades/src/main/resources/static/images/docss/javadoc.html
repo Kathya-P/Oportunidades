@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>JavaDoc — Sistema de Asistencia Oportunidades FGK</title>
+<style>
+  body { font-family: DejaVu Sans, Arial, Helvetica, sans-serif; font-size: 14px; margin: 0; padding: 0; background: #fff; color: #353833; }
+  a { color: #4A6782; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header principal ── */
+  .top-bar { background: #4A7D8C; padding: 6px 16px; }
+  .top-bar span { color: #fff; font-size: 13px; }
+  h1.pkg { background: #4A7D8C; color: #fff; padding: 10px 16px; margin: 0; font-size: 15px; font-weight: normal; }
+
+  /* ── Contenedor ── */
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px 40px; }
+
+  /* ── Cabecera de clase ── */
+  .class-header { border-bottom: 2px solid #4A7D8C; margin: 32px 0 10px; padding-bottom: 6px; }
+  .class-header h2 { font-size: 18px; margin: 0 0 2px; color: #000; }
+  .class-header .pkg-label { font-size: 12px; color: #666; }
+  .class-header .author-line { font-size: 12px; color: #444; margin-top: 4px; }
+
+  /* ── Descripción de clase ── */
+  .class-desc { margin: 8px 0 18px; font-size: 13px; line-height: 1.6; }
+
+  /* ── Tabla de métodos ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px; }
+  table caption { text-align: left; font-weight: bold; font-size: 13px; background: #DEE3E9; border: 1px solid #9EADC8; padding: 5px 8px; color: #000; }
+  th { background: #DEE3E9; border: 1px solid #9EADC8; padding: 5px 8px; text-align: left; font-weight: bold; }
+  td { border: 1px solid #9EADC8; padding: 5px 8px; vertical-align: top; }
+  tr.alt td { background: #EEEEFF; }
+  td.ret { color: #555; font-style: italic; white-space: nowrap; }
+  td.mname { font-weight: bold; color: #4A6782; }
+  td.desc { color: #353833; }
+  td.params { font-size: 12px; color: #555; }
+
+  /* ── Tabla de campos ── */
+  .field-table td { font-size: 12px; }
+
+  /* ── Footer ── */
+  .footer { border-top: 1px solid #9EADC8; margin-top: 40px; padding-top: 8px; font-size: 11px; color: #777; text-align: center; }
+
+  /* ── Índice de clases ── */
+  .index-box { background: #F7F7F7; border: 1px solid #ccc; padding: 12px 16px; margin: 20px 0; font-size: 13px; }
+  .index-box h3 { margin: 0 0 8px; font-size: 13px; color: #000; }
+  .index-box ul { margin: 0; padding-left: 20px; }
+  .index-box li { margin: 3px 0; }
+
+  .badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: bold; margin-left: 6px; }
+  .badge-service  { background: #D6EAF8; color: #154360; }
+  .badge-model    { background: #D5F5E3; color: #145A32; }
+  .badge-ctrl     { background: #FDEBD0; color: #784212; }
+  .badge-security { background: #F9EBEA; color: #7B241C; }
+</style>
+</head>
+<body>
+
+<div class="top-bar"><span>Sistema de Asistencia &mdash; Programa Oportunidades FGK &mdash; Documentación de API</span></div>
+<h1 class="pkg">Paquete: AsistenciaFGK.Oportunidades</h1>
+
+<div class="wrap">
+
+  <!-- ── Índice ── -->
+  <div class="index-box">
+    <h3>Clases documentadas</h3>
+    <ul>
+      <li><a href="#AlertaScheduler">AlertaScheduler</a> <span class="badge badge-service">@Component</span></li>
+      <li><a href="#ExportService">ExportService</a> <span class="badge badge-service">@Service</span></li>
+      <li><a href="#CalendarioService">CalendarioService</a> <span class="badge badge-service">@Service</span></li>
+      <li><a href="#SecurityConfig">SecurityConfig</a> <span class="badge badge-security">@Configuration</span></li>
+      <li><a href="#AdminController">AdminController</a> <span class="badge badge-ctrl">@Controller</span></li>
+      <li><a href="#AsistenciaController">AsistenciaController</a> <span class="badge badge-ctrl">@Controller</span></li>
+      <li><a href="#Estudiante">Estudiante</a> <span class="badge badge-model">@Entity</span></li>
+      <li><a href="#Asistencia">Asistencia</a> <span class="badge badge-model">@Entity</span></li>
+      <li><a href="#Grupo">Grupo</a> <span class="badge badge-model">@Entity</span></li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- AlertaScheduler -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="AlertaScheduler">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.services</div>
+    <h2>AlertaScheduler</h2>
+    <div class="author-line">
+      <strong>@author</strong> Justin Oswaldo Ramírez Lemus &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Componente de Spring que ejecuta tareas programadas (<code>@Scheduled</code>) para monitorear
+    la asistencia de los estudiantes durante el período escolar activo. Detecta ausencias por
+    horario de grupo y ausentismo acumulado, registrando alertas en la base de datos y enviando
+    notificaciones por correo electrónico a los supervisores del programa.
+    <br><br>
+    <em>Dependencias:</em> EstudianteRepository, AsistenciaRepository, AlertaRepository,
+    UsuarioRepository, GrupoRepository, CalendarioService, EmailService.
+  </div>
+
+  <table>
+    <caption>Resumen de métodos</caption>
+    <tr><th style="width:130px">Tipo de retorno</th><th style="width:260px">Método</th><th>Descripción</th></tr>
+    <tr>
+      <td class="ret">void</td>
+      <td class="mname">actualizarPendientesYAusentesPorHorario()</td>
+      <td class="desc">
+        Se ejecuta cada <strong>5 minutos</strong> (<code>fixedDelay = 300 000 ms</code>).
+        Recorre todos los grupos con clase en el día actual y verifica si la hora actual
+        supera el horario de fin de la sesión. Los registros en estado <code>PENDIENTE</code>
+        se actualizan a <code>AUSENTE</code>; si el alumno no tiene registro, se crea uno.
+        Al terminar envía un resumen de ausentes por sección a todos los usuarios con rol
+        <code>ROLE_SUPERVISOR</code>. No actúa si no hay período escolar activo o si el día
+        está bloqueado en el calendario académico.
+        <br><br>
+        <span class="params"><strong>@param</strong> — (ninguno)</span><br>
+        <span class="params"><strong>@throws</strong> — Captura internamente errores de correo; los registra en consola sin detener la ejecución.</span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">void</td>
+      <td class="mname">verificarAusentismo()</td>
+      <td class="desc">
+        Se ejecuta cada <strong>1 minuto</strong> (<code>fixedDelay = 60 000 ms</code>).
+        Consulta el total de ausencias de cada estudiante en el período escolar activo.
+        Si un alumno acumula <strong>3 o más ausencias</strong> y no existe ya una alerta
+        activa del tipo <code>INASISTENCIA</code>, crea un registro en la entidad
+        <code>Alerta</code> y notifica por correo a todos los supervisores.
+        <br><br>
+        <span class="params"><strong>@param</strong> — (ninguno)</span><br>
+        <span class="params"><strong>@return</strong> — void</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ExportService -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="ExportService">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.services</div>
+    <h2>ExportService</h2>
+    <div class="author-line">
+      <strong>@author</strong> Justin Oswaldo Ramírez Lemus &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Servicio responsable de generar y enviar al cliente reportes en formato PDF y Excel.
+    Utiliza la librería <strong>iText</strong> para documentos PDF y <strong>Apache POI (XSSFWorkbook)</strong>
+    para hojas de cálculo. Los archivos se escriben directamente en el
+    <code>HttpServletResponse</code> como descarga adjunta.
+  </div>
+
+  <table>
+    <caption>Resumen de métodos</caption>
+    <tr><th style="width:130px">Tipo de retorno</th><th style="width:300px">Método</th><th>Descripción</th></tr>
+    <tr>
+      <td class="ret">void</td>
+      <td class="mname">exportarAsistenciasPDF(List&lt;Asistencia&gt;, String, String, String, HttpServletResponse)</td>
+      <td class="desc">
+        Genera un PDF orientado horizontal (A4) con una tabla de asistencias filtradas.
+        Incluye encabezado con nombre del programa, rango de fechas y pie de página con total de registros.
+        <br><br>
+        <span class="params">
+          <strong>@param</strong> asistencias — lista de registros a exportar<br>
+          <strong>@param</strong> filtro — etiqueta de agrupación (ej. nombre del grupo)<br>
+          <strong>@param</strong> inicio — fecha de inicio del reporte (String)<br>
+          <strong>@param</strong> fin — fecha de fin del reporte (String)<br>
+          <strong>@param</strong> response — respuesta HTTP donde se escribe el PDF<br>
+          <strong>@throws</strong> Exception — si falla la escritura del documento
+        </span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">void</td>
+      <td class="mname">exportarAsistenciasExcel(List&lt;Asistencia&gt;, String, String, String, HttpServletResponse)</td>
+      <td class="desc">
+        Genera un archivo <code>.xlsx</code> con filas alternadas en gris. Incluye fila de título,
+        subtítulo y encabezados de columna con fondo oscuro. Aplica autoajuste de ancho a todas las columnas.
+        <br><br>
+        <span class="params">
+          <strong>@param</strong> asistencias — lista de registros a exportar<br>
+          <strong>@param</strong> filtro, inicio, fin — igual que en el método PDF<br>
+          <strong>@param</strong> response — respuesta HTTP donde se escribe el Excel<br>
+          <strong>@throws</strong> IOException — si falla la escritura
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td class="ret">void</td>
+      <td class="mname">exportarRiesgoPDF(List&lt;Map&lt;String,Object&gt;&gt;, HttpServletResponse)</td>
+      <td class="desc">
+        Genera un PDF con la lista de estudiantes en riesgo de ausentismo. Muestra nombre,
+        cantidad de ausencias, tardanzas y nivel de riesgo (Precaución / Alerta / Crítico).
+        <br><br>
+        <span class="params">
+          <strong>@param</strong> enRiesgo — lista de mapas con claves: nombre, ausencias, tardanzas, nivel<br>
+          <strong>@param</strong> response — respuesta HTTP<br>
+          <strong>@throws</strong> Exception
+        </span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">void</td>
+      <td class="mname">exportarRiesgoExcel(List&lt;Map&lt;String,Object&gt;&gt;, HttpServletResponse)</td>
+      <td class="desc">
+        Versión Excel del reporte de riesgo. Mismo contenido que el PDF pero en formato
+        <code>.xlsx</code> con estilos de encabezado y filas alternadas.
+        <br><br>
+        <span class="params">
+          <strong>@param</strong> enRiesgo — lista de mapas con datos de riesgo<br>
+          <strong>@param</strong> response — respuesta HTTP<br>
+          <strong>@throws</strong> IOException
+        </span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- CalendarioService -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="CalendarioService">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.services</div>
+    <h2>CalendarioService</h2>
+    <div class="author-line">
+      <strong>@author</strong> Justin Oswaldo Ramírez Lemus &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Servicio que centraliza la lógica del calendario académico del programa. Gestiona períodos
+    escolares (<code>PeriodoEscolar</code>) y días especiales (<code>DiaEspecial</code>) como
+    festivos, asuetos y semanas pedagógicas. Determina si un día específico bloquea el registro
+    de asistencia.
+  </div>
+
+  <table>
+    <caption>Resumen de métodos</caption>
+    <tr><th style="width:200px">Tipo de retorno</th><th style="width:280px">Método</th><th>Descripción</th></tr>
+    <tr>
+      <td class="ret">Optional&lt;PeriodoEscolar&gt;</td>
+      <td class="mname">periodoActual()</td>
+      <td class="desc">Retorna el período escolar activo que contiene la fecha de hoy. Retorna <code>empty</code> si no existe ninguno vigente.</td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">Optional&lt;PeriodoEscolar&gt;</td>
+      <td class="mname">periodoParaFecha(LocalDate fecha)</td>
+      <td class="desc">Retorna el período activo que contiene la fecha indicada (no necesariamente hoy).<br><span class="params"><strong>@param</strong> fecha — fecha a evaluar</span></td>
+    </tr>
+    <tr>
+      <td class="ret">Optional&lt;PeriodoEscolar&gt;</td>
+      <td class="mname">periodoQueContieneRango(LocalDate desde, LocalDate hasta)</td>
+      <td class="desc">Retorna el período que cubre todo el rango [desde, hasta]. Si los extremos pertenecen a períodos distintos retorna <code>empty</code>.</td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">boolean</td>
+      <td class="mname">esHoyDiaBloqueado()</td>
+      <td class="desc">Retorna <code>true</code> si la fecha actual está marcada como bloqueada en el calendario (festivo, asueto, semana pedagógica).</td>
+    </tr>
+    <tr>
+      <td class="ret">boolean</td>
+      <td class="mname">esDiaBloqueado(LocalDate fecha)</td>
+      <td class="desc">Versión parametrizada de <code>esHoyDiaBloqueado()</code> para evaluar cualquier fecha.<br><span class="params"><strong>@param</strong> fecha — fecha a consultar</span></td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">String</td>
+      <td class="mname">motivoBloqueoHoy()</td>
+      <td class="desc">Retorna el nombre del día especial que bloquea hoy (ej. "Día del maestro"). Retorna <code>null</code> si hoy no está bloqueado.</td>
+    </tr>
+    <tr>
+      <td class="ret">boolean</td>
+      <td class="mname">hayTraslapePeriodos(LocalDate inicio, LocalDate fin, Integer excluirId)</td>
+      <td class="desc">Valida que el rango de un nuevo período no se cruce con otro existente. El parámetro <code>excluirId</code> permite ignorar el propio período al editar.</td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">List&lt;DiaEspecial&gt;</td>
+      <td class="mname">diasEnRango(LocalDate inicio, LocalDate fin)</td>
+      <td class="desc">Retorna todos los días especiales que caen dentro del rango indicado, ordenados por fecha ascendente.</td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SecurityConfig -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="SecurityConfig">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.security</div>
+    <h2>SecurityConfig</h2>
+    <div class="author-line">
+      <strong>@author</strong> Kathya Carolina Pérez Jiménez &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Clase de configuración de Spring Security. Define las reglas de acceso por rol para todas
+    las rutas del sistema, el formulario de login con redirección dinámica por rol, el manejo
+    de cierre de sesión y el <code>PasswordEncoder</code> basado en BCrypt. Habilita la seguridad
+    a nivel de método mediante <code>@EnableMethodSecurity</code>.
+    <br><br>
+    <strong>Roles del sistema:</strong> <code>ROLE_ADMIN</code>, <code>ROLE_DOCENTE</code>,
+    <code>ROLE_SUPERVISOR</code>. Las rutas <code>/login</code>, <code>/images/**</code>,
+    <code>/asistencia/lector</code> y <code>/asistencia/registrar</code> son públicas.
+  </div>
+
+  <table>
+    <caption>Resumen de métodos (Beans)</caption>
+    <tr><th style="width:200px">Tipo de retorno</th><th style="width:240px">Método</th><th>Descripción</th></tr>
+    <tr>
+      <td class="ret">SecurityFilterChain</td>
+      <td class="mname">filterChain(HttpSecurity http)</td>
+      <td class="desc">
+        Configura la cadena de filtros HTTP. Define rutas permitidas por rol, página de login,
+        redireccionamiento post-login según rol y política de logout (invalida sesión, elimina cookie
+        <code>JSESSIONID</code>). CSRF desactivado para compatibilidad con formularios Thymeleaf sin token.
+        <br><br>
+        <span class="params">
+          <strong>@param</strong> http — objeto de configuración HTTP de Spring Security<br>
+          <strong>@return</strong> SecurityFilterChain configurada<br>
+          <strong>@throws</strong> Exception
+        </span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">PasswordEncoder</td>
+      <td class="mname">passwordEncoder()</td>
+      <td class="desc">
+        Expone un <code>BCryptPasswordEncoder</code> como bean de Spring para el cifrado
+        de contraseñas de usuarios del sistema.
+        <br><span class="params"><strong>@return</strong> instancia de BCryptPasswordEncoder</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="ret">AuthenticationManager</td>
+      <td class="mname">authenticationManager(AuthenticationConfiguration config)</td>
+      <td class="desc">
+        Expone el <code>AuthenticationManager</code> de Spring para su uso en otros componentes.
+        <br><span class="params"><strong>@return</strong> AuthenticationManager<br><strong>@throws</strong> Exception</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- AdminController -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="AdminController">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.controllers</div>
+    <h2>AdminController</h2>
+    <div class="author-line">
+      <strong>@author</strong> Kathya Carolina Pérez Jiménez &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Controlador que gestiona el panel administrativo del sistema. Requiere rol
+    <code>ROLE_ADMIN</code> en todas sus rutas (<code>/admin/**</code>). Maneja el dashboard
+    con estadísticas en tiempo real, el CRUD de usuarios del sistema y el widget de calendario
+    académico mensual.
+  </div>
+
+  <table>
+    <caption>Resumen de métodos</caption>
+    <tr><th style="width:130px">Tipo de retorno</th><th style="width:240px">Método</th><th>Descripción</th></tr>
+    <tr>
+      <td class="ret">String</td>
+      <td class="mname">dashboard(Model model)</td>
+      <td class="desc">
+        <code>GET /admin</code> — Carga el panel principal. Agrega al modelo: total de alumnos,
+        docentes, grupos, usuarios del sistema, asistencias del día y datos del calendario mensual
+        (período activo, días especiales, primer día del mes).
+        <br><span class="params"><strong>@return</strong> vista <code>admin/dashboard</code></span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">String</td>
+      <td class="mname">listarUsuarios(Model model)</td>
+      <td class="desc">
+        <code>GET /admin/usuarios</code> — Lista todos los usuarios del sistema.
+        <br><span class="params"><strong>@return</strong> vista <code>admin/usuarios</code></span>
+      </td>
+    </tr>
+    <tr>
+      <td class="ret">String</td>
+      <td class="mname">guardarUsuario(Usuario, RedirectAttributes)</td>
+      <td class="desc">
+        <code>POST /admin/usuarios/guardar</code> — Guarda o actualiza un usuario. Valida que el
+        username no esté duplicado al crear. Redirige con mensaje de éxito o error.
+        <br><span class="params"><strong>@param</strong> usuario — datos del formulario<br><strong>@return</strong> redirect a <code>/admin/usuarios</code></span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">String</td>
+      <td class="mname">editarUsuario(Integer id, Model model)</td>
+      <td class="desc">
+        <code>GET /admin/usuarios/editar/{id}</code> — Carga el formulario de edición de un usuario existente.
+        <br><span class="params"><strong>@param</strong> id — identificador del usuario<br><strong>@return</strong> vista <code>admin/usuario-form</code></span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- AsistenciaController -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="AsistenciaController">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.controllers</div>
+    <h2>AsistenciaController</h2>
+    <div class="author-line">
+      <strong>@author</strong> Kathya Carolina Pérez Jiménez &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Controlador que maneja el registro de asistencia mediante lector de código de barras. Sus
+    endpoints <code>/asistencia/lector</code> y <code>/asistencia/registrar</code> son públicos
+    (sin autenticación) para permitir el uso desde dispositivos de lectura físicos. Valida período
+    escolar activo, días bloqueados, horario del grupo y jornada del alumno antes de registrar.
+  </div>
+
+  <table>
+    <caption>Resumen de métodos</caption>
+    <tr><th style="width:130px">Tipo de retorno</th><th style="width:220px">Método</th><th>Descripción</th></tr>
+    <tr>
+      <td class="ret">String</td>
+      <td class="mname">paginaLector(Model model)</td>
+      <td class="desc">
+        <code>GET /asistencia/lector</code> — Muestra la pantalla del lector QR/barras.
+        Indica si hoy es día bloqueado y el motivo, para informar al operador.
+        <br><span class="params"><strong>@return</strong> vista <code>asistencia/lector</code></span>
+      </td>
+    </tr>
+    <tr class="alt">
+      <td class="ret">String</td>
+      <td class="mname">registrar(String codigoBarras, Model model)</td>
+      <td class="desc">
+        <code>POST /asistencia/registrar</code> — Procesa el escaneo de un código de barras.
+        Busca al estudiante, determina su grupo activo por horario y día de la semana, y crea
+        o actualiza el registro de asistencia con estado <code>PRESENTE</code> o <code>TARDANZA</code>.
+        Bloquea el registro si no hay período activo o si el día está bloqueado en el calendario.
+        <br><br>
+        <span class="params">
+          <strong>@param</strong> codigoBarras — código escaneado del carnet del alumno<br>
+          <strong>@return</strong> vista <code>asistencia/lector</code> con resultado del registro
+        </span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- Estudiante -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="Estudiante">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.models</div>
+    <h2>Estudiante</h2>
+    <div class="author-line">
+      <strong>@author</strong> Daniela Carolina Monge Cartagena &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Entidad JPA que representa a un alumno del Programa Oportunidades. El estudiante no posee
+    credenciales de acceso al sistema; se identifica únicamente mediante su
+    <code>codigoBarras</code> escaneado en el lector físico. Tiene relación
+    <code>ManyToMany</code> con <code>Grupo</code>.
+  </div>
+
+  <table class="field-table">
+    <caption>Campos principales</caption>
+    <tr><th style="width:160px">Tipo</th><th style="width:160px">Campo</th><th>Descripción</th></tr>
+    <tr><td>Integer</td><td>idEstudiante</td><td>Clave primaria autoincremental.</td></tr>
+    <tr class="alt"><td>String</td><td>nombre</td><td>Nombre(s) del alumno. No nulo.</td></tr>
+    <tr><td>String</td><td>apellido</td><td>Apellido(s) del alumno. No nulo.</td></tr>
+    <tr class="alt"><td>String</td><td>codigoBarras</td><td>Código único del carnet físico. No nulo, único en la tabla.</td></tr>
+    <tr><td>Jornada</td><td>jornada</td><td>Enum: <code>FULL_TIME</code> o <code>SABATINO</code>. Por defecto <code>FULL_TIME</code>.</td></tr>
+    <tr class="alt"><td>String</td><td>direccion</td><td>Dirección del alumno. Opcional.</td></tr>
+    <tr><td>List&lt;Grupo&gt;</td><td>grupos</td><td>Grupos en los que está inscrito el alumno (ManyToMany).</td></tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- Asistencia -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="Asistencia">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.models</div>
+    <h2>Asistencia</h2>
+    <div class="author-line">
+      <strong>@author</strong> Daniela Carolina Monge Cartagena &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Entidad JPA que registra cada evento de asistencia de un alumno en un grupo. El campo
+    <code>estado</code> puede tomar los valores: <code>PRESENTE</code>, <code>AUSENTE</code>,
+    <code>TARDANZA</code> o <code>PENDIENTE</code>. Un registro <code>PENDIENTE</code> indica
+    que la clase aún no ha terminado; el <code>AlertaScheduler</code> lo convierte a
+    <code>AUSENTE</code> al finalizar el horario.
+  </div>
+
+  <table class="field-table">
+    <caption>Campos principales</caption>
+    <tr><th style="width:160px">Tipo</th><th style="width:160px">Campo</th><th>Descripción</th></tr>
+    <tr><td>Integer</td><td>idAsistencia</td><td>Clave primaria autoincremental.</td></tr>
+    <tr class="alt"><td>Date</td><td>fecha</td><td>Fecha del registro (<code>TemporalType.DATE</code>). No nulo.</td></tr>
+    <tr><td>String</td><td>horaEntrada</td><td>Hora en que el alumno escaneó su carnet. Nulo si no se presentó.</td></tr>
+    <tr class="alt"><td>String</td><td>horaSalida</td><td>Hora de salida registrada. Opcional.</td></tr>
+    <tr><td>String</td><td>estado</td><td>Estado del registro: PRESENTE | AUSENTE | TARDANZA | PENDIENTE.</td></tr>
+    <tr class="alt"><td>Estudiante</td><td>estudiante</td><td>Alumno al que pertenece el registro (ManyToOne).</td></tr>
+    <tr><td>Grupo</td><td>grupo</td><td>Grupo al que corresponde la asistencia (ManyToOne).</td></tr>
+  </table>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- Grupo -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="class-header" id="Grupo">
+    <div class="pkg-label">AsistenciaFGK.Oportunidades.models</div>
+    <h2>Grupo</h2>
+    <div class="author-line">
+      <strong>@author</strong> Daniela Carolina Monge Cartagena &nbsp;|&nbsp;
+      <strong>@version</strong> 1.0 &nbsp;|&nbsp;
+      <strong>@since</strong> 2026
+    </div>
+  </div>
+  <div class="class-desc">
+    Entidad JPA que representa un grupo de alumnos dentro del programa. Define el horario
+    de clases (días de la semana, hora de inicio y fin), la modalidad de jornada y la
+    capacidad máxima. Tiene relación <code>ManyToMany</code> con <code>Estudiante</code>
+    y <code>ManyToOne</code> con <code>Programa</code>.
+  </div>
+
+  <table class="field-table">
+    <caption>Campos principales</caption>
+    <tr><th style="width:160px">Tipo</th><th style="width:160px">Campo</th><th>Descripción</th></tr>
+    <tr><td>Integer</td><td>idGrupo</td><td>Clave primaria autoincremental.</td></tr>
+    <tr class="alt"><td>String</td><td>nombre</td><td>Nombre del grupo. No nulo.</td></tr>
+    <tr><td>String</td><td>dias</td><td>Días de clase separados por coma. Ej: <code>"LUNES,MARTES,JUEVES"</code>.</td></tr>
+    <tr class="alt"><td>String</td><td>horaInicio</td><td>Hora de inicio de clase en formato <code>HH:mm</code>. Ej: <code>"08:00"</code>.</td></tr>
+    <tr><td>String</td><td>horaFin</td><td>Hora de fin de clase en formato <code>HH:mm</code>. Ej: <code>"12:00"</code>.</td></tr>
+    <tr class="alt"><td>String</td><td>modalidad</td><td>Jornada del grupo: <code>"FULL_TIME"</code> o <code>"SABATINO"</code>.</td></tr>
+    <tr><td>Integer</td><td>capacidad</td><td>Número máximo de alumnos en el grupo.</td></tr>
+    <tr class="alt"><td>Programa</td><td>programa</td><td>Programa académico al que pertenece el grupo (ManyToOne).</td></tr>
+    <tr><td>List&lt;Estudiante&gt;</td><td>estudiantes</td><td>Alumnos inscritos en el grupo (ManyToMany, mappedBy).</td></tr>
+  </table>
+
+  <div class="footer">
+    Generado para: Sistema de Asistencia &mdash; Programa Oportunidades FGK &nbsp;&mdash;&nbsp;
+    Daniela Carolina Monge Cartagena &nbsp;|&nbsp; Kathya Carolina Pérez Jiménez &nbsp;|&nbsp; Justin Oswaldo Ramírez Lemus
+    &nbsp;&mdash;&nbsp; 2025
+  </div>
+
+</div>
+</body>
+</html>
