@@ -7,6 +7,8 @@ import AsistenciaFGK.Oportunidades.repositories.AsistenciaRepository;
 import AsistenciaFGK.Oportunidades.repositories.EstudianteRepository;
 import AsistenciaFGK.Oportunidades.repositories.GrupoRepository;
 import AsistenciaFGK.Oportunidades.services.CalendarioService;
+import AsistenciaFGK.Oportunidades.services.ExportService;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/asistencia")
 public class AsistenciaController {
+
+    @Autowired
+private ExportService exportService;
 
     @Autowired
     private EstudianteRepository estudianteRepository;
@@ -56,6 +61,28 @@ public class AsistenciaController {
         model.addAttribute("error",  null);
         return "asistencia/lector";
     }
+
+@GetMapping("/exportar/jasper")
+public void exportarJasper(
+        @RequestParam String filtro,
+        @RequestParam String inicio,
+        @RequestParam String fin,
+        HttpServletResponse response) {
+    try {
+        List<Asistencia> asistencias = asistenciaRepository.findAll();
+        exportService.exportarAsistenciasJasper(asistencias, filtro, inicio, fin, response);
+    } catch (Exception e) {
+        // Si hay error ANTES de abrir el stream, mandamos mensaje de texto
+        if (!response.isCommitted()) {
+            try {
+                response.setContentType("text/plain");
+                response.setStatus(500);
+                response.getWriter().write("Error generando reporte: " + e.getMessage());
+            } catch (Exception ignored) {}
+        }
+        e.printStackTrace(); // Para ver el error real en consola
+    }
+}
 
     // ── Endpoint que recibe el escaneo ────────────────────────────────────────
     @PostMapping("/registrar")

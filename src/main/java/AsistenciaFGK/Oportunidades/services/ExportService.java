@@ -1,14 +1,21 @@
 package AsistenciaFGK.Oportunidades.services;
 
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import AsistenciaFGK.Oportunidades.models.Asistencia;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import jakarta.servlet.http.HttpServletResponse;
+// Nuevos imports que necesitas agregar arriba:
+import org.springframework.core.io.ClassPathResource;
+import AsistenciaFGK.Oportunidades.models.AsistenciaReporteDTO;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -283,4 +290,46 @@ public class ExportService {
         wb.write(response.getOutputStream());
         wb.close();
     }
+
+    // Nuevo método a agregar al final de ExportService:
+public void exportarAsistenciasJasper(
+        List<Asistencia> asistencias,
+        String filtro,
+        String inicio,
+        String fin,
+        HttpServletResponse response) throws Exception {
+
+    // 1. Convertir las asistencias al DTO que Jasper entiende
+    List<AsistenciaReporteDTO> datos = asistencias.stream()
+        .map(a -> new AsistenciaReporteDTO(
+            a.getEstudiante().getNombre() + " " + a.getEstudiante().getApellido(),
+            a.getGrupo().getNombre(),
+            a.getHoraEntrada(),
+            a.getHoraSalida(),
+            a.getEstado()
+        )).toList();
+
+    // 2. Cargar la plantilla .jrxml y compilarla
+    InputStream reportStream = new ClassPathResource("reports/asistencias.jrxml").getInputStream();
+    JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+    // 3. Pasar los parámetros
+    HashMap<String, Object> params = new HashMap<>();
+    params.put("filtro", filtro);
+    params.put("inicio", inicio);
+    params.put("fin", fin);
+
+    // 4. Crear el datasource desde la lista de DTOs
+    JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(datos);
+
+    // 5. Llenar el reporte con datos
+    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, dataSource);
+
+    // 6. Exportar como PDF al response
+    response.setContentType("application/pdf");
+    response.setHeader("Content-Disposition",
+        "attachment; filename=asistencia-jasper-" + filtro + "-" + inicio + ".pdf");
+
+    JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
+}
 }
