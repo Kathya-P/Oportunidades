@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Estadísticas — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap"
+          rel="stylesheet"/>
+
+    <style>
+
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #FCE7EB;
+            --negro:      #141414;
+            --gris-90:    #222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFF;
+            --verde:      #1D9E75;
+            --rojo-chart: #E24B4A;
+            --amarillo:   #EF9F27;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--gris-10);
+            color: var(--negro);
+            min-height: 100vh;
+        }
+
+        /* ── NAV ── */
+        nav {
+            height: 72px;
+            background: var(--negro);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand-name { color:white; font-size:14px; font-weight:700; }
+        .brand-sub  { color:#8D8D8D; font-size:11px; }
+
+        .nav-right { display:flex; align-items:center; gap:2rem; }
+
+        .nav-links { display:flex; align-items:center; gap:1.5rem; }
+
+        .nav-links a {
+            color: #BABABA;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color .2s;
+        }
+
+        .nav-links a:hover { color: white; }
+
+        .nav-links a.active {
+            color: var(--rojo);
+            font-weight: 600;
+        }
+
+        .user-chip {
+            padding: 9px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.07);
+            color: #BABABA;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .logout-link { color:#888; text-decoration:none; font-size:13px; }
+        .logout-link:hover { color:var(--rojo); }
+
+        /* ── LAYOUT ── */
+        .container {
+            max-width: 1200px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ── HEADER ── */
+        .page-header { margin-bottom: 2.4rem; }
+
+        .eyebrow {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--rojo);
+            font-weight: 700;
+            letter-spacing: .12em;
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2.6rem;
+            line-height: 1.1;
+        }
+
+        .page-header p {
+            margin-top: 8px;
+            color: var(--gris-50);
+            font-size: 14px;
+        }
+
+        /* ── STATS GRID ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--blanco);
+            border: 1px solid #ececec;
+            border-radius: 20px;
+            padding: 1.6rem 1.4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: box-shadow .2s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 28px rgba(0,0,0,.07);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon svg { width:20px; height:20px; }
+
+        .icon-rojo   { background: var(--rojo-light); }
+        .icon-negro  { background: #f0f0f0; }
+        .icon-verde  { background: #E6F9F0; }
+        .icon-azul   { background: #E8F0FE; }
+        .icon-naranja{ background: #FFF3E0; }
+
+        .stat-num {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--gris-50);
+            font-weight: 600;
+        }
+
+        /* ── CHART CARDS ── */
+        .chart-card {
+            background: var(--blanco);
+            border: 1px solid #ececec;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow .2s;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 8px 28px rgba(0,0,0,.07);
+        }
+
+        .chart-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--negro);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container-donut {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── FLASH ── */
+        .flash {
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-ok    { background:#E6F9F0; color:#1A7A4A; border:1px solid #B2EDD0; }
+        .flash-error { background:var(--rojo-light); color:var(--rojo-dark); border:1px solid #F5C2CA; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            .page-header h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+    <div class="brand">
+        <a th:href="@{/admin}" style="display:flex; align-items:center; gap:14px; text-decoration:none;">
+            <img src="/images/opor.png" style="height:42px;width:auto;" alt="Logo"/>
+            <div>
+                <div class="brand-name">Programa Oportunidades</div>
+                <div class="brand-sub">Panel administrativo</div>
+            </div>
+        </a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-links">
+            <a th:href="@{/admin/usuarios}">Usuarios</a>
+            <a th:href="@{/admin/secciones}">Secciones</a>
+            <a th:href="@{/admin/alumnos}">Alumnos</a>
+            <a th:href="@{/admin/estadisticas}" class="active">Estadísticas</a>
+        </div>
+        <div class="user-chip">Administrador</div>
+        <a th:href="@{/logout}" class="logout-link">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- FLASH -->
+    <div class="flash flash-ok" th:if="${exito}">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#1A7A4A;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span th:text="${exito}"></span>
+    </div>
+
+    <div class="flash flash-error" th:if="${error}">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--rojo-dark);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="eyebrow">Panel administrativo</div>
+        <h1>Estadísticas</h1>
+        <p>Resumen de asistencia del período activo</p>
+    </div>
+
+    <!-- METRIC CARDS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon icon-rojo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--rojo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 11 12 14 22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${totalPresentes}">0</div>
+            <div class="stat-label">Total Presentes</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-negro">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--rojo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${totalAusentes}">0</div>
+            <div class="stat-label">Total Ausentes</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon icon-rojo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--rojo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+            <div class="stat-num" th:text="${porcentajeGeneral}">0%</div>
+            <div class="stat-label">Porcentaje General</div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+        <!-- Bar Chart -->
+        <div class="chart-card">
+            <div class="chart-card-title">Asistencia por Grupo</div>
+            <div class="chart-container">
+                <canvas id="chartBarras"></canvas>
+            </div>
+        </div>
+
+        <!-- Donut Chart -->
+        <div class="chart-card">
+            <div class="chart-card-title">Distribución General</div>
+            <div class="chart-container-donut">
+                <canvas id="chartDona"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    // Data from Thymeleaf backend
+    const nombresGrupos = /*[[${nombresGrupos}]]*/ [];
+    const presentes = /*[[${presentes}]]*/ [];
+    const ausentes = /*[[${ausentes}]]*/ [];
+    const tardanzas = /*[[${tardanzas}]]*/ [];
+
+    const totalPresentes = /*[[${totalPresentes}]]*/ 0;
+    const totalAusentes = /*[[${totalAusentes}]]*/ 0;
+    const totalTardanzas = /*[[${totalTardanzas}]]*/ 0;
+
+    // Bar Chart - Asistencia por Grupo
+    const ctxBarras = document.getElementById('chartBarras').getContext('2d');
+    const chartBarras = new Chart(ctxBarras, {
+        type: 'bar',
+        data: {
+            labels: nombresGrupos,
+            datasets: [
+                {
+                    label: 'Presentes',
+                    data: presentes,
+                    backgroundColor: 'var(--verde)',
+                    borderRadius: 8,
+                    borderSkipped: false
+                },
+                {
+                    label: 'Ausentes',
+                    data: ausentes,
+                    backgroundColor: 'var(--rojo-chart)',
+                    borderRadius: 8,
+                    borderSkipped: false
+                },
+                {
+                    label: 'Tardanzas',
+                    data: tardanzas,
+                    backgroundColor: 'var(--amarillo)',
+                    borderRadius: 8,
+                    borderSkipped: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 12, weight: '500', family: "'DM Sans', sans-serif" },
+                        color: 'var(--gris-50)',
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                filler: {
+                    propagate: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f0f0f0',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: { size: 12, family: "'DM Sans', sans-serif" },
+                        color: 'var(--gris-50)'
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 12, family: "'DM Sans', sans-serif" },
+                        color: 'var(--gris-50)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Donut Chart - Distribución General
+    const ctxDona = document.getElementById('chartDona').getContext('2d');
+    const chartDona = new Chart(ctxDona, {
+        type: 'doughnut',
+        data: {
+            labels: ['Presentes', 'Ausentes', 'Tardanzas'],
+            datasets: [
+                {
+                    data: [totalPresentes, totalAusentes, totalTardanzas],
+                    backgroundColor: [
+                        'var(--verde)',
+                        'var(--rojo-chart)',
+                        'var(--amarillo)'
+                    ],
+                    borderColor: 'white',
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 12, weight: '500', family: "'DM Sans', sans-serif" },
+                        color: 'var(--gris-50)',
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                }
+            }
+        }
+    });
+
+</script>
+
+</body>
+</html>
