@@ -10,9 +10,7 @@ package AsistenciaFGK.Oportunidades.controllers;
 
 import AsistenciaFGK.Oportunidades.models.Role;
 import AsistenciaFGK.Oportunidades.models.Usuario;
-import AsistenciaFGK.Oportunidades.models.PeriodoEscolar;
-import AsistenciaFGK.Oportunidades.models.Grupo;
-import AsistenciaFGK.Oportunidades.services.CalendarioService;
+import AsistenciaFGK.Oportunidades.services.CalendarioService; // ← NUEVO
 import AsistenciaFGK.Oportunidades.services.EmailService;
 import AsistenciaFGK.Oportunidades.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.ZoneId;
-import java.util.Optional;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
 
 @Controller
 @RequestMapping("/admin")
@@ -144,60 +137,5 @@ public String editarUsuario(@PathVariable Integer id, Model model) {
         usuarioService.eliminar(id);
         redirectAttrs.addFlashAttribute("exito", "Usuario eliminado.");
         return "redirect:/admin/usuarios";
-    }
-
-    @GetMapping("/estadisticas")
-    public String estadisticas(Model model) {
-        Optional<PeriodoEscolar> periodoActual = calendarioService.periodoActual();
-        
-        if (periodoActual.isEmpty()) {
-            return "redirect:/admin/dashboard";
-        }
-        
-        PeriodoEscolar periodo = periodoActual.get();
-        LocalDate fechaInicio = periodo.getFechaInicio();
-        LocalDate fechaFin = periodo.getFechaFin();
-        
-        // Convertir LocalDate a java.util.Date
-        Date fechaInicioUtil = Date.from(fechaInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date fechaFinUtil = Date.from(fechaFin.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        
-        List<Grupo> grupos = grupoRepository.findAll();
-        List<String> nombresGrupos = grupos.stream().map(Grupo::getNombre).toList();
-        
-        List<Long> presentes = new ArrayList<>();
-        List<Long> ausentes = new ArrayList<>();
-        List<Long> tardanzas = new ArrayList<>();
-        
-        for (Grupo grupo : grupos) {
-            Long presentesCount = asistenciaRepository.countByGrupoAndEstadoAndFechaBetween(
-                grupo, "Presente", fechaInicioUtil, fechaFinUtil
-            );
-            Long ausentesCount = asistenciaRepository.countByGrupoAndEstadoAndFechaBetween(
-                grupo, "Ausente", fechaInicioUtil, fechaFinUtil
-            );
-            Long tardanzasCount = asistenciaRepository.countByGrupoAndEstadoAndFechaBetween(
-                grupo, "Tardanza", fechaInicioUtil, fechaFinUtil
-            );
-            
-            presentes.add(presentesCount != null ? presentesCount : 0);
-            ausentes.add(ausentesCount != null ? ausentesCount : 0);
-            tardanzas.add(tardanzasCount != null ? tardanzasCount : 0);
-        }
-        
-        Long totalPresentes = presentes.stream().mapToLong(Long::longValue).sum();
-        Long totalAusentes = ausentes.stream().mapToLong(Long::longValue).sum();
-        Long totalRegistros = totalPresentes + totalAusentes;
-        double porcentajeGeneral = totalRegistros > 0 ? (totalPresentes * 100.0) / totalRegistros : 0;
-        
-        model.addAttribute("nombresGrupos", nombresGrupos);
-        model.addAttribute("presentes", presentes);
-        model.addAttribute("ausentes", ausentes);
-        model.addAttribute("tardanzas", tardanzas);
-        model.addAttribute("totalPresentes", totalPresentes);
-        model.addAttribute("totalAusentes", totalAusentes);
-        model.addAttribute("porcentajeGeneral", porcentajeGeneral);
-        
-        return "admin/estadisticas";
     }
 }
