@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Riesgo de Ausentismo — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --rojo:       #C8102E;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFFFFF;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans', sans-serif; background:var(--gris-10); color:var(--negro); }
+
+        nav {
+            height:72px; background:rgba(20,20,20,0.98);
+            backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            padding:0 2.5rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand img { height:34px; width:auto; }
+        .brand-name { font-size:14px; font-weight:600; color:white; }
+        .brand-sub  { font-size:11px; color:#8D8D8D; margin-top:2px; }
+        .nav-right  { display:flex; align-items:center; gap:10px; }
+        .user-chip  {
+            padding:9px 14px; border-radius:999px;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.1);
+            font-size:12px; font-weight:500; color:#BABABA;
+        }
+        .nav-right a {
+            text-decoration:none; color:#7A7A7A; font-size:13px;
+            font-weight:500; padding:10px 14px; border-radius:10px; transition:0.15s;
+        }
+        .nav-right a:hover { color:white; background:rgba(255,255,255,0.06); }
+        .nav-right a.active { background:rgba(255,255,255,0.1); color:white; }
+        .nav-right a.logout { color:var(--rojo); }
+        .nav-right a.logout:hover { background:rgba(200,16,46,0.12); color:#FF4D6A; }
+
+        .container { max-width:1000px; margin:2.5rem auto; padding:0 1.2rem; }
+
+        .page-header {
+            display:flex; align-items:flex-end; justify-content:space-between;
+            gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;
+        }
+        .eyebrow {
+            font-size:11px; font-weight:700; letter-spacing:.12em;
+            text-transform:uppercase; color:var(--rojo); margin-bottom:8px;
+        }
+        .page-header h1 {
+            font-family:'DM Serif Display', serif;
+            font-size:2rem; line-height:1.1; color:var(--negro);
+        }
+        .page-header p { margin-top:8px; color:var(--gris-50); font-size:13px; line-height:1.6; }
+
+        .criterios {
+            background:#FEF3F2; border:1px solid #F7C6C3;
+            border-left:4px solid var(--rojo);
+            border-radius:12px; padding:1rem 1.25rem;
+            margin-bottom:1.5rem; font-size:13px; color:#7F1D1D; line-height:1.8;
+        }
+        .criterios strong { display:block; margin-bottom:2px; font-size:13px; }
+
+        .distribucion {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:16px; padding:1.25rem 1.5rem;
+            margin-bottom:1.5rem;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
+        }
+        .distribucion h3 { font-size:13px; font-weight:700; color:var(--negro); margin-bottom:1rem; }
+        .bar-row { display:flex; align-items:center; gap:12px; margin:0.5rem 0; }
+        .bar-label { width:90px; font-size:13px; color:var(--gris-70); }
+        .bar-track { flex:1; height:16px; background:var(--gris-10); border-radius:999px; overflow:hidden; }
+        .bar-fill  { height:100%; width:0%; border-radius:999px; transition:width 0.4s ease; }
+        .bar-count { width:30px; text-align:right; font-size:13px; color:var(--gris-50); font-weight:600; }
+
+        .export-bar {
+            display:flex; gap:12px; align-items:center;
+            margin-bottom:1.25rem; flex-wrap:wrap; justify-content:flex-end;
+        }
+        .export-label {
+            font-size:11px; color:var(--gris-50); font-weight:700;
+            text-transform:uppercase; letter-spacing:.08em;
+        }
+        .export-select {
+            padding:9px 14px; border:1.5px solid var(--gris-20); border-radius:9px;
+            font-size:13px; font-family:'DM Sans', sans-serif; color:var(--negro);
+            background:var(--blanco); outline:none; cursor:pointer; transition:0.15s;
+            min-width:140px;
+        }
+        .export-select:focus { border-color:var(--rojo); }
+        .btn-download {
+            background:var(--rojo); color:var(--blanco); border:none;
+            padding:9px 18px; border-radius:9px; text-decoration:none;
+            font-size:13px; font-weight:600; transition:0.15s; cursor:pointer;
+        }
+        .btn-download:hover { background:#A00826; }
+
+        .table-wrap {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:18px; overflow:hidden;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
+        }
+        table { width:100%; border-collapse:collapse; }
+        thead { background:#FAFAFA; }
+        th {
+            text-align:left; padding:13px 18px;
+            font-size:11px; font-weight:700; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--gris-50);
+            border-bottom:1px solid #ececec;
+        }
+        td { padding:13px 18px; font-size:14px; border-bottom:1px solid #f1f1f1; vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr:hover td { background:#fcfcfc; }
+
+        .fila-critico td    { background:#FFF7F7; }
+        .fila-alerta td     { background:#FAEAEA; }
+        .fila-precaucion td { background:#F5F5F5; }
+
+        .danger-num { color:var(--rojo); font-weight:700; font-size:15px; }
+
+        .badge {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 11px; border-radius:999px;
+            font-size:11px; font-weight:700; letter-spacing:.04em;
+        }
+        .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .badge-critico    { background:#FEE2E2; color:#B91C1C; }
+        .dot-critico      { background:#D92D20; }
+        .badge-alerta     { background:#F3E8E8; color:#C8102E; }
+        .dot-alerta       { background:#C8102E; }
+        .badge-precaucion { background:#E8E8E8; color:#7A7A7A; }
+        .dot-precaucion   { background:#B0B0B0; }
+
+        .empty { text-align:center; color:var(--gris-50); padding:3rem; font-size:14px; }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">
+        <a th:href="@{/supervisor}" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;">
+            <img src="/images/opor.png" alt="Logo"/>
+            <div>
+                <div class="brand-name">Programa Oportunidades</div>
+                <div class="brand-sub">Panel de supervisión FGK</div>
+            </div>
+        </a>
+    </div>
+    <div class="nav-right">
+        <span class="user-chip" sec:authentication="name">Usuario</span>
+        <a th:href="@{/supervisor}">Dashboard</a>
+        <a th:href="@{/supervisor/riesgo}" class="active">Riesgo</a>
+        <a th:href="@{/supervisor/usuarios}">Usuarios</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">⚠ Supervisión</div>
+            <h1>Riesgo de Ausentismo</h1>
+            <p>
+                Estudiantes con 1 o más ausencias en el período (máximo recomendado: 2)
+                <span th:if="${periodoActual}"> — <span th:text="${periodoActual.nombre}"></span></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="criterios">
+        <strong>⚠ Criterio de riesgo (por ausencias):</strong>
+        1 ausencia = Precaución &nbsp;|&nbsp; 2 ausencias = Alerta &nbsp;|&nbsp; 3 o más = Crítico
+    </div>
+
+    <div class="distribucion" th:if="${!#lists.isEmpty(enRiesgo)}">
+        <h3>Distribución de riesgo</h3>
+        <div class="bar-row">
+            <div class="bar-label">Precaución</div>
+            <div class="bar-track"><div id="barPrec" class="bar-fill" style="background:var(--rojo)"></div></div>
+            <div id="countPrec" class="bar-count">0</div>
+        </div>
+        <div class="bar-row">
+            <div class="bar-label">Alerta</div>
+            <div class="bar-track"><div id="barAlerta" class="bar-fill" style="background:var(--rojo)"></div></div>
+            <div id="countAlerta" class="bar-count">0</div>
+        </div>
+        <div class="bar-row">
+            <div class="bar-label">Crítico</div>
+            <div class="bar-track"><div id="barCrit" class="bar-fill" style="background:var(--rojo)"></div></div>
+            <div id="countCrit" class="bar-count">0</div>
+        </div>
+    </div>
+
+    <div class="export-bar">
+        <span class="export-label">Exportar vista:</span>
+        <select id="exportFormat" class="export-select">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+        </select>
+        <button id="downloadBtn" class="btn-download">⬇ Descargar</button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Estudiante</th>
+                <th>Ausencias</th>
+                <th>Total registros</th>
+                <th>Nivel de riesgo</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:if="${#lists.isEmpty(enRiesgo)}">
+                <td colspan="4" class="empty">🎉 Ningún estudiante en riesgo actualmente</td>
+            </tr>
+
+            <tr th:each="r : ${enRiesgo}"
+                th:attr="data-nivel=${r.nivel}"
+                th:classappend="${r.nivel == 'CRITICO'}    ? 'fila-critico' :
+                               (${r.nivel == 'ALERTA'}     ? 'fila-alerta' :
+                               (${r.nivel == 'PRECAUCION'} ? 'fila-precaucion' : ''))">
+
+                <td th:text="${r.nombre}"></td>
+                <td><span class="danger-num" th:text="${r.ausencias}"></span></td>
+                <td th:text="${r.total}" style="color:var(--gris-50);"></td>
+                <td>
+                    <span class="badge badge-critico" th:if="${r.nivel == 'CRITICO'}">
+                        <span class="dot dot-critico"></span> CRÍTICO
+                    </span>
+                    <span class="badge badge-alerta" th:if="${r.nivel == 'ALERTA'}">
+                        <span class="dot dot-alerta"></span> ALERTA
+                    </span>
+                    <span class="badge badge-precaucion" th:if="${r.nivel == 'PRECAUCION'}">
+                        <span class="dot dot-precaucion"></span> PRECAUCIÓN
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    (function(){
+        const rows = document.querySelectorAll('tbody tr[data-nivel]');
+        let prec = 0, alerta = 0, crit = 0;
+        rows.forEach(r => {
+            const n = (r.getAttribute('data-nivel') || '').toUpperCase();
+            if (n === 'PRECAUCION') prec++;
+            else if (n === 'ALERTA') alerta++;
+            else if (n === 'CRITICO') crit++;
+        });
+        const total = Math.max(prec + alerta + crit, 1);
+        const set = (idFill, idCount, value) => {
+            const fill = document.getElementById(idFill);
+            const count = document.getElementById(idCount);
+            if (count) count.textContent = String(value);
+            if (fill) fill.style.width = ((value * 100) / total).toFixed(0) + '%';
+        };
+        set('barPrec',   'countPrec',   prec);
+        set('barAlerta', 'countAlerta', alerta);
+        set('barCrit',   'countCrit',   crit);
+    })();
+
+    // Manejo de descarga de exportación
+    document.getElementById('downloadBtn')?.addEventListener('click', function(){
+        const format = document.getElementById('exportFormat')?.value || 'pdf';
+        window.location.href = '/supervisor/riesgo/exportar?formato=' + format;
+    });
+</script>
+
+</body>
+</html>

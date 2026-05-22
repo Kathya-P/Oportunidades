@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard Supervisor — Programa Oportunidades</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #F5D0D7;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-30:    #B0B0B0;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F4F3F1;
+            --blanco:     #FFFFFF;
+
+            --verde:      #1F8A4D;
+            --verde-bg:   #EDF8F1;
+            --naranja:    #C77700;
+            --naranja-bg: #FFF5E7;
+            --rojo-alerta:#B42318;
+            --rojo-alerta-bg:#FEF3F2;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans', sans-serif; background:var(--gris-10); color:var(--negro); }
+
+        /* ── NAV ── */
+        nav {
+            height:72px;
+            background:rgba(20,20,20,0.98);
+            backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            padding:0 2.5rem;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+        }
+        .brand { display:flex; align-items:center; gap:14px; }
+        .brand-name { font-size:14px; font-weight:600; color:white; }
+        .brand-sub  { font-size:11px; color:#8D8D8D; margin-top:2px; }
+        .nav-right  { display:flex; align-items:center; gap:10px; }
+        .user-chip  {
+            padding:9px 14px; border-radius:999px;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.1);
+            font-size:12px; font-weight:500; color:#BABABA;
+        }
+        .nav-right a {
+            text-decoration:none; color:#7A7A7A; font-size:13px;
+            font-weight:500; padding:10px 14px; border-radius:10px; transition:0.15s;
+        }
+        .nav-right a:hover { color:white; background:rgba(255,255,255,0.06); }
+        .nav-right a.active { background:rgba(255,255,255,0.1); color:white; }
+        .nav-right a.logout { color:var(--rojo); }
+        .nav-right a.logout:hover { background:rgba(200,16,46,0.12); color:#FF4D6A; }
+
+        /* ── LAYOUT ── */
+        .container { max-width:1200px; margin:2.5rem auto; padding:0 1.2rem; }
+
+        .page-header { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:2rem; }
+        .eyebrow { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--rojo); margin-bottom:10px; }
+        .page-header h1 { font-family:'DM Serif Display', serif; font-size:2.4rem; line-height:1.1; color:var(--negro); }
+        .page-header p { margin-top:10px; color:var(--gris-50); font-size:14px; max-width:600px; line-height:1.7; }
+
+        /* ── QUICK ACTIONS ── */
+        .quick { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .btn {
+            border:none; text-decoration:none; cursor:pointer;
+            display:inline-flex; align-items:center; gap:7px;
+            padding:11px 16px; border-radius:10px;
+            font-family:'DM Sans', sans-serif; font-size:13px; font-weight:600;
+            transition:0.15s;
+        }
+        .btn svg { width:15px; height:15px; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+        .btn-dark  { background:var(--negro); color:white; }
+        .btn-dark svg { stroke:white; }
+        .btn-dark:hover { background:var(--gris-90); }
+        .btn-outline { background:white; color:var(--gris-70); border:1px solid var(--gris-20); }
+        .btn-outline svg { stroke:var(--gris-70); }
+        .btn-outline:hover { border-color:var(--negro); color:var(--negro); }
+
+        /* ── STATS ── */
+        .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:1rem; margin-bottom:1.8rem; }
+
+        /* ── Calendario grande separado de stats ── */
+        .dash-grid{
+            display:grid;
+            grid-template-columns: 440px 1fr;
+            gap: 1.2rem;
+            align-items:start;
+            margin-bottom:1.8rem;
+        }
+        @media(max-width:1000px){ .dash-grid{ grid-template-columns:1fr; } }
+        .dash-calendar .mini-day{ padding:7px 2px; font-size:12.5px; }
+        .dash-calendar .mini-day-name{ font-size:10.5px; padding:6px 0; }
+        .stat-card {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:18px; padding:1.4rem;
+            position:relative; overflow:hidden;
+        }
+        .stat-card::before {
+            content:''; position:absolute; top:0; left:0;
+            width:100%; height:3px;
+        }
+        .stat-total::before    { background:var(--negro); }
+        .stat-presente::before { background:var(--negro); }
+        .stat-ausente::before  { background:var(--rojo); }
+        .stat-tardanza::before { background:var(--gris-30); }
+        .stat-num   { font-size:2rem; font-weight:700; margin-bottom:6px; }
+        .stat-label { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--gris-50); font-weight:600; }
+        .stat-sub   { font-size:12px; color:var(--gris-50); margin-top:4px; }
+        .stat-total .stat-num    { color:var(--negro); }
+        .stat-presente .stat-num { color:var(--negro); }
+        .stat-ausente .stat-num  { color:var(--rojo); }
+        .stat-tardanza .stat-num { color:var(--gris-50); }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:1rem; gap:1rem; flex-wrap:wrap;
+        }
+        .section-title { font-size:.95rem; font-weight:700; color:var(--negro); }
+
+        .pill {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:7px 14px; border-radius:999px; font-size:12px; font-weight:700;
+        }
+        .pill-danger { background:var(--rojo-alerta-bg); color:var(--rojo-alerta); border:1px solid #F7C6C3; }
+        .pill-success { background:var(--verde-bg); color:var(--verde); border:1px solid #CDEBD8; }
+
+        /* ── FILTERS BAR ── */
+        .filters-bar {
+            background:white; border-radius:16px; border:1px solid rgba(0,0,0,0.05);
+            padding:1.2rem 1.5rem; margin-bottom:1.2rem;
+            display:flex; gap:1rem; align-items:center; flex-wrap:wrap;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
+        }
+        .search-wrap { position:relative; flex:1; min-width:200px; }
+        .search-wrap svg {
+            position:absolute; left:12px; top:50%; transform:translateY(-50%);
+            width:15px; height:15px; stroke:var(--gris-50); fill:none;
+            stroke-width:2; stroke-linecap:round; stroke-linejoin:round; pointer-events:none;
+        }
+        .search-wrap input {
+            width:100%; padding:10px 14px 10px 38px;
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            font-size:13px; font-family:'DM Sans', sans-serif;
+            color:var(--negro); background:var(--gris-10); outline:none; transition:0.15s;
+        }
+        .search-wrap input:focus { border-color:var(--rojo); background:white; }
+        .filter-select {
+            padding:10px 14px; border:1.5px solid var(--gris-20); border-radius:10px;
+            font-size:13px; font-family:'DM Sans', sans-serif; color:var(--gris-70);
+            background:var(--gris-10); outline:none; cursor:pointer; transition:0.15s; min-width:150px;
+        }
+        .filter-select:focus { border-color:var(--rojo); background:white; }
+        .filters-count { font-size:12px; color:var(--gris-50); white-space:nowrap; }
+        .filters-count span { font-weight:600; color:var(--negro); }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background:var(--blanco); border:1px solid #ececec;
+            border-radius:18px; overflow:hidden;
+            box-shadow:0 2px 12px rgba(0,0,0,0.03);
+            margin-bottom:2rem;
+        }
+        table { width:100%; border-collapse:collapse; }
+        thead { background:#FAFAFA; }
+        th {
+            text-align:left; padding:14px 18px;
+            font-size:11px; font-weight:700; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--gris-50);
+            border-bottom:1px solid #ececec;
+        }
+        td { padding:13px 18px; font-size:14px; border-bottom:1px solid #f1f1f1; vertical-align:middle; }
+        tbody tr:last-child td { border-bottom:none; }
+        tbody tr { transition:0.15s; }
+        tbody tr:hover { background:#fcfcfc; }
+
+        /* nivel dot */
+        .nivel-bar { display:flex; align-items:center; gap:10px; }
+        .nivel-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .dot-critico   { background:#D92D20; }
+        .dot-alerta    { background:#F79009; }
+        .dot-precaucion{ background:#F2C94C; }
+
+        /* riesgo row bg */
+        .fila-critico   { background:#FFF7F7; }
+        .fila-alerta    { background:#FFFBF5; }
+        .fila-precaucion{ background:#FFFEF5; }
+
+        /* badges */
+        .badge {
+            display:inline-flex; align-items:center; gap:5px;
+            padding:5px 12px; border-radius:999px;
+            font-size:11px; font-weight:700; letter-spacing:.02em;
+        }
+        .badge-critico   { background:#FEE4E2; color:#B42318; border:1px solid #FECDCA; }
+        .badge-alerta    { background:#FFF0D5; color:#B54708; border:1px solid #FED3A0; }
+        .badge-precaucion{ background:#FFF8DB; color:#9A6700; border:1px solid #F9E08E; }
+
+        /* bar for % */
+        .bar-line { display:flex; align-items:center; gap:10px; }
+        .bar-wrap { width:110px; height:7px; border-radius:999px; background:#ECECEC; overflow:hidden; }
+        .bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--rojo),#E03A52); }
+
+        /* no results */
+        .empty { padding:3rem; text-align:center; color:var(--gris-50); font-size:14px; }
+        #no-results-riesgo,
+        #no-results-grupos { display:none; text-align:center; padding:2.5rem; color:var(--gris-50); font-size:14px; }
+
+        @media (max-width:900px) {
+            nav { padding:0 1rem; height:auto; flex-direction:column; gap:1rem; align-items:flex-start; padding:1rem; }
+            .nav-right { flex-wrap:wrap; }
+            .page-header h1 { font-size:2rem; }
+            .container { padding:0 1rem; }
+            .table-wrap { overflow-x:auto; }
+            table { min-width:700px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+    <div class="brand">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+        <div>
+            <div class="brand-name">Programa Oportunidades</div>
+            <div class="brand-sub">Panel de supervisión FGK</div>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <div class="user-chip" sec:authentication="name">Supervisor</div>
+
+        <a th:href="@{/supervisor/riesgo}">Riesgo</a>
+        <a th:href="@{/supervisor/usuarios}">Usuarios</a>
+        <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+<!-- ── CONTENIDO ── -->
+<div class="container">
+
+    <!-- ENCABEZADO -->
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">Panel de supervisión</div>
+            <h1>Dashboard</h1>
+            <p>Resumen general de asistencia y calendario.</p>
+        </div>
+    </div>
+
+    <!-- CALENDARIO + STATS (separados) -->
+    <div class="dash-grid">
+        <div class="dash-calendar">
+            <div th:replace="~{calendario/widget-calendario :: widget}"></div>
+        </div>
+        <div>
+            <div class="stats">
+                <div class="stat-card stat-total">
+            <div class="stat-num" th:text="${stats.total}">0</div>
+            <div class="stat-label">Total registros</div>
+        </div>
+                <div class="stat-card stat-presente">
+            <div class="stat-num" th:text="${stats.presentes}">0</div>
+            <div class="stat-label">Presentes</div>
+            <div class="stat-sub" th:text="${stats.pctPresente + '%'}">0%</div>
+        </div>
+                <div class="stat-card stat-ausente">
+            <div class="stat-num" th:text="${stats.ausentes}">0</div>
+            <div class="stat-label">Ausentes</div>
+            <div class="stat-sub" th:text="${stats.pctAusente + '%'}">0%</div>
+        </div>
+                <div class="stat-card stat-tardanza">
+            <div class="stat-num" th:text="${stats.tardanzas}">0</div>
+            <div class="stat-label">Tardanzas</div>
+            <div class="stat-sub" th:text="${stats.pctTardanza + '%'}">0%</div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

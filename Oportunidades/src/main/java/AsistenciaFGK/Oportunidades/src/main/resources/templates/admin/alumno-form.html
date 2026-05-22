@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 
 <head>
     <meta charset="UTF-8"/>
-    <title>Usuario — Programa Oportunidades</title>
+    <title>Alumno — Programa Oportunidades</title>
 
     <style>
 
@@ -87,10 +85,9 @@
             padding-left:18px;
         }
 
-        /* CONTENEDOR */
-
+        /* CONTENIDO */
         .container{
-            max-width:760px;
+            max-width:720px;
             margin:2.5rem auto;
             padding:0 2rem;
         }
@@ -104,7 +101,7 @@
             flex-wrap:wrap;
         }
 
-        .page-title h1{
+        .page-header h1{
             font-size:2.2rem;
             font-weight:700;
             color:var(--negro);
@@ -132,13 +129,13 @@
         }
 
         .btn-back{
-            text-decoration:none;
-            border:1px solid var(--gris-20);
+            border:1.5px solid var(--gris-20);
+            color:var(--gris-70);
             padding:0.6rem 1rem;
             border-radius:9px;
-            color:var(--gris-70);
-            background:var(--blanco);
+            text-decoration:none;
             font-size:0.85rem;
+            background:var(--blanco);
             font-weight:500;
             transition:0.2s;
         }
@@ -150,13 +147,12 @@
         }
 
         /* CARD */
-
         .card{
             background:var(--blanco);
-            border-radius:18px;
             border:1.5px solid #efefef;
-            box-shadow:0 8px 32px rgba(0,0,0,0.05);
+            border-radius:18px;
             padding:2.8rem;
+            box-shadow:0 8px 32px rgba(0,0,0,0.05);
             position:relative;
             overflow:hidden;
         }
@@ -184,7 +180,6 @@
         }
 
         /* ALERTA */
-
         .alert{
             padding:1rem 1.2rem;
             border-radius:12px;
@@ -199,7 +194,6 @@
         }
 
         /* FORM */
-
         .field{
             margin-bottom:1.6rem;
         }
@@ -254,10 +248,24 @@
             border-width:2px;
         }
 
-        .field .hint{
-            font-size:0.75rem;
-            color:var(--gris-50);
-            margin-top:6px;
+        .field input,
+        .field select{
+            width:100%;
+            padding:12px 14px;
+            font-size:0.9rem;
+            border:1.5px solid var(--gris-20);
+            border-radius:10px;
+            outline:none;
+            transition:0.2s;
+            background:var(--blanco);
+            font-family:'DM Sans', sans-serif;
+        }
+
+        .field input:focus,
+        .field select:focus{
+            border-color:var(--rojo);
+            background:var(--blanco);
+            box-shadow:0 0 0 3px rgba(200,16,46,0.08);
         }
 
         .field-row{
@@ -266,35 +274,7 @@
             gap:1.2rem;
         }
 
-        /* CHECKBOX */
-
-        .checkbox-row{
-            display:flex;
-            align-items:center;
-            gap:10px;
-            margin-top:1.5rem;
-            padding:1.2rem;
-            border:1.5px solid var(--gris-20);
-            border-radius:10px;
-            background:rgba(200,16,46,0.04);
-        }
-
-        .checkbox-row input{
-            width:auto;
-            transform:scale(1.15);
-            accent-color:var(--rojo);
-            cursor:pointer;
-        }
-
-        .checkbox-row label{
-            font-size:0.9rem;
-            color:var(--negro);
-            font-weight:500;
-            cursor:pointer;
-        }
-
         /* BOTONES */
-
         .form-actions{
             display:flex;
             justify-content:flex-end;
@@ -354,39 +334,18 @@
             background:rgba(200,16,46,0.06);
         }
 
-        .btn-reset{
-            background:rgba(200,16,46,0.12);
-            border:1.5px solid rgba(200,16,46,0.25);
-            color:var(--rojo);
-        }
-
-        .btn-reset:hover{
-            background:rgba(200,16,46,0.18);
-            border-color:var(--rojo);
-        }
-
-        @media(max-width:700px){
-
+        @media(max-width:640px){
             .container{
                 padding:0 1rem;
             }
-
             .field-row{
                 grid-template-columns:1fr;
             }
-
-            .form-actions{
-                flex-direction:column-reverse;
+            .card{
+                padding:1.3rem;
             }
-
-            .form-actions .btn,
-            .form-actions a{
-                width:100%;
-                text-align:center;
-            }
-
-            .page-header{
-                align-items:flex-start;
+            nav{
+                padding:1rem;
             }
         }
 
@@ -406,10 +365,9 @@
     </a>
     <div class="nav-links">
         <a th:href="@{/admin}" class="inicio">Inicio</a>
-        <a th:href="@{/admin/usuarios}" class="active">Usuarios</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
         <a th:href="@{/admin/secciones}">Secciones</a>
-        <a th:href="@{/admin/alumnos}">Alumnos</a>
-        <a th:href="@{/admin/estadisticas}">Estadísticas</a>
+        <a th:href="@{/admin/alumnos}" class="active">Alumnos</a>
         <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
     </div>
 </nav>
@@ -419,14 +377,14 @@
 
     <div class="page-header">
 
-        <div class="page-title">
+        <div>
 
             <h1 th:text="${titulo}">
-                Usuario
+                Alumno
             </h1>
 
-            <p>
-                Gestión de usuarios del sistema
+            <p class="subtitle">
+                Registro y edición de estudiantes del sistema
             </p>
 
         </div>
@@ -439,12 +397,12 @@
              th:text="${error}">
         </div>
 
-        <form th:action="@{/admin/usuarios/guardar}"
-              th:object="${usuario}"
+        <form th:action="@{/admin/alumnos/guardar}"
+              th:object="${alumno}"
               method="post">
 
             <input type="hidden"
-                   th:field="*{idUsuario}"/>
+                   th:field="*{idEstudiante}"/>
 
             <div class="field-row">
 
@@ -456,7 +414,7 @@
 
                     <input type="text"
                            th:field="*{nombre}"
-                           placeholder="Nombre"
+                           placeholder="Ingrese el nombre"
                            required/>
 
                 </div>
@@ -464,67 +422,12 @@
                 <div class="field">
 
                     <label>
-                        Apellido
+                        Apellido *
                     </label>
 
                     <input type="text"
                            th:field="*{apellido}"
-                           placeholder="Apellido"/>
-
-                </div>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Username *
-                </label>
-
-                <input type="text"
-                       th:field="*{username}"
-                       placeholder="Ej. jperez"
-                       required/>
-
-            </div>
-
-            <div class="field"
-                 th:if="${usuario.idUsuario == null}">
-
-                <label>
-                    Contraseña *
-                </label>
-
-                <input type="password"
-                       th:field="*{password}"
-                       placeholder="••••••••"
-                       required/>
-
-            </div>
-
-            <div class="field-row">
-
-                <div class="field">
-
-                    <label>
-                        Teléfono
-                    </label>
-
-                    <input type="text"
-                           th:field="*{telefono}"
-                           placeholder="Ej. 7000-0000"/>
-
-                </div>
-
-                <div class="field">
-
-                    <label>
-                        Correo electrónico *
-                    </label>
-
-                    <input type="email"
-                           th:field="*{email}"
-                           placeholder="usuario@email.com"
+                           placeholder="Ingrese el apellido"
                            required/>
 
                 </div>
@@ -534,60 +437,69 @@
             <div class="field">
 
                 <label>
-                    Rol *
+                    Código de barras *
                 </label>
 
-                <select th:field="*{role}"
-                        required>
+                <input type="text"
+                       th:field="*{codigoBarras}"
+                       placeholder="Ej. 0001"
+                       required/>
 
-                    <option value="">
-                        — Seleccioná un rol —
-                    </option>
+            </div>
 
-                    <option th:each="r : ${roles}"
-                            th:value="${r}"
-                            th:text="${r.name().replace('ROLE_', '')}">
-                    </option>
+            <div class="field">
 
+                <label>
+                    Dirección
+                </label>
+
+                <input type="text"
+                       th:field="*{direccion}"
+                       placeholder="Ej. Ahuachapán"/>
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    Jornada
+                </label>
+
+                <select th:field="*{jornada}">
+                    <option th:value="FULL_TIME" th:selected="${alumno.jornada == null or alumno.jornada.name() == 'FULL_TIME'}">Full time</option>
+                    <option th:value="SABATINO" th:selected="${alumno.jornada != null and alumno.jornada.name() == 'SABATINO'}">Sabatino (solo sábados)</option>
                 </select>
 
             </div>
 
-            <div class="checkbox-row">
-
-                <input type="checkbox"
-                       th:field="*{activo}"
-                       id="activo"/>
-
-                <label for="activo">
-                    Usuario activo
-                </label>
-
-            </div>
+            <div class="field">
+    <label>Sección</label>
+    <select name="grupos" id="selectSeccion">
+        <option value="">— Sin sección —</option>
+        <option th:each="s : ${secciones}"
+                th:value="${s.idGrupo}"
+                th:text="${s.nombre + (s.dias != null ? ' (' + s.dias.replace(',', '·') + ')' : '')}"
+                th:attr="data-modalidad=${s.modalidad}"
+                th:selected="${alumno.grupos != null && alumno.grupos.contains(s)}">
+        </option>
+    </select>
+</div>
 
             <div class="form-actions">
 
-                <a th:href="@{/admin/usuarios}"
-                   class="btn btn-outline">
+                <a th:href="@{/admin/alumnos}"
+                   class="btn btn-ghost">
 
                     Cancelar
 
                 </a>
 
                 <button type="submit"
-                        class="btn btn-primary">
+                        class="btn btn-dark">
 
-                    Guardar usuario
+                    Guardar alumno
 
                 </button>
-
-                <a th:if="${usuario.idUsuario != null}"
-                   th:href="@{/admin/usuarios/reset-password/{id}(id=${usuario.idUsuario})}"
-                   class="btn btn-reset">
-
-                    Resetear contraseña
-
-                </a>
 
             </div>
 
@@ -596,6 +508,28 @@
     </div>
 
 </div>
+<script>
+(function(){
+    const jornadaSelect  = document.querySelector('select[name="jornada"], #jornada, [id*="jornada"]');
+    const seccionSelect  = document.getElementById('selectSeccion');
 
+    function filtrarSecciones() {
+        const jornada = jornadaSelect ? jornadaSelect.value : 'FULL_TIME';
+        Array.from(seccionSelect.options).forEach(opt => {
+            if (!opt.value) return; // opción vacía siempre visible
+            const mod = opt.getAttribute('data-modalidad') || 'FULL_TIME';
+            opt.hidden = (mod !== jornada);
+        });
+        // si la opción seleccionada quedó oculta, resetear
+        const seleccionada = seccionSelect.options[seccionSelect.selectedIndex];
+        if (seleccionada && seleccionada.hidden) seccionSelect.value = '';
+    }
+
+    if (jornadaSelect) {
+        jornadaSelect.addEventListener('change', filtrarSecciones);
+        filtrarSecciones(); // aplicar al cargar
+    }
+})();
+</script>
 </body>
 </html>

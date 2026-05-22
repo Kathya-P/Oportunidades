@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Usuarios — Programa Oportunidades</title>
+    <title>Alumnos — Programa Oportunidades</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
@@ -46,21 +46,6 @@
         }
 
         .nav-left{ display:flex; align-items:center; gap:14px; }
-
-        .brand-icon{
-            width:42px; height:42px;
-            border-radius:10px;
-            background:var(--rojo);
-            display:flex; align-items:center; justify-content:center;
-            box-shadow:0 10px 25px rgba(200,16,46,0.25);
-        }
-
-        .brand-icon svg{
-            width:22px; height:22px;
-            stroke:white; fill:none; stroke-width:2;
-            stroke-linecap:round; stroke-linejoin:round;
-        }
-
         .brand-info{ display:flex; flex-direction:column; }
         .brand-name{ color:white; font-size:14px; font-weight:600; letter-spacing:0.02em; }
         .brand-sub{ color:#909090; font-size:11px; }
@@ -98,7 +83,7 @@
         }
 
         /* CONTAINER */
-        .container{ max-width:1280px; margin:0 auto; padding:2.5rem 1.5rem; }
+        .container{ max-width:1350px; margin:0 auto; padding:2.5rem 1.5rem; }
 
         /* HERO */
         .hero{
@@ -219,8 +204,7 @@
 
         .search-wrap svg{
             position:absolute;
-            left:12px;
-            top:50%;
+            left:12px; top:50%;
             transform:translateY(-50%);
             width:16px; height:16px;
             stroke:var(--gris-50); fill:none;
@@ -241,10 +225,7 @@
             transition:0.15s;
         }
 
-        .search-wrap input:focus{
-            border-color:var(--rojo);
-            background:white;
-        }
+        .search-wrap input:focus{ border-color:var(--rojo); background:white; }
 
         .filter-select{
             padding:10px 14px;
@@ -257,7 +238,7 @@
             outline:none;
             cursor:pointer;
             transition:0.15s;
-            min-width:150px;
+            min-width:160px;
         }
 
         .filter-select:focus{ border-color:var(--rojo); background:white; }
@@ -268,10 +249,7 @@
             white-space:nowrap;
         }
 
-        .filters-count span{
-            font-weight:600;
-            color:var(--negro);
-        }
+        .filters-count span{ font-weight:600; color:var(--negro); }
 
         /* TABLE CARD */
         .table-card{
@@ -307,63 +285,37 @@
         tbody tr{ transition:0.15s ease; }
         tbody tr:hover{ background:#FCFCFC; }
         tbody tr:last-child td{ border-bottom:none; }
-        tbody tr.hidden-row{ display:none; }
 
-        .username{ color:var(--gris-50); font-family:monospace; font-size:13px; }
+        .code{
+            font-family:monospace; color:var(--gris-50); font-size:13px;
+            background:#F8F8F8; padding:6px 10px; border-radius:8px; display:inline-block;
+        }
 
-        /* BADGES — solo rojo/gris */
+        .direccion{ color:var(--gris-50); max-width:240px; line-height:1.5; }
+
         .badge{
             display:inline-flex; align-items:center; justify-content:center;
             padding:5px 12px; border-radius:999px;
-            font-size:11px; font-weight:600; letter-spacing:0.04em;
-        }
-
-        .badge-admin{
-            background:rgba(200,16,46,0.1);
+            font-size:11px; font-weight:600;
+            background:rgba(200,16,46,0.10);
             color:var(--rojo-dark);
-            border:1px solid rgba(200,16,46,0.25);
+            border:1px solid rgba(200,16,46,0.2);
         }
 
-        .badge-docente{
-            background:var(--gris-10);
-            color:var(--gris-70);
-            border:1px solid var(--gris-20);
-        }
-
-        .badge-supervisor{
-            background:var(--negro);
-            color:white;
-            border:1px solid var(--gris-90);
-        }
-
-        .badge-alumno{
-            background:white;
-            color:var(--gris-50);
-            border:1px solid var(--gris-20);
-        }
-
-        /* STATUS */
-        .status{ display:flex; align-items:center; gap:8px; color:var(--gris-50); font-size:13px; }
-
-        .dot{ width:9px; height:9px; border-radius:50%; }
-        .dot-active{ background:var(--rojo); box-shadow:0 0 8px rgba(200,16,46,0.4); }
-        .dot-inactive{ background:var(--gris-20); }
+        .empty-dash{ color:#BDBDBD; }
 
         .actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
-        /* EMPTY */
         .empty{ text-align:center; padding:4rem 2rem; color:var(--gris-50); }
 
         .empty svg{
             width:46px; height:46px;
-            stroke:#CFCFCF; fill:none; stroke-width:1.8;
-            margin-bottom:14px;
+            stroke:#CFCFCF; fill:none; stroke-width:1.8; margin-bottom:14px;
         }
 
         .empty-title{ font-size:15px; font-weight:600; color:var(--gris-70); margin-bottom:6px; }
         .empty-sub{ font-size:13px; }
 
-        /* No results message */
         #no-results{
             display:none;
             text-align:center;
@@ -378,8 +330,30 @@
             .hero-content{ flex-direction:column; align-items:flex-start; }
             .hero-copy h1{ font-size:2rem; }
             .table-card{ overflow-x:auto; }
-            table{ min-width:980px; }
+            table{ min-width:1100px; }
         }
+        
+        .btn-barcode {
+    background: rgba(34, 139, 34, 0.12);
+    border: 1px solid rgba(34, 139, 34, 0.35);
+    color: #228B22;
+}
+.btn-barcode:hover {
+    background: rgba(34, 139, 34, 0.22);
+    color: #1a6e1a;
+}
+
+.badge-fulltime {
+    background: var(--rojo);
+    color: white;
+    border: none;
+}
+
+.badge-sabatino {
+    background: var(--gris-70);
+    color: white;
+    border: none;
+}
     </style>
 </head>
 
@@ -395,10 +369,9 @@
     </a>
     <div class="nav-links">
         <a th:href="@{/admin}" class="inicio">Inicio</a>
-        <a th:href="@{/admin/usuarios}" class="active">Usuarios</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
         <a th:href="@{/admin/secciones}">Secciones</a>
-        <a th:href="@{/admin/alumnos}">Alumnos</a>
-        <a th:href="@{/admin/estadisticas}">Estadísticas</a>
+        <a th:href="@{/admin/alumnos}" class="active">Alumnos</a>
         <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
     </div>
 </nav>
@@ -408,13 +381,13 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-copy">
-                <div class="eyebrow">Administración del sistema</div>
-                <h1>Gestión de<br>Usuarios</h1>
-                <p>Administre accesos, roles y estados de usuarios dentro de la plataforma institucional del Programa Oportunidades.</p>
+                <div class="eyebrow">Gestión estudiantil</div>
+                <h1>Administración<br>de Alumnos</h1>
+                <p>Visualice, edite y gestione la información académica y administrativa de los estudiantes registrados dentro del sistema institucional.</p>
             </div>
-            <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-primary">
+            <a th:href="@{/admin/alumnos/nuevo}" class="btn btn-primary">
                 <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuevo usuario
+                Nuevo alumno
             </a>
         </div>
     </section>
@@ -433,32 +406,30 @@
     <div class="filters-bar">
         <div class="search-wrap">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchInput" placeholder="Buscar por nombre o usuario…"/>
+            <input type="text" id="searchInput" placeholder="Buscar por nombre, apellido o código…"/>
         </div>
 
-        <select class="filter-select" id="filterRol">
-            <option value="">Todos los roles</option>
-            <option value="ROLE_ADMIN">Admin</option>
-            <option value="ROLE_DOCENTE">Docente</option>
-            <option value="ROLE_SUPERVISOR">Supervisor</option>
+        <select class="filter-select" id="filterModalidad">
+            <option value="">Todas las modalidades</option>
+            <option value="FULL_TIME">Full Time</option>
+            <option value="SABATINO">Sabatino</option>
         </select>
 
-        <select class="filter-select" id="filterEstado">
-            <option value="">Todos los estados</option>
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
+        <select class="filter-select" id="filterSeccion">
+            <option value="">Todas las secciones</option>
+            <!-- Opciones generadas dinámicamente por JS desde los datos de la tabla -->
         </select>
 
         <div class="filters-count">
-            Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span> usuarios
+            Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span> alumnos
         </div>
     </div>
 
     <div class="table-card">
         <div class="table-header">
             <div>
-                <div class="table-title">Usuarios registrados</div>
-                <div class="table-sub">Gestión de cuentas, permisos y estados del sistema.</div>
+                <div class="table-title">Alumnos registrados</div>
+                <div class="table-sub">Registro general de estudiantes y asignación de secciones.</div>
             </div>
         </div>
 
@@ -466,17 +437,19 @@
             <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Usuario</th>
-                <th>Rol</th>
-                <th>Estado</th>
+                <th>Apellido</th>
+                <th>Código</th>
+                <th>Dirección</th>
+                <th>Modalidad</th>
+                <th>Sección</th>
                 <th>Acciones</th>
             </tr>
             </thead>
 
-            <tbody id="tablaUsuarios">
+            <tbody id="tablaAlumnos">
 
-            <tr th:if="${#lists.isEmpty(usuarios)}">
-                <td colspan="5">
+            <tr th:if="${#lists.isEmpty(alumnos)}">
+                <td colspan="7">
                     <div class="empty">
                         <svg viewBox="0 0 24 24">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -484,54 +457,61 @@
                             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
-                        <div class="empty-title">No hay usuarios registrados</div>
-                        <div class="empty-sub">Cree un nuevo usuario para comenzar.</div>
+                        <div class="empty-title">No hay alumnos registrados</div>
+                        <div class="empty-sub">Cree un nuevo alumno para comenzar.</div>
                     </div>
                 </td>
             </tr>
 
-            <tr th:each="u : ${usuarios}"
-                th:attr="data-nombre=${u.nombre + ' ' + (u.apellido != null ? u.apellido : '')},
-                         data-username=${u.username},
-                         data-rol=${u.role.name()},
-                         data-estado=${u.activo ? 'activo' : 'inactivo'}">
+            <tr th:each="a : ${alumnos}"
+                th:attr="data-nombre=${a.nombre},
+                         data-apellido=${a.apellido},
+                         data-codigo=${a.codigoBarras},
+                         data-modalidad=${a.jornada.name()},
+                         data-seccion=${!#lists.isEmpty(a.grupos) ? a.grupos[0].nombre : ''}">
+
+                <td th:text="${a.nombre}"></td>
+                <td th:text="${a.apellido}"></td>
+
+                <td><span class="code" th:text="${a.codigoBarras}"></span></td>
+
+                <td class="direccion" th:text="${a.direccion}"></td>
 
                 <td>
-                    <span th:text="${u.nombre + ' ' + (u.apellido != null ? u.apellido : '')}"></span>
+                    <span class="badge" th:classappend="${a.jornada.name() == 'FULL_TIME' ? 'badge-fulltime' : 'badge-sabatino'}" 
+                          th:text="${a.jornada.name() == 'FULL_TIME' ? 'Full Time' : 'Sabatino'}"></span>
                 </td>
 
                 <td>
-                    <span class="username" th:text="${u.username}"></span>
-                </td>
-
-                <td>
-                    <span th:switch="${u.role.name()}">
-                        <span th:case="'ROLE_ADMIN'" class="badge badge-admin">Admin</span>
-                        <span th:case="'ROLE_DOCENTE'" class="badge badge-docente">Docente</span>
-                        <span th:case="'ROLE_SUPERVISOR'" class="badge badge-supervisor">Supervisor</span>
-                        <span th:case="'ROLE_ALUMNO'" class="badge badge-alumno">Alumno</span>
+                    <span th:if="${!#lists.isEmpty(a.grupos)}"
+                          class="badge"
+                          th:text="${a.grupos[0].nombre}">
                     </span>
-                </td>
-
-                <td>
-                    <div class="status">
-                        <span class="dot" th:classappend="${u.activo} ? 'dot-active' : 'dot-inactive'"></span>
-                        <span th:text="${u.activo} ? 'Activo' : 'Inactivo'"></span>
-                    </div>
+                    <span th:if="${#lists.isEmpty(a.grupos)}" class="empty-dash">—</span>
                 </td>
 
                 <td>
                     <div class="actions">
-                        <a th:href="@{/admin/usuarios/editar/{id}(id=${u.idUsuario})}" class="btn btn-secondary">
+                        <a th:href="@{/admin/alumnos/editar/{id}(id=${a.idEstudiante})}" class="btn btn-secondary">
                             <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                             Editar
                         </a>
-                        <a th:href="@{/admin/usuarios/eliminar/{id}(id=${u.idUsuario})}"
+                        <a th:href="@{/admin/alumnos/eliminar/{id}(id=${a.idEstudiante})}"
                            class="btn btn-danger"
-                           onclick="return confirm('¿Eliminar este usuario?')">
+                           onclick="return confirm('¿Eliminar este alumno?')">
                             <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                             Eliminar
                         </a>
+                        <a th:href="@{/admin/alumnos/{id}/barcode(id=${a.idEstudiante})}"
+   title="Descargar código de barras"
+   class="btn btn-secondary btn-barcode">
+    <svg viewBox="0 0 24 24" width="15" height="15"
+         fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 5v14M7 5v14M11 5v14M15 5v8M19 5v8M15 17l2 2 4-4"/>
+    </svg>
+    Código
+</a>
                     </div>
                 </td>
             </tr>
@@ -543,42 +523,56 @@
             <svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#D6D6D6;fill:none;stroke-width:1.8;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            No se encontraron usuarios con esos filtros.
+            No se encontraron alumnos con esos filtros.
         </div>
     </div>
 
 </div>
 
 <script>
-    const searchInput  = document.getElementById('searchInput');
-    const filterRol    = document.getElementById('filterRol');
-    const filterEstado = document.getElementById('filterEstado');
-    const rows         = document.querySelectorAll('#tablaUsuarios tr[data-nombre]');
-    const countVisible = document.getElementById('countVisible');
-    const countTotal   = document.getElementById('countTotal');
-    const noResults    = document.getElementById('no-results');
+    const searchInput   = document.getElementById('searchInput');
+    const filterSeccion = document.getElementById('filterSeccion');
+    const filterModalidad = document.getElementById('filterModalidad');
+    const rows          = document.querySelectorAll('#tablaAlumnos tr[data-nombre]');
+    const countVisible  = document.getElementById('countVisible');
+    const countTotal    = document.getElementById('countTotal');
+    const noResults     = document.getElementById('no-results');
 
-    countTotal.textContent = Array.from(rows).filter(r => r.dataset.rol !== 'ROLE_ALUMNO').length;
+    countTotal.textContent = rows.length;
+
+    // Poblar filtro de secciones dinámicamente
+    const secciones = new Set();
+    rows.forEach(row => {
+        const s = (row.dataset.seccion || '').trim();
+        if (s) secciones.add(s);
+    });
+
+    secciones.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        filterSeccion.appendChild(opt);
+    });
 
     function applyFilters() {
-        const q      = searchInput.value.toLowerCase().trim();
-        const rol    = filterRol.value;
-        const estado = filterEstado.value;
+        const q        = searchInput.value.toLowerCase().trim();
+        const seccion  = filterSeccion.value;
+        const modalidad = filterModalidad.value;
 
         let visible = 0;
 
         rows.forEach(row => {
-            const nombre   = (row.dataset.nombre   || '').toLowerCase();
-            const username = (row.dataset.username || '').toLowerCase();
-            const rowRol   = row.dataset.rol   || '';
-            const rowEst   = row.dataset.estado || '';
+            const nombre      = (row.dataset.nombre   || '').toLowerCase();
+            const apellido    = (row.dataset.apellido || '').toLowerCase();
+            const codigo      = (row.dataset.codigo   || '').toLowerCase();
+            const rowSec      = (row.dataset.seccion  || '').trim();
+            const rowModalidad = (row.dataset.modalidad || '').trim();
 
-            const esAlumno    = rowRol === 'ROLE_ALUMNO';
-            const matchQ      = !q      || nombre.includes(q) || username.includes(q);
-            const matchRol    = !rol    || rowRol === rol;
-            const matchEstado = !estado || rowEst === estado;
+            const matchQ         = !q        || nombre.includes(q) || apellido.includes(q) || codigo.includes(q);
+            const matchSec       = !seccion  || rowSec === seccion;
+            const matchModalidad = !modalidad || rowModalidad === modalidad;
 
-            if (!esAlumno && matchQ && matchRol && matchEstado) {
+            if (matchQ && matchSec && matchModalidad) {
                 row.style.display = '';
                 visible++;
             } else {
@@ -593,8 +587,8 @@
     applyFilters();
 
     searchInput.addEventListener('input',   applyFilters);
-    filterRol.addEventListener('change',    applyFilters);
-    filterEstado.addEventListener('change', applyFilters);
+    filterSeccion.addEventListener('change', applyFilters);
+    filterModalidad.addEventListener('change', applyFilters);
 </script>
 
 </body>

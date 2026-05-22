@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Asistencias — Programa Oportunidades</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+
+    <style>
+
+        :root{
+            --rojo:#C8102E;
+            --rojo-dark:#A00E25;
+            --rojo-light:#FCE7EB;
+            --negro:#141414;
+            --gris-90:#222;
+            --gris-70:#4A4A4A;
+            --gris-50:#7A7A7A;
+            --gris-30:#B0B0B0;
+            --gris-20:#D6D6D6;
+            --gris-10:#F4F3F1;
+            --blanco:#FFF;
+        }
+
+        *{ margin:0; padding:0; box-sizing:border-box; }
+
+        body{ font-family:'DM Sans',sans-serif; background:var(--gris-10); color:var(--negro); }
+
+        nav{
+            height:72px; background:#141414; padding:0 2rem;
+            display:flex; align-items:center; justify-content:space-between;
+        }
+
+        .brand{ display:flex; align-items:center; gap:14px; }
+        .brand-name{ color:white; font-size:14px; font-weight:700; }
+        .brand-sub{ color:#8D8D8D; font-size:11px; }
+        .nav-right{ display:flex; align-items:center; gap:1rem; }
+
+        .nav-tabs {
+            display: flex; gap: 4px; align-items: center;
+        }
+
+        .nav-tab {
+            text-decoration: none; color: #7A7A7A; font-size: 13px;
+            font-weight: 600; padding: 8px 14px; border-radius: 8px;
+            transition: 0.15s; white-space: nowrap;
+        }
+
+        .nav-tab:hover { color: white; background: rgba(255,255,255,0.06); }
+        .nav-tab.active { background: var(--rojo); color: white; }
+        .nav-tab.nav-tab-lector {
+            background: rgba(200,16,46,0.12);
+            color: var(--rojo);
+            border: 1px solid rgba(200,16,46,0.2);
+        }
+        .nav-tab.nav-tab-lector:hover { background: rgba(200,16,46,0.18); }
+
+        .user-chip{
+            padding:9px 14px; border-radius:999px;
+            background:rgba(255,255,255,.06); color:#BABABA; font-size:12px;
+        }
+
+        .logout-link{ color:#888; text-decoration:none; font-size:13px; }
+        .logout-link:hover{ color:var(--rojo); }
+
+        .container{ max-width:1200px; margin:2rem auto; padding:0 1rem; }
+        .page-header{ margin-bottom:2rem; }
+
+        .eyebrow{
+            font-size:11px; text-transform:uppercase; color:var(--rojo);
+            font-weight:700; margin-bottom:10px; letter-spacing:.1em;
+        }
+
+        .page-header h1{ font-family:'DM Serif Display',serif; font-size:2.5rem; }
+        .fecha-label{ margin-top:10px; color:var(--gris-50); font-size:14px; }
+
+        .export-bar{
+            background:white; border:1px solid #ececec; border-radius:18px;
+            padding:1.2rem 1.4rem; margin-bottom:1.6rem;
+            display:flex; gap:1rem; align-items:center; flex-wrap:wrap;
+        }
+
+        .export-label{
+            font-size:11px; font-weight:700; letter-spacing:.08em;
+            text-transform:uppercase; color:var(--gris-50);
+        }
+
+        .export-select{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa;
+            font-family:'DM Sans',sans-serif; font-size:13px;
+            cursor:pointer; min-width:120px;
+        }
+
+        .export-select:focus{ outline:none; border-color:var(--rojo); background:white; }
+
+        .btn-download{
+            background:var(--rojo); color:white; border:none;
+            border-radius:10px; padding:11px 18px;
+            font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif;
+            cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+        }
+
+        .btn-download:hover{ background:var(--rojo-dark); }
+
+        .historial-card{
+            background:white; border-radius:18px;
+            border:1px solid #ececec; padding:1.5rem; margin-bottom:1.5rem;
+        }
+
+        .historial-card-title{
+            font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+            color:var(--gris-50); font-weight:700; margin-bottom:1rem;
+        }
+
+        .section-divider{ border:none; border-top:1px solid #ececec; margin:1.4rem 0; }
+
+        .range-form{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+
+        .range-field{ display:flex; flex-direction:column; gap:6px; }
+
+        .range-field label{
+            font-size:11px; text-transform:uppercase;
+            letter-spacing:.06em; color:var(--gris-50); font-weight:700;
+        }
+
+        .range-field input[type="date"]{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa;
+            min-width:170px; font-family:'DM Sans',sans-serif;
+        }
+
+        .range-field input[type="date"]:focus{
+            outline:none; border-color:var(--rojo); background:white;
+        }
+
+        .btn{
+            border:none; border-radius:10px; padding:11px 16px;
+            cursor:pointer; font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif;
+        }
+
+        .btn-dark{ background:var(--negro); color:white; }
+        .btn-dark:hover{ opacity:.92; }
+
+        .filter-select{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa; font-family:'DM Sans',sans-serif;
+        }
+
+        .stats{
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+            gap:1rem; margin-bottom:1.5rem;
+        }
+
+        /* ── Calendario grande separado de stats ── */
+        .dash-grid{
+            display:grid;
+            grid-template-columns: 440px 1fr;
+            gap: 1.2rem;
+            align-items:start;
+            margin-bottom:1.5rem;
+        }
+        @media(max-width:1000px){ .dash-grid{ grid-template-columns:1fr; } }
+        .dash-calendar .mini-day{ padding:7px 2px; font-size:12.5px; }
+        .dash-calendar .mini-day-name{ font-size:10.5px; padding:6px 0; }
+
+        .stat-card{ background:white; border:1px solid #ececec; border-radius:18px; padding:1.4rem; }
+        .stat-num{ font-size:2rem; font-weight:700; margin-bottom:5px; }
+
+        .stat-label{
+            font-size:12px; text-transform:uppercase;
+            color:var(--gris-50); letter-spacing:.08em;
+        }
+
+        .filters-bar{
+            background:white; border:1px solid #ececec; border-radius:18px;
+            padding:1.2rem; margin-bottom:1.2rem;
+            display:flex; gap:1rem; flex-wrap:wrap; align-items:center;
+        }
+
+        .search-wrap{ flex:1; min-width:240px; }
+
+        .search-wrap input{
+            width:100%; border:1.5px solid var(--gris-20);
+            border-radius:10px; padding:11px 14px; background:#fafafa;
+        }
+
+        .search-wrap input:focus{ outline:none; border-color:var(--rojo); background:white; }
+
+        .card{ background:white; border:1px solid #ececec; border-radius:18px; overflow:hidden; }
+
+        table{ width:100%; border-collapse:collapse; }
+        thead{ background:#fafafa; }
+
+        th{
+            text-align:left; padding:16px; font-size:11px;
+            text-transform:uppercase; color:var(--gris-50); letter-spacing:.08em;
+        }
+
+        td{ padding:16px; border-top:1px solid #f1f1f1; font-size:14px; }
+        tbody tr:hover{ background:#fcfcfc; }
+
+        .badge{
+            display:inline-flex; align-items:center; justify-content:center;
+            padding:5px 12px; border-radius:999px; font-size:11px; font-weight:700;
+        }
+
+        .badge-presente{ background:black; color:white; }
+        .badge-ausente{ background:#FDEBEC; color:var(--rojo-dark); }
+        .badge-tardanza{ background:#F1F1F1; color:#555; }
+        .badge-pendiente{ background:var(--gris-10); color:var(--gris-70); border:1px solid var(--gris-20); }
+
+        .fecha-badge{ padding:4px 10px; border-radius:8px; background:#f4f4f4; font-size:12px; }
+        .empty{ padding:3rem; text-align:center; color:var(--gris-50); }
+
+        /* ── Botón exportar por alumno ── */
+        .btn-alumno{
+            background:transparent; border:1.5px solid var(--gris-20);
+            border-radius:8px; padding:6px 12px;
+            font-size:12px; font-weight:600; font-family:'DM Sans',sans-serif;
+            color:var(--gris-70); cursor:pointer;
+            display:inline-flex; align-items:center; gap:6px;
+            transition:.15s;
+        }
+
+        .btn-alumno:hover{
+            border-color:var(--rojo); color:var(--rojo); background:var(--rojo-light);
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay{
+            display:none;
+            position:fixed; inset:0;
+            background:rgba(0,0,0,.45);
+            backdrop-filter:blur(4px);
+            z-index:1000;
+            align-items:center; justify-content:center;
+        }
+
+        .modal-overlay.open{ display:flex; }
+
+        .modal{
+            background:white; border-radius:20px;
+            padding:2rem; width:100%; max-width:440px;
+            box-shadow:0 24px 60px rgba(0,0,0,.15);
+            position:relative;
+        }
+
+        .modal-close{
+            position:absolute; top:1rem; right:1rem;
+            background:none; border:none; font-size:20px;
+            cursor:pointer; color:var(--gris-30); line-height:1;
+        }
+
+        .modal-close:hover{ color:var(--negro); }
+
+        .modal-eyebrow{
+            font-size:10px; font-weight:700; letter-spacing:.1em;
+            text-transform:uppercase; color:var(--rojo); margin-bottom:6px;
+        }
+
+        .modal-title{
+            font-family:'DM Serif Display',serif;
+            font-size:1.5rem; margin-bottom:1.4rem; color:var(--negro);
+        }
+
+        .modal-fields{
+            display:flex; flex-direction:column; gap:1rem; margin-bottom:1.4rem;
+        }
+
+        .modal-field{ display:flex; flex-direction:column; gap:6px; }
+
+        .modal-field label{
+            font-size:11px; font-weight:700; text-transform:uppercase;
+            letter-spacing:.06em; color:var(--gris-50);
+        }
+
+        .modal-field input[type="date"],
+        .modal-field select{
+            border:1.5px solid var(--gris-20); border-radius:10px;
+            padding:11px 14px; background:#fafafa;
+            font-family:'DM Sans',sans-serif; font-size:13px; width:100%;
+        }
+
+        .modal-field input[type="date"]:focus,
+        .modal-field select:focus{
+            outline:none; border-color:var(--rojo); background:white;
+        }
+
+        .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+
+        .btn-cancel{
+            background:var(--gris-10); color:var(--gris-70);
+            border:none; border-radius:10px; padding:11px 18px;
+            font-size:13px; font-weight:600; font-family:'DM Sans',sans-serif;
+            cursor:pointer;
+        }
+
+        .btn-cancel:hover{ background:var(--gris-20); }
+
+        /* ── MULTISELECT ── */
+        .multi-select{ position:relative; width:260px; }
+
+        .multi-select-btn{
+            width:100%; background:#fafafa; border:1.5px solid var(--gris-20);
+            border-radius:10px; padding:11px 14px; cursor:pointer;
+            display:flex; align-items:center; justify-content:space-between; font-size:13px;
+        }
+
+        .multi-select-dropdown{
+            display:none; position:absolute; top:105%; left:0; width:100%;
+            background:white; border:1px solid #ececec; border-radius:12px;
+            box-shadow:0 10px 25px rgba(0,0,0,.08); z-index:999;
+            max-height:220px; overflow-y:auto;
+        }
+
+        .multi-select-dropdown.show{ display:block; }
+
+        .multi-option{
+            display:flex; align-items:center; gap:10px;
+            padding:10px 14px; border-bottom:1px solid #f3f3f3;
+        }
+
+        .multi-option:last-child{ border-bottom:none; }
+        .multi-option:hover{ background:#fafafa; }
+        .multi-option input{ width:16px; height:16px; accent-color:var(--rojo); }
+
+
+        /* ── BURBUJA FLOTANTE ── */
+        .bubble-float {
+            position: fixed;
+            top: 50%;
+            right: 24px;
+            transform: translateY(-50%);
+            z-index: 500;
+            background: var(--negro);
+            color: white;
+            border-radius: 20px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity .2s;
+            min-width: 90px;
+        }
+        .bubble-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .bubble-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .bubble-lbl {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #aaa;
+        }
+        .bubble-sep {
+            width: 60px;
+            height: 1px;
+            background: rgba(255,255,255,0.12);
+        }
+        .bubble-num.verde  { color: #4ade80; }
+        .bubble-num.amarillo { color: #fbbf24; }
+        .bubble-num.rojo   { color: #f87171; }
+
+        /* ── FILTROS HOY ── */
+        .filters-hoy {
+            background: white;
+            border: 1px solid #ececec;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            gap: .8rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filters-hoy input,
+        .filters-hoy select {
+            border: 1.5px solid var(--gris-20);
+            border-radius: 10px;
+            padding: 10px 13px;
+            background: #fafafa;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+        }
+        .filters-hoy input { flex: 1; min-width: 200px; }
+        .filters-hoy input:focus,
+        .filters-hoy select:focus {
+            outline: none;
+            border-color: var(--rojo);
+            background: white;
+        }
+
+
+        /* ── PANEL SECCIÓN ACTUAL ── */
+        .bubble-seccion-btn {
+            width: 100%;
+            background: var(--rojo);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            text-align: center;
+            transition: .15s;
+        }
+        .bubble-seccion-btn:hover { background: var(--rojo-dark); }
+
+        .seccion-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            right: 130px;
+            transform: translateY(-50%);
+            background: white;
+            border: 1px solid #ececec;
+            border-radius: 18px;
+            padding: 1.4rem;
+            min-width: 260px;
+            max-width: 320px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+            z-index: 499;
+        }
+        .seccion-panel.open { display: block; }
+        .seccion-panel-title {
+            font-size: 10px; font-weight: 700; letter-spacing: .08em;
+            text-transform: uppercase; color: var(--rojo); margin-bottom: 8px;
+        }
+        .seccion-panel-name {
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;
+        }
+        .seccion-panel-row {
+            display: flex; justify-content: space-between;
+            font-size: 12px; color: var(--gris-50); padding: 5px 0;
+            border-bottom: 1px solid #f3f3f3;
+        }
+        .seccion-panel-row:last-child { border-bottom: none; }
+        .seccion-panel-row span:last-child { color: var(--negro); font-weight: 600; }
+
+        /* ── TABLA ÚNICA HOY ── */
+        .table-hoy-wrap { background: white; border: 1px solid #ececec; border-radius: 18px; overflow: hidden; }
+
+        /* filtro de estado pills */
+        .estado-pills {
+            display: flex; gap: 6px; flex-wrap: wrap;
+        }
+        .pill {
+            padding: 7px 14px; border-radius: 999px;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            border: 1.5px solid transparent; transition: .15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .pill-all    { background: #f3f3f3; color: #555; border-color: #ddd; }
+        .pill-pres   { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+        .pill-pend   { background: #fefce8; color: #a16207; border-color: #fde68a; }
+        .pill-aus    { background: #fef2f2; color: var(--rojo-dark); border-color: #fecaca; }
+        .pill.active, .pill:hover { opacity: .8; transform: scale(1.02); }
+        .pill-all.active  { background: var(--negro); color: white; border-color: var(--negro); }
+        .pill-pres.active { background: #15803d; color: white; border-color: #15803d; }
+        .pill-pend.active { background: #a16207; color: white; border-color: #a16207; }
+        .pill-aus.active  { background: var(--rojo); color: white; border-color: var(--rojo); }
+
+        @media(max-width:768px){
+            nav{ padding:0 1rem; }
+            table{ min-width:760px; }
+            .card{ overflow:auto; }
+            .modal{ margin:1rem; }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">
+        <a th:href="@{/docente}" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;">
+            <img src="/images/opor.png" style="height:42px;width:auto;" alt="Logo"/>
+            <div>
+                <div class="brand-name">Programa Oportunidades</div>
+                <div class="brand-sub">Panel docente</div>
+            </div>
+        </a>
+    </div>
+    <div class="nav-right">
+        <div class="nav-tabs">
+            <a th:href="@{/docente}" class="nav-tab"
+               th:classappend="${!modoHistorial and !modoRango} ? ' active' : ''">Hoy</a>
+            <a th:href="@{/docente/historial}" class="nav-tab"
+               th:classappend="${modoHistorial or modoRango} ? ' active' : ''">Historial</a>
+            <a th:href="@{/asistencia/lector}" class="nav-tab nav-tab-lector">
+                <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;margin-right:4px;">
+                    <path d="M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14"/>
+                </svg>
+                Lector
+            </a>
+        </div>
+        <div class="user-chip"
+             th:text="${docente.nombre + ' ' + (docente.apellido != null ? docente.apellido : '')}">
+            Docente
+        </div>
+        <a th:href="@{/logout}" class="logout-link">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="page-header">
+        <div class="eyebrow">Control académico</div>
+        <h1>Asistencias</h1>
+        <p class="fecha-label"
+   th:text="${modoRango} ? ('Historial ' + fechaDesdeStr + ' - ' + fechaHastaStr) : 'Registro de hoy'">
+</p>
+    </div>
+
+    <!-- CALENDARIO + STATS (separados) -->
+    <div class="dash-grid">
+        <div class="dash-calendar">
+            <div th:replace="~{calendario/widget-calendario :: widget}"></div>
+        </div>
+        <div>
+            <div class="stats">
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias)}">0</div>
+            <div class="stat-label">Total registros</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PRESENTE' || estado == 'TARDANZA'])}">0</div>
+            <div class="stat-label">Llegaron</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'AUSENTE'])}">0</div>
+            <div class="stat-label">Ausentes</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(asistencias.?[estado == 'PENDIENTE'])}">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+                <div class="stat-card">
+            <div class="stat-num" th:text="${#lists.size(gruposActivos)}">0</div>
+            <div class="stat-label">Secciones activas</div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ PANELES HOY: LLEGARON / PENDIENTES ══ -->
+    <div th:if="${!modoHistorial and !modoRango}">
+
+
+        <!-- ── EXPORTAR HOY (sincronizado con filtros) ── -->
+        <div class="export-bar">
+            <span class="export-label">Exportar vista</span>
+            <select class="export-select" id="formatoHoy">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+            </select>
+            <button class="btn-download" onclick="descargarHoy()">
+                <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar
+            </button>
+            <span id="fechaHoyStr" th:text="${fechaSeleccionada}" style="display:none;"></span>
+        </div>
+
+        <!-- ── FILTROS HOY ── -->
+        <div class="filters-hoy">
+            <input type="text" id="searchHoy" placeholder="Buscar por nombre…"/>
+            <select id="filterSeccionHoy">
+                <option value="">Todas las secciones</option>
+                <option th:each="g : ${grupos}" th:value="${g.nombre}" th:text="${g.nombre}">A1</option>
+            </select>
+            <select id="filterEstadoHoy">
+                <option value="">Todos los estados</option>
+                <option value="PRESENTE,TARDANZA">Presentes</option>
+                <option value="PENDIENTE">Pendientes</option>
+                <option value="AUSENTE">Ausentes</option>
+            </select>
+        </div>
+
+
+        <!-- ── TABLA ÚNICA HOY ── -->
+        <div class="table-hoy-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Sección</th>
+                        <th>Modalidad</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaHoy">
+                    <tr th:if="${#lists.isEmpty(asistencias)}">
+                        <td colspan="6" class="empty">Sin registros por hoy.</td>
+                    </tr>
+                    <tr th:each="a : ${asistencias}"
+                        th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},
+                                 data-grupo=${a.grupo.nombre},
+                                 data-estado=${a.estado}">
+                        <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
+                        <td th:text="${a.grupo.nombre}"></td>
+                        <td>
+                            <span th:if="${a.grupo.modalidad == 'SABATINO'}"
+                                  style="background:#4A4A4A;color:white;border:none;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;">Sabatino</span>
+                            <span th:if="${a.grupo.modalidad == 'FULL_TIME'}"
+                                  style="background:#C8102E;color:white;border:none;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;">Full Time</span>
+                        </td>
+                        <td th:text="${a.horaEntrada != null ? a.horaEntrada : '—'}"></td>
+                        <td th:text="${a.horaSalida  != null ? a.horaSalida  : '—'}"></td>
+                        <td>
+                            <span th:switch="${a.estado}">
+                                <span th:case="'PRESENTE'"  class="badge badge-presente">Presente</span>
+                                <span th:case="'TARDANZA'"  class="badge badge-tardanza">Tardanza</span>
+                                <span th:case="'PENDIENTE'" class="badge badge-pendiente">Pendiente</span>
+                                <span th:case="'AUSENTE'"   class="badge badge-ausente">Ausente</span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Aviso scheduler -->
+        <div th:if="${#lists.isEmpty(asistencias)}"
+             style="background:#FFF8E1;border:1px solid #FFE082;border-radius:12px;padding:12px 16px;font-size:13px;color:#7A5C00;margin-top:1rem;">
+            &#9201; Los registros se actualizan cada 5 minutos. Recarg&#225; la p&#225;gina en un momento.
+        </div>
+
+    </div><!-- fin paneles hoy -->
+
+    <!-- ══ SECCIÓN HISTORIAL ══ -->
+    <div th:if="${modoHistorial or modoRango}">
+
+    <!-- HISTORIAL CARD -->
+    <div class="historial-card">
+
+        <p class="historial-card-title">Seleccionar rango de fechas</p>
+
+        <form th:action="@{/docente/historial}" method="get" class="range-form">
+
+            <div class="range-field">
+                <label>Secciones</label>
+                <div class="multi-select">
+                    <button type="button" class="multi-select-btn" id="multiSelectBtn">
+                        <span id="multiSelectText">Seleccionar secciones</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="multi-select-dropdown" id="multiSelectDropdown">
+                        <label class="multi-option" th:each="g : ${grupos}">
+                            <input type="checkbox" name="secciones"
+                                   th:value="${g.idGrupo}"
+                                   th:checked="${seccionesSeleccionadas.contains(g.idGrupo)}"/>
+                            <span th:text="${g.nombre}">A1</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="range-field">
+                <label>Desde</label>
+                <input type="date" name="desde" th:value="${fechaDesdeStr}"/>
+            </div>
+
+            <div class="range-field">
+                <label>Hasta</label>
+                <input type="date" name="hasta" th:value="${fechaHastaStr}"/>
+            </div>
+
+            <button type="submit" class="btn btn-dark">Ver asistencias</button>
+
+        </form>
+
+        <hr class="section-divider"/>
+
+        <!-- EXPORTAR RANGO -->
+        <p class="historial-card-title">Exportar rango</p>
+
+        <form th:action="@{/docente/exportar}" method="get"
+              style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+
+            <input type="hidden" name="filtro" value="rango"/>
+            <input type="hidden" name="desde" th:value="${fechaDesdeStr}"/>
+            <input type="hidden" name="hasta" th:value="${fechaHastaStr}"/>
+            <div id="hiddenSeccionesExport"></div>
+
+            <select name="formato" class="export-select">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+            </select>
+
+            <button type="submit" class="btn-download">
+                <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- FILTROS HISTORIAL -->
+    <div class="filters-bar">
+        <div class="search-wrap">
+            <input type="text" id="searchInput" placeholder="Buscar estudiante o grupo..."/>
+        </div>
+        <select id="filterEstado" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="PRESENTE">Presente</option>
+            <option value="AUSENTE">Ausente</option>
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="TARDANZA">Tardanza</option>
+        </select>
+        <select id="filterGrupo" class="filter-select">
+            <option value="">Todos los grupos</option>
+        </select>
+    </div>
+
+    <!-- TABLA HISTORIAL -->
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Grupo</th>
+                    <th th:if="${modoRango}">Fecha</th>
+                    <th>Hora entrada</th>
+                    <th>Hora salida</th>
+                    <th>Estado</th>
+                    <th>Exportar</th>
+                </tr>
+            </thead>
+            <tbody id="tablaAsistencias">
+
+                <tr th:if="${#lists.isEmpty(asistencias)}">
+                    <td th:colspan="${modoRango ? 7 : 6}" class="empty">
+                        No hay registros.
+                    </td>
+                </tr>
+
+                <tr th:each="a : ${asistencias}"
+    th:attr="data-estudiante=${a.estudiante.nombre + ' ' + a.estudiante.apellido},
+             data-grupo=${a.grupo.nombre},
+             data-estado=${a.estado}">
+
+    <td th:text="${a.estudiante.nombre + ' ' + a.estudiante.apellido}"></td>
+    <td th:text="${a.grupo.nombre}"></td>
+
+    <td th:if="${modoRango}">
+        <span class="fecha-badge" th:text="${#dates.format(a.fecha,'dd/MM/yyyy')}"></span>
+    </td>
+
+    <td th:text="${a.horaEntrada != null ? a.horaEntrada : '—'}"></td>
+    <td th:text="${a.horaSalida  != null ? a.horaSalida  : '—'}"></td>
+
+    <td>
+        <span th:switch="${a.estado}">
+            <span th:case="'PRESENTE'" class="badge badge-presente">Presente</span>
+            <span th:case="'AUSENTE'"  class="badge badge-ausente">Ausente</span>
+            <span th:case="'PENDIENTE'" class="badge badge-pendiente">Pendiente</span>
+            <span th:case="'TARDANZA'" class="badge badge-tardanza">Tardanza</span>
+        </span>
+    </td>
+
+    <td>
+        <button class="btn-alumno"
+                th:attr="data-id=${a.estudiante.idEstudiante},
+                         data-nombre=${a.estudiante.nombre + ' ' + a.estudiante.apellido}">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Exportar
+        </button>
+    </td>
+
+</tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    </div><!-- fin sección historial -->
+
+</div><!-- fin .container -->
+
+<!-- ══════════════════════════════════════════
+     MODAL — Exportar por alumno
+     ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalAlumno">
+    <div class="modal">
+
+        <button class="modal-close" onclick="cerrarModal()">✕</button>
+
+        <div class="modal-eyebrow">Exportar asistencia</div>
+        <div class="modal-title" id="modalNombreAlumno">Alumno</div>
+
+        <div class="modal-fields">
+
+            <div class="modal-field">
+                <label>Desde</label>
+                <input type="date" id="modalDesde"/>
+            </div>
+
+            <div class="modal-field">
+                <label>Hasta</label>
+                <input type="date" id="modalHasta"/>
+            </div>
+
+            <div class="modal-field">
+                <label>Formato</label>
+                <select id="modalFormato">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn-download" onclick="descargarAlumno()">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- PANEL SECCIÓN ACTUAL (oculto por defecto) -->
+<div class="seccion-panel" id="seccionPanel" th:if="${!modoHistorial and !modoRango and !#lists.isEmpty(grupos)}">
+    <div class="seccion-panel-title">Secciones de hoy</div>
+    <div th:each="g, gStat : ${grupos}">
+        <div class="seccion-panel-name" th:text="${g.nombre}">A1</div>
+        <div class="seccion-panel-row">
+            <span>Modalidad</span>
+            <span th:text="${g.modalidad == 'SABATINO' ? 'Sabatino' : 'Full Time'}">—</span>
+        </div>
+        <div class="seccion-panel-row">
+            <span>Horario</span>
+            <span th:text="${(g.horaInicio != null ? g.horaInicio : '—') + ' – ' + (g.horaFin != null ? g.horaFin : '—')}">—</span>
+        </div>
+        <div class="seccion-panel-row">
+            <span>Días</span>
+            <span th:text="${g.dias != null and !#strings.isEmpty(g.dias) ? g.dias.replace(',', ' · ') : '—'}">—</span>
+        </div>
+        <hr style="border:none;border-top:1px solid #f0f0f0;margin:10px 0;" th:if="${!gStat.last}"/>
+    </div>
+</div>
+
+<!-- BURBUJA FLOTANTE -->
+<div class="bubble-float" id="bubbleFloat" th:if="${!modoHistorial and !modoRango}">
+    <div class="bubble-stat">
+        <span class="bubble-num verde" id="bubbleLlegaron" th:text="${#lists.size(presentes)}">0</span>
+        <span class="bubble-lbl">Llegaron</span>
+    </div>
+    <div class="bubble-sep"></div>
+    <div class="bubble-stat">
+        <span class="bubble-num amarillo" id="bubblePendientes" th:text="${#lists.size(pendientes)}">0</span>
+        <span class="bubble-lbl">Pendientes</span>
+    </div>
+    <div class="bubble-sep"></div>
+    <div class="bubble-stat">
+        <span class="bubble-num rojo" id="bubbleAusentes" th:text="${#lists.size(ausentes)}">0</span>
+        <span class="bubble-lbl">Ausentes</span>
+    </div>
+    <div class="bubble-sep" th:if="${!#lists.isEmpty(grupos)}"></div>
+    <button class="bubble-seccion-btn" id="btnSeccionActual"
+            onclick="toggleSeccionPanel()"
+            th:if="${!#lists.isEmpty(grupos)}">
+        <span th:if="${#lists.size(grupos) == 1}"
+              th:text="${grupos[0].nombre}">A1</span>
+        <span th:if="${#lists.size(grupos) > 1}">
+            <th:block th:each="g, i : ${grupos}">
+                <span th:text="${g.nombre}">A1</span><br th:if="${!i.last}"/>
+            </th:block>
+        </span>
+    </button>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════════════════
+// FUNCIONES GLOBALES — llamadas desde onclick en el HTML
+// ═══════════════════════════════════════════════════════════════
+
+function descargarHoy() {
+    const formato = document.getElementById('formatoHoy').value;
+    const fecha   = document.getElementById('fechaHoyStr').textContent.trim()
+                    || new Date().toISOString().split('T')[0];
+    const seccion = document.getElementById('filterSeccionHoy')?.value || '';
+    const estadoV = document.getElementById('filterEstadoHoy')?.value  || '';
+    let url = `/docente/exportar?filtro=dia&formato=${formato}&fecha=${fecha}`;
+    if (seccion) url += `&grupo=${encodeURIComponent(seccion)}`;
+    if (estadoV) url += `&estadoFiltro=${encodeURIComponent(estadoV)}`;
+    window.location.href = url;
+}
+
+function toggleSeccionPanel() {
+    const panel = document.getElementById('seccionPanel');
+    if (panel) panel.classList.toggle('open');
+}
+
+function cerrarModal() {
+    document.getElementById('modalAlumno').classList.remove('open');
+    window._alumnoIdActual = null;
+}
+
+function descargarAlumno() {
+    if (!window._alumnoIdActual) return;
+    const desde   = document.getElementById('modalDesde').value;
+    const hasta   = document.getElementById('modalHasta').value;
+    const formato = document.getElementById('modalFormato').value;
+    if (!desde || !hasta) { alert('Seleccioná ambas fechas.'); return; }
+    if (hasta < desde) { alert('La fecha "Hasta" no puede ser anterior a "Desde".'); return; }
+    window.location.href =
+        `/docente/exportar?filtro=alumno&formato=${formato}&idEstudiante=${window._alumnoIdActual}&desde=${desde}&hasta=${hasta}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOM LISTENERS — ejecutar cuando el DOM esté listo
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── MULTISELECT (Historial) ───────────────────────────────────
+    const multiBtn      = document.getElementById('multiSelectBtn');
+    const multiDropdown = document.getElementById('multiSelectDropdown');
+    const multiText     = document.getElementById('multiSelectText');
+
+    if (multiBtn && multiDropdown && multiText) {
+        multiBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            multiDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', function (e) {
+            if (!multiDropdown.contains(e.target) && !multiBtn.contains(e.target)) {
+                multiDropdown.classList.remove('show');
+            }
+        });
+        const checks = multiDropdown.querySelectorAll('input[type="checkbox"]');
+        updateMultiText();
+        checks.forEach(chk => chk.addEventListener('change', updateMultiText));
+        function updateMultiText() {
+            const selected = [];
+            checks.forEach(chk => {
+                if (chk.checked) selected.push(chk.parentElement.innerText.trim());
+            });
+            multiText.textContent = selected.length > 0 ? selected.join(', ') : 'Seleccionar secciones';
+            const hiddenExport = document.getElementById('hiddenSeccionesExport');
+            if (hiddenExport) {
+                hiddenExport.innerHTML = '';
+                checks.forEach(chk => {
+                    if (chk.checked)
+                        hiddenExport.innerHTML += `<input type="hidden" name="secciones" value="${chk.value}">`;
+                });
+            }
+        }
+    }
+
+    // ── FILTROS VISTA HOY ─────────────────────────────────────────
+    const searchHoy        = document.getElementById('searchHoy');
+    const filterSeccionHoy = document.getElementById('filterSeccionHoy');
+    const filterEstadoHoy  = document.getElementById('filterEstadoHoy');
+
+    function applyFiltersHoy() {
+        const q       = (searchHoy?.value || '').toLowerCase().trim();
+        const seccion = filterSeccionHoy?.value || '';
+        const estadoV = filterEstadoHoy?.value  || '';
+        const activos = estadoV ? estadoV.split(',') : [];
+        let cntP = 0, cntN = 0, cntA = 0;
+        document.querySelectorAll('#tablaHoy tr[data-estudiante]').forEach(row => {
+            const matchQ = !q       || (row.dataset.estudiante||'').toLowerCase().includes(q)
+                                    || (row.dataset.grupo||'').toLowerCase().includes(q);
+            const matchS = !seccion || (row.dataset.grupo||'') === seccion;
+            const estado = row.dataset.estado || '';
+            const matchE = activos.length === 0 || activos.includes(estado);
+            const show   = matchQ && matchS && matchE;
+            row.style.display = show ? '' : 'none';
+            if (show) {
+                if (estado === 'PRESENTE' || estado === 'TARDANZA') cntP++;
+                else if (estado === 'PENDIENTE') cntN++;
+                else if (estado === 'AUSENTE')   cntA++;
+            }
+        });
+        const bubLleg = document.getElementById('bubbleLlegaron');
+        const bubPend = document.getElementById('bubblePendientes');
+        const bubAus  = document.getElementById('bubbleAusentes');
+        if (bubLleg) bubLleg.textContent = cntP;
+        if (bubPend) bubPend.textContent = cntN;
+        if (bubAus)  bubAus.textContent  = cntA;
+    }
+
+    if (searchHoy)        searchHoy.addEventListener('input',   applyFiltersHoy);
+    if (filterSeccionHoy) filterSeccionHoy.addEventListener('change', applyFiltersHoy);
+    if (filterEstadoHoy)  filterEstadoHoy.addEventListener('change',  applyFiltersHoy);
+
+    // ── CERRAR PANEL SECCIÓN al click fuera ───────────────────────
+    document.addEventListener('click', function (e) {
+        const panel = document.getElementById('seccionPanel');
+        const btn   = document.getElementById('btnSeccionActual');
+        if (panel && panel.classList.contains('open')
+            && !panel.contains(e.target)
+            && btn && !btn.contains(e.target)) {
+            panel.classList.remove('open');
+        }
+    });
+
+    // ── MODAL ALUMNO ──────────────────────────────────────────────
+    function attachExportListener(tbodyId) {
+        const el = document.getElementById(tbodyId);
+        if (!el) return;
+        el.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-alumno');
+            if (!btn) return;
+            window._alumnoIdActual = btn.dataset.id;
+            document.getElementById('modalNombreAlumno').textContent = btn.dataset.nombre || 'Alumno';
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('modalDesde').value = hoy;
+            document.getElementById('modalHasta').value = hoy;
+            document.getElementById('modalAlumno').classList.add('open');
+        });
+    }
+    attachExportListener('tablaHoy');
+    attachExportListener('tablaAsistencias');
+
+    const modalEl = document.getElementById('modalAlumno');
+    if (modalEl) modalEl.addEventListener('click', function (e) {
+        if (e.target === this) cerrarModal();
+    });
+
+    // ── FILTROS TABLA HISTORIAL ───────────────────────────────────
+    const searchInput  = document.getElementById('searchInput');
+    const filterEstado = document.getElementById('filterEstado');
+    const filterGrupo  = document.getElementById('filterGrupo');
+
+    if (filterGrupo) {
+        const gruposSet = new Set();
+        document.querySelectorAll('#tablaAsistencias tr[data-estudiante]').forEach(row => {
+            const g = (row.dataset.grupo || '').trim();
+            if (g) gruposSet.add(g);
+        });
+        gruposSet.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g; opt.textContent = g;
+            filterGrupo.appendChild(opt);
+        });
+    }
+
+    function applyFilters() {
+        const q      = (searchInput?.value || '').toLowerCase().trim();
+        const estado = filterEstado?.value || '';
+        const grupo  = filterGrupo?.value  || '';
+        document.querySelectorAll('#tablaAsistencias tr[data-estudiante]').forEach(row => {
+            const matchQ      = !q      || (row.dataset.estudiante||'').toLowerCase().includes(q)
+                                        || (row.dataset.grupo||'').toLowerCase().includes(q);
+            const matchEstado = !estado || (row.dataset.estado||'') === estado;
+            const matchGrupo  = !grupo  || (row.dataset.grupo||'')  === grupo;
+            row.style.display = matchQ && matchEstado && matchGrupo ? '' : 'none';
+        });
+    }
+
+    if (searchInput)  searchInput.addEventListener('input',   applyFilters);
+    if (filterEstado) filterEstado.addEventListener('change', applyFilters);
+    if (filterGrupo)  filterGrupo.addEventListener('change',  applyFilters);
+
+}); // fin DOMContentLoaded
+
+</script>
+
+</body>
+</html>

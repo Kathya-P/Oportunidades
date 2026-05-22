@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Usuarios — Programa Oportunidades</title>
+    <title>Secciones — Programa Oportunidades</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
     <style>
-        :root{
-            --rojo:#C8102E;
-            --rojo-dark:#A00E25;
-            --rojo-light:#F5D0D7;
-            --negro:#141414;
-            --gris-90:#222222;
-            --gris-70:#4A4A4A;
-            --gris-50:#7A7A7A;
-            --gris-20:#D6D6D6;
-            --gris-10:#F0EFED;
-            --blanco:#FFFFFF;
+        :root {
+            --rojo:       #C8102E;
+            --rojo-dark:  #A00E25;
+            --rojo-light: #F5D0D7;
+            --negro:      #141414;
+            --gris-90:    #222222;
+            --gris-70:    #4A4A4A;
+            --gris-50:    #7A7A7A;
+            --gris-20:    #D6D6D6;
+            --gris-10:    #F0EFED;
+            --blanco:     #FFFFFF;
         }
 
         *{ margin:0; padding:0; box-sizing:border-box; }
@@ -33,12 +33,12 @@
         /* NAVBAR */
         nav{
             height:72px;
-            background:rgba(20,20,20,0.98);
+            background:rgba(20,20,20,0.97);
+            border-bottom:1px solid rgba(255,255,255,0.05);
             display:flex;
             align-items:center;
             justify-content:space-between;
             padding:0 2.5rem;
-            border-bottom:1px solid rgba(255,255,255,0.05);
             position:sticky;
             top:0;
             z-index:100;
@@ -46,29 +46,14 @@
         }
 
         .nav-left{ display:flex; align-items:center; gap:14px; }
-
-        .brand-icon{
-            width:42px; height:42px;
-            border-radius:10px;
-            background:var(--rojo);
-            display:flex; align-items:center; justify-content:center;
-            box-shadow:0 10px 25px rgba(200,16,46,0.25);
-        }
-
-        .brand-icon svg{
-            width:22px; height:22px;
-            stroke:white; fill:none; stroke-width:2;
-            stroke-linecap:round; stroke-linejoin:round;
-        }
-
         .brand-info{ display:flex; flex-direction:column; }
-        .brand-name{ color:white; font-size:14px; font-weight:600; letter-spacing:0.02em; }
-        .brand-sub{ color:#909090; font-size:11px; }
+        .brand-name{ color:var(--blanco); font-size:14px; font-weight:600; letter-spacing:0.02em; }
+        .brand-sub{ color:#8D8D8D; font-size:11px; }
 
         .nav-links{ display:flex; align-items:center; gap:12px; }
 
         .nav-links a{
-            text-decoration:none; color:#BABABA;
+            color:#B8B8B8; text-decoration:none;
             font-size:13px; font-weight:500;
             padding:10px 14px; border-radius:8px;
             transition:0.15s ease;
@@ -78,12 +63,12 @@
 
         .nav-links a.active{
             background:rgba(200,16,46,0.15);
-            border:1px solid rgba(200,16,46,0.35);
             color:white;
+            border:1px solid rgba(200,16,46,0.35);
         }
 
         .logout{
-            margin-left:8px;
+            margin-left:10px;
             border-left:1px solid rgba(255,255,255,0.08);
             padding-left:18px;
         }
@@ -98,28 +83,28 @@
         }
 
         /* CONTAINER */
-        .container{ max-width:1280px; margin:0 auto; padding:2.5rem 1.5rem; }
+        .container{ max-width:1200px; margin:0 auto; padding:2.5rem 1.5rem; }
 
         /* HERO */
         .hero{
             background:linear-gradient(135deg,#181818 0%,#101010 100%);
-            border-radius:26px; overflow:hidden;
-            position:relative; padding:2.7rem;
+            border-radius:24px; padding:2.5rem;
+            position:relative; overflow:hidden;
             margin-bottom:2rem;
         }
 
         .hero::before{
             content:''; position:absolute;
-            width:420px; height:420px;
-            border-radius:50%; border:1px solid rgba(200,16,46,0.12);
-            top:-180px; right:-140px;
+            width:380px; height:380px;
+            border-radius:50%; border:1px solid rgba(200,16,46,0.15);
+            right:-140px; top:-140px;
         }
 
         .hero::after{
             content:''; position:absolute;
             width:260px; height:260px;
-            border-radius:50%; border:1px solid rgba(200,16,46,0.10);
-            bottom:-120px; left:-90px;
+            border-radius:50%; border:1px solid rgba(200,16,46,0.12);
+            left:-100px; bottom:-120px;
         }
 
         .hero-content{
@@ -130,21 +115,21 @@
 
         .hero-copy .eyebrow{
             color:var(--rojo); font-size:11px; font-weight:700;
-            text-transform:uppercase; letter-spacing:0.12em; margin-bottom:10px;
+            letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px;
         }
 
         .hero-copy h1{
             font-family:'DM Serif Display', serif;
-            color:white; font-size:2.7rem; line-height:1.1; margin-bottom:14px;
+            color:white; font-size:2.6rem; line-height:1.1; margin-bottom:14px;
         }
 
-        .hero-copy p{ color:#9F9F9F; font-size:14px; line-height:1.7; max-width:580px; }
+        .hero-copy p{ color:#9E9E9E; font-size:14px; max-width:560px; line-height:1.7; }
 
         /* BUTTONS */
         .btn{
-            text-decoration:none; border:none; cursor:pointer;
+            border:none; text-decoration:none; cursor:pointer;
             display:inline-flex; align-items:center; justify-content:center; gap:8px;
-            font-family:'DM Sans', sans-serif; transition:0.15s ease;
+            transition:0.15s ease; font-family:'DM Sans', sans-serif;
         }
 
         .btn svg{
@@ -157,7 +142,7 @@
             background:var(--rojo); color:white;
             padding:13px 18px; border-radius:10px;
             font-size:14px; font-weight:600;
-            box-shadow:0 12px 25px rgba(200,16,46,0.25);
+            box-shadow:0 12px 24px rgba(200,16,46,0.22);
         }
 
         .btn-primary:hover{ background:var(--rojo-dark); transform:translateY(-1px); }
@@ -169,7 +154,7 @@
             font-size:13px; font-weight:500;
         }
 
-        .btn-secondary:hover{ border-color:var(--rojo); color:var(--rojo); }
+        .btn-secondary:hover{ border-color:var(--rojo); color:var(--rojo); background:#fff; }
 
         .btn-danger{
             background:#FFF5F6; color:var(--rojo);
@@ -180,7 +165,7 @@
 
         .btn-danger:hover{ background:#FDECEF; }
 
-        /* ALERTS */
+        /* ALERT */
         .alert{
             margin-bottom:1.5rem; padding:14px 16px; border-radius:12px;
             display:flex; align-items:center; gap:10px;
@@ -188,14 +173,12 @@
         }
 
         .alert svg{
-            width:18px; height:18px; fill:none; stroke-width:2;
-            stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;
+            width:18px; height:18px; stroke-width:2;
+            stroke-linecap:round; stroke-linejoin:round; fill:none; flex-shrink:0;
         }
 
         .alert-success{ background:#F0F7F1; border:1px solid #B7D4B7; color:#2A5C2A; }
         .alert-success svg{ stroke:#2A5C2A; }
-        .alert-error{ background:#FEF0F2; border:1px solid var(--rojo-light); color:var(--rojo-dark); }
-        .alert-error svg{ stroke:var(--rojo); }
 
         /* FILTROS */
         .filters-bar{
@@ -219,8 +202,7 @@
 
         .search-wrap svg{
             position:absolute;
-            left:12px;
-            top:50%;
+            left:12px; top:50%;
             transform:translateY(-50%);
             width:16px; height:16px;
             stroke:var(--gris-50); fill:none;
@@ -241,10 +223,7 @@
             transition:0.15s;
         }
 
-        .search-wrap input:focus{
-            border-color:var(--rojo);
-            background:white;
-        }
+        .search-wrap input:focus{ border-color:var(--rojo); background:white; }
 
         .filter-select{
             padding:10px 14px;
@@ -257,31 +236,26 @@
             outline:none;
             cursor:pointer;
             transition:0.15s;
-            min-width:150px;
+            min-width:160px;
         }
 
         .filter-select:focus{ border-color:var(--rojo); background:white; }
 
         .filters-count{
-            font-size:12px;
-            color:var(--gris-50);
-            white-space:nowrap;
+            font-size:12px; color:var(--gris-50); white-space:nowrap;
         }
 
-        .filters-count span{
-            font-weight:600;
-            color:var(--negro);
-        }
+        .filters-count span{ font-weight:600; color:var(--negro); }
 
         /* TABLE CARD */
         .table-card{
-            background:white; border-radius:22px; overflow:hidden;
-            border:1px solid rgba(0,0,0,0.05);
-            box-shadow:0 5px 25px rgba(0,0,0,0.03);
+            background:white; border-radius:22px;
+            border:1px solid rgba(0,0,0,0.05); overflow:hidden;
+            box-shadow:0 4px 20px rgba(0,0,0,0.03);
         }
 
         .table-header{
-            padding:1.5rem 1.7rem; border-bottom:1px solid #F1F1F1;
+            padding:1.4rem 1.6rem; border-bottom:1px solid #EFEFEF;
             display:flex; align-items:center; justify-content:space-between;
         }
 
@@ -299,71 +273,37 @@
         }
 
         td{
-            padding:18px 20px; font-size:14px;
-            border-bottom:1px solid #F5F5F5;
-            vertical-align:middle;
+            padding:18px 20px; border-bottom:1px solid #F5F5F5;
+            font-size:14px; vertical-align:middle;
         }
 
         tbody tr{ transition:0.15s ease; }
         tbody tr:hover{ background:#FCFCFC; }
         tbody tr:last-child td{ border-bottom:none; }
-        tbody tr.hidden-row{ display:none; }
 
-        .username{ color:var(--gris-50); font-family:monospace; font-size:13px; }
+        .schedule{ color:var(--gris-50); }
 
-        /* BADGES — solo rojo/gris */
-        .badge{
+        .capacity-badge{
             display:inline-flex; align-items:center; justify-content:center;
-            padding:5px 12px; border-radius:999px;
-            font-size:11px; font-weight:600; letter-spacing:0.04em;
-        }
-
-        .badge-admin{
-            background:rgba(200,16,46,0.1);
-            color:var(--rojo-dark);
-            border:1px solid rgba(200,16,46,0.25);
-        }
-
-        .badge-docente{
+            min-width:42px; height:30px; padding:0 10px;
+            border-radius:999px;
             background:var(--gris-10);
-            color:var(--gris-70);
             border:1px solid var(--gris-20);
+            font-size:12px; font-weight:600; color:var(--gris-70);
         }
-
-        .badge-supervisor{
-            background:var(--negro);
-            color:white;
-            border:1px solid var(--gris-90);
-        }
-
-        .badge-alumno{
-            background:white;
-            color:var(--gris-50);
-            border:1px solid var(--gris-20);
-        }
-
-        /* STATUS */
-        .status{ display:flex; align-items:center; gap:8px; color:var(--gris-50); font-size:13px; }
-
-        .dot{ width:9px; height:9px; border-radius:50%; }
-        .dot-active{ background:var(--rojo); box-shadow:0 0 8px rgba(200,16,46,0.4); }
-        .dot-inactive{ background:var(--gris-20); }
 
         .actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
-        /* EMPTY */
         .empty{ text-align:center; padding:4rem 2rem; color:var(--gris-50); }
 
         .empty svg{
-            width:46px; height:46px;
-            stroke:#CFCFCF; fill:none; stroke-width:1.8;
-            margin-bottom:14px;
+            width:44px; height:44px;
+            stroke:#CFCFCF; fill:none; stroke-width:1.7; margin-bottom:14px;
         }
 
         .empty-title{ font-size:15px; font-weight:600; color:var(--gris-70); margin-bottom:6px; }
         .empty-sub{ font-size:13px; }
 
-        /* No results message */
         #no-results{
             display:none;
             text-align:center;
@@ -372,13 +312,13 @@
             font-size:14px;
         }
 
-        @media(max-width:1000px){
-            nav{ height:auto; padding:1rem; flex-direction:column; align-items:flex-start; gap:1rem; }
+        @media (max-width: 900px){
+            nav{ padding:1rem; height:auto; flex-direction:column; align-items:flex-start; gap:1rem; }
             .nav-links{ width:100%; flex-wrap:wrap; }
             .hero-content{ flex-direction:column; align-items:flex-start; }
             .hero-copy h1{ font-size:2rem; }
             .table-card{ overflow-x:auto; }
-            table{ min-width:980px; }
+            table{ min-width:760px; }
         }
     </style>
 </head>
@@ -395,10 +335,9 @@
     </a>
     <div class="nav-links">
         <a th:href="@{/admin}" class="inicio">Inicio</a>
-        <a th:href="@{/admin/usuarios}" class="active">Usuarios</a>
-        <a th:href="@{/admin/secciones}">Secciones</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/secciones}" class="active">Secciones</a>
         <a th:href="@{/admin/alumnos}">Alumnos</a>
-        <a th:href="@{/admin/estadisticas}">Estadísticas</a>
         <a th:href="@{/logout}" class="logout">Cerrar sesión</a>
     </div>
 </nav>
@@ -408,13 +347,13 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-copy">
-                <div class="eyebrow">Administración del sistema</div>
-                <h1>Gestión de<br>Usuarios</h1>
-                <p>Administre accesos, roles y estados de usuarios dentro de la plataforma institucional del Programa Oportunidades.</p>
+                <div class="eyebrow">Administración académica</div>
+                <h1>Gestión de<br>Secciones</h1>
+                <p>Administre horarios y organización de grupos dentro del sistema institucional del Programa Oportunidades.</p>
             </div>
-            <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-primary">
+            <a th:href="@{/admin/secciones/nueva}" class="btn btn-primary">
                 <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuevo usuario
+                Nueva sección
             </a>
         </div>
     </section>
@@ -424,41 +363,27 @@
         <span th:text="${exito}"></span>
     </div>
 
-    <div class="alert alert-error" th:if="${error}">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        <span th:text="${error}"></span>
-    </div>
-
     <!-- Barra de filtros -->
     <div class="filters-bar">
         <div class="search-wrap">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchInput" placeholder="Buscar por nombre o usuario…"/>
+            <input type="text" id="searchInput" placeholder="Buscar por nombre u horario…"/>
         </div>
 
-        <select class="filter-select" id="filterRol">
-            <option value="">Todos los roles</option>
-            <option value="ROLE_ADMIN">Admin</option>
-            <option value="ROLE_DOCENTE">Docente</option>
-            <option value="ROLE_SUPERVISOR">Supervisor</option>
-        </select>
-
-        <select class="filter-select" id="filterEstado">
-            <option value="">Todos los estados</option>
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
+        <select class="filter-select" id="filterHorario">
+            <option value="">Todos los horarios</option>
         </select>
 
         <div class="filters-count">
-            Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span> usuarios
+            Mostrando <span id="countVisible">0</span> de <span id="countTotal">0</span> secciones
         </div>
     </div>
 
     <div class="table-card">
         <div class="table-header">
             <div>
-                <div class="table-title">Usuarios registrados</div>
-                <div class="table-sub">Gestión de cuentas, permisos y estados del sistema.</div>
+                <div class="table-title">Secciones registradas</div>
+                <div class="table-sub">Listado general de grupos disponibles en el sistema.</div>
             </div>
         </div>
 
@@ -466,69 +391,66 @@
             <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Usuario</th>
-                <th>Rol</th>
-                <th>Estado</th>
+                <th>Horario</th>
+                <th>Modalidad</th>
                 <th>Acciones</th>
             </tr>
             </thead>
 
-            <tbody id="tablaUsuarios">
+            <tbody id="tablaSecciones">
 
-            <tr th:if="${#lists.isEmpty(usuarios)}">
-                <td colspan="5">
+            <tr th:if="${#lists.isEmpty(secciones)}">
+                <td colspan="4">
                     <div class="empty">
                         <svg viewBox="0 0 24 24">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            <rect x="3" y="4" width="18" height="18" rx="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
-                        <div class="empty-title">No hay usuarios registrados</div>
-                        <div class="empty-sub">Cree un nuevo usuario para comenzar.</div>
+                        <div class="empty-title">No hay secciones registradas</div>
+                        <div class="empty-sub">Cree una nueva sección para comenzar.</div>
                     </div>
                 </td>
             </tr>
 
-            <tr th:each="u : ${usuarios}"
-                th:attr="data-nombre=${u.nombre + ' ' + (u.apellido != null ? u.apellido : '')},
-                         data-username=${u.username},
-                         data-rol=${u.role.name()},
-                         data-estado=${u.activo ? 'activo' : 'inactivo'}">
+            <tr th:each="s : ${secciones}"
+                th:attr="data-nombre=${s.nombre}, data-horario=${s.horario}, data-modalidad=${s.modalidad}">
+
+                <td th:text="${s.nombre}"></td>
+
+                <td class="schedule">
+    <span th:if="${s.dias != null and s.dias != ''}" th:text="${s.dias.replace(',', ' · ')}"></span>
+    <span th:if="${s.dias == null or s.dias == ''}">—</span>
+    <span th:if="${s.horaInicio != null and s.horaInicio != ''}"
+          style="color:#aaa; margin-left:6px;"
+          th:text="'(' + ${s.horaInicio} + ' - ' + ${s.horaFin} + ')'">
+    </span>
+</td>
+
 
                 <td>
-                    <span th:text="${u.nombre + ' ' + (u.apellido != null ? u.apellido : '')}"></span>
-                </td>
-
-                <td>
-                    <span class="username" th:text="${u.username}"></span>
-                </td>
-
-                <td>
-                    <span th:switch="${u.role.name()}">
-                        <span th:case="'ROLE_ADMIN'" class="badge badge-admin">Admin</span>
-                        <span th:case="'ROLE_DOCENTE'" class="badge badge-docente">Docente</span>
-                        <span th:case="'ROLE_SUPERVISOR'" class="badge badge-supervisor">Supervisor</span>
-                        <span th:case="'ROLE_ALUMNO'" class="badge badge-alumno">Alumno</span>
+                    <span th:if="${s.modalidad == 'SABATINO'}"
+                          style="background:#4A4A4A;color:white;border:none;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:600;">
+                        Sabatino
                     </span>
-                </td>
-
-                <td>
-                    <div class="status">
-                        <span class="dot" th:classappend="${u.activo} ? 'dot-active' : 'dot-inactive'"></span>
-                        <span th:text="${u.activo} ? 'Activo' : 'Inactivo'"></span>
-                    </div>
+                    <span th:if="${s.modalidad == 'FULL_TIME'}"
+                          style="background:#C8102E;color:white;border:none;padding:6px 12px;border-radius:20px;font-size:0.78rem;font-weight:600;">
+                        Full Time
+                    </span>
+                    <span th:if="${s.modalidad == null or s.modalidad == ''}"
+                          style="color:#aaa;font-size:0.82rem;">—</span>
                 </td>
 
                 <td>
                     <div class="actions">
-                        <a th:href="@{/admin/usuarios/editar/{id}(id=${u.idUsuario})}" class="btn btn-secondary">
+                        <a th:href="@{/admin/secciones/editar/{id}(id=${s.idGrupo})}" class="btn btn-secondary">
                             <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                             Editar
                         </a>
-                        <a th:href="@{/admin/usuarios/eliminar/{id}(id=${u.idUsuario})}"
+                        <a th:href="@{/admin/secciones/eliminar/{id}(id=${s.idGrupo})}"
                            class="btn btn-danger"
-                           onclick="return confirm('¿Eliminar este usuario?')">
+                           onclick="return confirm('¿Eliminar esta sección?')">
                             <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                             Eliminar
                         </a>
@@ -543,42 +465,50 @@
             <svg viewBox="0 0 24 24" style="width:36px;height:36px;stroke:#D6D6D6;fill:none;stroke-width:1.8;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            No se encontraron usuarios con esos filtros.
+            No se encontraron secciones con esos filtros.
         </div>
     </div>
 
 </div>
 
 <script>
-    const searchInput  = document.getElementById('searchInput');
-    const filterRol    = document.getElementById('filterRol');
-    const filterEstado = document.getElementById('filterEstado');
-    const rows         = document.querySelectorAll('#tablaUsuarios tr[data-nombre]');
-    const countVisible = document.getElementById('countVisible');
-    const countTotal   = document.getElementById('countTotal');
-    const noResults    = document.getElementById('no-results');
+    const searchInput   = document.getElementById('searchInput');
+    const filterHorario = document.getElementById('filterHorario');
+    const rows          = document.querySelectorAll('#tablaSecciones tr[data-nombre]');
+    const countVisible  = document.getElementById('countVisible');
+    const countTotal    = document.getElementById('countTotal');
+    const noResults     = document.getElementById('no-results');
 
-    countTotal.textContent = Array.from(rows).filter(r => r.dataset.rol !== 'ROLE_ALUMNO').length;
+    countTotal.textContent = rows.length;
+
+    // Poblar filtro de horarios dinámicamente
+    const horarios = new Set();
+    rows.forEach(row => {
+        const h = (row.dataset.horario || '').trim();
+        if (h) horarios.add(h);
+    });
+
+    horarios.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h;
+        opt.textContent = h;
+        filterHorario.appendChild(opt);
+    });
 
     function applyFilters() {
-        const q      = searchInput.value.toLowerCase().trim();
-        const rol    = filterRol.value;
-        const estado = filterEstado.value;
+        const q       = searchInput.value.toLowerCase().trim();
+        const horario = filterHorario.value;
 
         let visible = 0;
 
         rows.forEach(row => {
-            const nombre   = (row.dataset.nombre   || '').toLowerCase();
-            const username = (row.dataset.username || '').toLowerCase();
-            const rowRol   = row.dataset.rol   || '';
-            const rowEst   = row.dataset.estado || '';
+            const nombre    = (row.dataset.nombre  || '').toLowerCase();
+            const rowHor    = (row.dataset.horario || '').trim();
 
-            const esAlumno    = rowRol === 'ROLE_ALUMNO';
-            const matchQ      = !q      || nombre.includes(q) || username.includes(q);
-            const matchRol    = !rol    || rowRol === rol;
-            const matchEstado = !estado || rowEst === estado;
+            const matchQ   = !q       || nombre.includes(q) || rowHor.toLowerCase().includes(q);
+            const matchHor = !horario || rowHor === horario;
 
-            if (!esAlumno && matchQ && matchRol && matchEstado) {
+            if (matchQ && matchHor) {
                 row.style.display = '';
                 visible++;
             } else {
@@ -592,9 +522,8 @@
 
     applyFilters();
 
-    searchInput.addEventListener('input',   applyFilters);
-    filterRol.addEventListener('change',    applyFilters);
-    filterEstado.addEventListener('change', applyFilters);
+    searchInput.addEventListener('input',    applyFilters);
+    filterHorario.addEventListener('change', applyFilters);
 </script>
 
 </body>
