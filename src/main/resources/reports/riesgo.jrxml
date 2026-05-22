@@ -1,0 +1,108 @@
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport name="riesgo" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cc43c1cb-773e-4023-b36a-989c6aeb1749">
+	<parameter name="totalCritico" class="java.lang.Integer"/>
+	<parameter name="totalAlerta" class="java.lang.Integer"/>
+	<parameter name="totalPrecaucion" class="java.lang.Integer"/>
+	<parameter name="fechaGenerado" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="ausencias" class="java.lang.Long"/>
+	<field name="total" class="java.lang.Long"/>
+	<field name="nivel" class="java.lang.String"/>
+	<variable name="contadorCritico" calculation="Count" class="java.lang.Integer">
+		<expression><![CDATA[$F{nivel}.equals("CRITICO") ? 1 : null]]></expression>
+	</variable>
+	<title height="78">
+		<element kind="rectangle" uuid="847dae3f-d6bd-4ee8-8594-da1595ecd0cc" x="0" y="0" width="555" height="6" forecolor="#C8102E" backcolor="#C8102E">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="staticText" uuid="dc6f78cb-62b1-4d7d-b7bd-2f5c1f758e67" x="0" y="16" width="555" height="28" fontName="SansSerif" fontSize="20.0" bold="true">
+			<text><![CDATA[Programa Oportunidades — FGK]]></text>
+		</element>
+		<element kind="staticText" uuid="b744b1d5-6f84-4144-afd7-223d251972ad" x="0" y="46" width="555" height="16" forecolor="#7A7A7A" fontSize="10.0">
+			<text><![CDATA[Reporte de Riesgo de Ausentismo]]></text>
+		</element>
+		<element kind="textField" uuid="79eefb32-6c8a-4c38-ae77-f92226e9716e" x="0" y="64" width="555" height="14" forecolor="#7A7A7A" fontSize="9.0" italic="true">
+			<expression><![CDATA["Generado: " + $P{fechaGenerado}]]></expression>
+		</element>
+	</title>
+	<pageHeader height="60">
+		<element kind="rectangle" uuid="83877d85-4f9b-4049-912a-46913734cb3b" x="0" y="0" width="175" height="50" forecolor="#FEE2E2" backcolor="#FEE2E2">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="staticText" uuid="adad78d7-a74a-4c69-b80f-8f6c3210e8e9" x="8" y="8" width="159" height="16" forecolor="#B91C1C" fontSize="9.0" bold="true">
+			<text><![CDATA[🔴  CRÍTICO]]></text>
+		</element>
+		<element kind="textField" uuid="79635213-aaca-4686-b32f-1f0e3ba3741e" x="8" y="26" width="159" height="20" forecolor="#B91C1C" fontSize="16.0" bold="true">
+			<expression><![CDATA[$P{totalCritico} + " estudiantes"]]></expression>
+		</element>
+		<element kind="rectangle" uuid="e9ad7882-dfd8-461d-9440-3e8db64603ae" x="190" y="0" width="175" height="50" forecolor="#F3E8E8" backcolor="#F3E8E8">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="staticText" uuid="c3c016ce-3194-41c4-bcf3-c38ca1a7bb6b" x="198" y="8" width="159" height="16" forecolor="#C8102E" fontSize="9.0" bold="true">
+			<text><![CDATA[🟠  ALERTA]]></text>
+		</element>
+		<element kind="textField" uuid="c0ea7f30-4420-4a85-bcfb-61ac60784409" x="198" y="26" width="159" height="20" forecolor="#C8102E" fontSize="16.0" bold="true">
+			<expression><![CDATA[$P{totalAlerta} + " estudiantes"]]></expression>
+		</element>
+		<element kind="rectangle" uuid="219d277c-6f49-44a7-bace-1f01ebaf4550" x="380" y="0" width="175" height="50" forecolor="#F5F5F5" backcolor="#F5F5F5">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="staticText" uuid="90543803-bf6f-46c5-b396-abd83381dd0f" x="388" y="8" width="159" height="16" forecolor="#7A7A7A" fontSize="9.0" bold="true">
+			<text><![CDATA[⚪  PRECAUCIÓN]]></text>
+		</element>
+		<element kind="textField" uuid="264cce4e-4ec7-4eb1-ac68-9e616fc75b7e" x="388" y="26" width="159" height="20" forecolor="#7A7A7A" fontSize="16.0" bold="true">
+			<expression><![CDATA[$P{totalPrecaucion} + " estudiantes"]]></expression>
+		</element>
+	</pageHeader>
+	<columnHeader height="28">
+		<element kind="rectangle" uuid="7cea7061-2dff-4e4e-9960-f1054e2c2eae" x="0" y="0" width="555" height="28" forecolor="#141414" backcolor="#141414">
+			<pen lineWidth="0.0"/>
+		</element>
+		<element kind="staticText" uuid="94b78963-3e14-473a-bd1c-53b2e28be997" x="8" y="8" width="230" height="14" forecolor="#FFFFFF" fontSize="9.0" bold="true">
+			<text><![CDATA[ESTUDIANTE]]></text>
+		</element>
+		<element kind="staticText" uuid="d0e0d004-4116-4e17-876d-3a87b9b3b713" x="248" y="8" width="80" height="14" forecolor="#FFFFFF" fontSize="9.0" bold="true">
+			<text><![CDATA[AUSENCIAS]]></text>
+		</element>
+		<element kind="staticText" uuid="b9af3c99-4aff-4388-90f0-a9c9c0def6b4" x="338" y="8" width="80" height="14" forecolor="#FFFFFF" fontSize="9.0" bold="true">
+			<text><![CDATA[TOTAL REG.]]></text>
+		</element>
+		<element kind="staticText" uuid="cad1b3c1-eb2d-4924-983c-d78277a0d2ae" x="428" y="8" width="120" height="14" forecolor="#FFFFFF" fontSize="9.0" bold="true">
+			<text><![CDATA[NIVEL]]></text>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<element kind="rectangle" uuid="57c2e630-7eba-40de-bc3d-90fd8d95ecbe" x="0" y="0" width="555" height="24" forecolor="#FFF7F7" backcolor="#FFF7F7" printWhenGroupChanges="null">
+				<printWhenExpression><![CDATA[$F{nivel}.equals("CRITICO")]]></printWhenExpression>
+				<pen lineWidth="0.0"/>
+			</element>
+			<element kind="rectangle" uuid="0bc8d00c-8fba-49d9-aaf2-d7c4d01d63cd" x="0" y="0" width="555" height="24" forecolor="#FAEAEA" backcolor="#FAEAEA">
+				<printWhenExpression><![CDATA[$F{nivel}.equals("ALERTA")]]></printWhenExpression>
+				<pen lineWidth="0.0"/>
+			</element>
+			<element kind="textField" uuid="eeae0f97-60ae-4863-a93d-e900b4c5b92b" x="8" y="5" width="230" height="14" fontSize="9.0">
+				<expression><![CDATA[$F{nombre}]]></expression>
+			</element>
+			<element kind="textField" uuid="9ea0ecca-572a-4f8a-9bf5-f18443ca6fbe" x="248" y="5" width="80" height="14" forecolor="#C8102E" fontSize="9.0" bold="true">
+				<expression><![CDATA[String.valueOf($F{ausencias})]]></expression>
+			</element>
+			<element kind="textField" uuid="421933a2-1431-4647-8366-79bf40f7bb96" x="338" y="5" width="80" height="14" forecolor="#7A7A7A" fontSize="9.0">
+				<expression><![CDATA[String.valueOf($F{total})]]></expression>
+			</element>
+			<element kind="textField" uuid="476d8c44-9626-4bc4-99b0-50a80b2ef721" x="428" y="5" width="120" height="14" fontSize="9.0" bold="true">
+				<expression><![CDATA[$F{nivel}]]></expression>
+			</element>
+			<element kind="line" uuid="4609f91a-6a75-4085-8df4-731cf6ba9b6e" x="0" y="23" width="555" height="1" forecolor="#F1F1F1"/>
+		</band>
+	</detail>
+	<pageFooter height="24">
+		<element kind="line" uuid="3e60f967-d224-456b-b815-6817344e36b8" x="0" y="0" width="555" height="1" forecolor="#ECECEC"/>
+		<element kind="staticText" uuid="725a00b0-9b1a-44cf-a6a6-d0e070f0a303" x="0" y="6" width="300" height="14" forecolor="#B0B0B0" fontSize="8.0" italic="true">
+			<text><![CDATA[Criterio: 1 falta = Precaución | 2 = Alerta | 3+ = Crítico]]></text>
+		</element>
+		<element kind="textField" uuid="2e7ba4e8-c2b5-48d8-931a-54f3412fd16f" x="400" y="6" width="155" height="14" forecolor="#B0B0B0" fontSize="8.0" hTextAlign="Right">
+			<expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+		</element>
+	</pageFooter>
+</jasperReport>

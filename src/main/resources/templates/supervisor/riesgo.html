@@ -212,14 +212,14 @@
         </div>
     </div>
 
-    <div class="export-bar">
-        <span class="export-label">Exportar vista:</span>
-        <select id="exportFormat" class="export-select">
-            <option value="pdf">PDF</option>
-            <option value="excel">Excel</option>
-        </select>
-        <button id="downloadBtn" class="btn-download">⬇ Descargar</button>
-    </div>
+<div class="export-bar">
+    <span class="export-label">Exportar vista:</span>
+    <select id="exportFormat" class="export-select">
+        <option value="jasper">PDF (Jasper)</option>
+        <option value="excel">Excel</option>
+    </select>
+    <button id="downloadBtn" class="btn-download">⬇ Descargar</button>
+</div>
 
     <div class="table-wrap">
         <table>
@@ -291,6 +291,16 @@
         const format = document.getElementById('exportFormat')?.value || 'pdf';
         window.location.href = '/supervisor/riesgo/exportar?formato=' + format;
     });
+    
+    document.getElementById('downloadBtn')?.addEventListener('click', function(){
+    const format = document.getElementById('exportFormat')?.value || 'jasper';
+    if (format === 'jasper') {
+        window.location.href = '/supervisor/riesgo/exportar/jasper';
+    } else {
+        window.location.href = '/supervisor/riesgo/exportar?formato=' + format;
+    }
+});
+
 </script>
 
 </body>

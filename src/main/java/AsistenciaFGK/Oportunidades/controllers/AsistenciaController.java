@@ -26,8 +26,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/asistencia")
 public class AsistenciaController {
 
-    @Autowired
-private ExportService exportService;
 
     @Autowired
     private EstudianteRepository estudianteRepository;
@@ -35,8 +33,6 @@ private ExportService exportService;
     @Autowired
     private AsistenciaRepository asistenciaRepository;
 
-    @Autowired
-    private GrupoRepository grupoRepository;
 
     @Autowired
     private CalendarioService calendarioService;
@@ -62,27 +58,6 @@ private ExportService exportService;
         return "asistencia/lector";
     }
 
-@GetMapping("/exportar/jasper")
-public void exportarJasper(
-        @RequestParam String filtro,
-        @RequestParam String inicio,
-        @RequestParam String fin,
-        HttpServletResponse response) {
-    try {
-        List<Asistencia> asistencias = asistenciaRepository.findAll();
-        exportService.exportarAsistenciasJasper(asistencias, filtro, inicio, fin, response);
-    } catch (Exception e) {
-        // Si hay error ANTES de abrir el stream, mandamos mensaje de texto
-        if (!response.isCommitted()) {
-            try {
-                response.setContentType("text/plain");
-                response.setStatus(500);
-                response.getWriter().write("Error generando reporte: " + e.getMessage());
-            } catch (Exception ignored) {}
-        }
-        e.printStackTrace(); // Para ver el error real en consola
-    }
-}
 
     // ── Endpoint que recibe el escaneo ────────────────────────────────────────
     @PostMapping("/registrar")

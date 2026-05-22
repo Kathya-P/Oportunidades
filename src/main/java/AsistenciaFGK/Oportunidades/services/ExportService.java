@@ -292,44 +292,47 @@ public class ExportService {
     }
 
     // Nuevo método a agregar al final de ExportService:
-public void exportarAsistenciasJasper(
-        List<Asistencia> asistencias,
-        String filtro,
-        String inicio,
-        String fin,
+public void exportarRiesgoJasper(
+        List<Map<String, Object>> enRiesgo,
         HttpServletResponse response) throws Exception {
 
-    // 1. Convertir las asistencias al DTO que Jasper entiende
-    List<AsistenciaReporteDTO> datos = asistencias.stream()
-        .map(a -> new AsistenciaReporteDTO(
-            a.getEstudiante().getNombre() + " " + a.getEstudiante().getApellido(),
-            a.getGrupo().getNombre(),
-            a.getHoraEntrada(),
-            a.getHoraSalida(),
-            a.getEstado()
+    // Convertir al DTO
+    List<RiesgoReporteDTO> datos = enRiesgo.stream()
+        .map(r -> new RiesgoReporteDTO(
+            (String) r.get("nombre"),
+            toLong(r.get("ausencias")),
+            toLong(r.get("total")),
+            (String) r.get("nivel")
         )).toList();
 
-    // 2. Cargar la plantilla .jrxml y compilarla
-    InputStream reportStream = new ClassPathResource("reports/asistencias.jrxml").getInputStream();
-    JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+    // Contar por nivel para las estadísticas del encabezado
+    int critico    = (int) datos.stream().filter(d -> "CRITICO".equals(d.getNivel())).count();
+    int alerta     = (int) datos.stream().filter(d -> "ALERTA".equals(d.getNivel())).count();
+    int precaucion = (int) datos.stream().filter(d -> "PRECAUCION".equals(d.getNivel())).count();
 
-    // 3. Pasar los parámetros
+    InputStream stream = new ClassPathResource("reports/riesgo.jrxml").getInputStream();
+    JasperReport jasperReport = JasperCompileManager.compileReport(stream);
+
     HashMap<String, Object> params = new HashMap<>();
-    params.put("filtro", filtro);
-    params.put("inicio", inicio);
-    params.put("fin", fin);
+    params.put("totalCritico",    critico);
+    params.put("totalAlerta",     alerta);
+    params.put("totalPrecaucion", precaucion);
+    params.put("fechaGenerado",   java.time.LocalDate.now().toString());
 
-    // 4. Crear el datasource desde la lista de DTOs
-    JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(datos);
+    JRBeanCollectionDataSource ds = new JRBeanCollectionDataSource(datos);
+    JasperPrint print = JasperFillManager.fillReport(jasperReport, params, ds);
 
-    // 5. Llenar el reporte con datos
-    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, dataSource);
-
-    // 6. Exportar como PDF al response
     response.setContentType("application/pdf");
     response.setHeader("Content-Disposition",
-        "attachment; filename=asistencia-jasper-" + filtro + "-" + inicio + ".pdf");
+        "attachment; filename=riesgo-ausentismo-" + java.time.LocalDate.now() + ".pdf");
+    JasperExportManager.exportReportToPdfStream(print, response.getOutputStream());
+}
 
-    JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
+// Helper para convertir Object a Long sin romper
+private Long toLong(Object val) {
+    if (val instanceof Long l) return l;
+    if (val instanceof Integer i) return i.longValue();
+    if (val instanceof Number n) return n.longValue();
+    return 0L;
 }
 }

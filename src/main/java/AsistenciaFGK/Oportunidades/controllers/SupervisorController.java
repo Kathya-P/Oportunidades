@@ -59,6 +59,24 @@ private ExportService exportService;
         return "supervisor/dashboard";
     }
 
+@GetMapping("/riesgo/exportar/jasper")  
+public void exportarRiesgoJasper(HttpServletResponse response) {
+    try {
+        List<Map<String, Object>> enRiesgo = supervisorService.detectarRiesgoAusentismo();
+        exportService.exportarRiesgoJasper(enRiesgo, response);
+    } catch (Exception e) {
+        e.printStackTrace(); // ← esto nos muestra el error real en consola
+        try {
+            if (!response.isCommitted()) {
+                response.setContentType("text/plain");
+                response.setStatus(500);
+                response.getWriter().write("ERROR: " + e.getMessage() + "\n" + e.getClass().getName());
+            }
+        } catch (Exception ignored) {}
+    }
+}
+
+    
     // ── Riesgo de ausentismo ───────────────────────────────────
     @GetMapping("/riesgo")
     public String verRiesgo(Model model) {
