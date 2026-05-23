@@ -30,7 +30,6 @@
             min-height:100vh;
         }
 
-        /* NAVBAR */
         nav{
             height:72px;
             background:rgba(20,20,20,0.98);
@@ -73,19 +72,11 @@
             padding-left:18px;
         }
 
-        .nav-links a.inicio {
-            background: var(--rojo);
-            color: var(--blanco);
-        }
+        .nav-links a.inicio{ background:var(--rojo); color:var(--blanco); }
+        .nav-links a.inicio:hover{ background:var(--rojo-dark); }
 
-        .nav-links a.inicio:hover {
-            background: var(--rojo-dark);
-        }
-
-        /* CONTAINER */
         .container{ max-width:1350px; margin:0 auto; padding:2.5rem 1.5rem; }
 
-        /* HERO */
         .hero{
             background:linear-gradient(135deg,#181818 0%,#101010 100%);
             border-radius:26px; overflow:hidden;
@@ -125,7 +116,6 @@
 
         .hero-copy p{ color:#9F9F9F; font-size:14px; line-height:1.7; max-width:580px; }
 
-        /* BUTTONS */
         .btn{
             text-decoration:none; border:none; cursor:pointer;
             display:inline-flex; align-items:center; justify-content:center; gap:8px;
@@ -165,7 +155,16 @@
 
         .btn-danger:hover{ background:#FDECEF; }
 
-        /* ALERTS */
+.btn-zip{
+    background: white;
+    border: 1px solid var(--gris-20);
+    color: var(--gris-70);
+    padding: 10px 14px; border-radius: 9px;
+    font-size: 13px; font-weight: 500;
+}
+.btn-zip:hover{ border-color: var(--rojo); color: var(--rojo); }
+
+
         .alert{
             margin-bottom:1.5rem; padding:14px 16px; border-radius:12px;
             display:flex; align-items:center; gap:10px;
@@ -182,7 +181,6 @@
         .alert-error{ background:#FEF0F2; border:1px solid var(--rojo-light); color:var(--rojo-dark); }
         .alert-error svg{ stroke:var(--rojo); }
 
-        /* FILTROS */
         .filters-bar{
             background:white;
             border-radius:16px;
@@ -251,7 +249,6 @@
 
         .filters-count span{ font-weight:600; color:var(--negro); }
 
-        /* TABLE CARD */
         .table-card{
             background:white; border-radius:22px; overflow:hidden;
             border:1px solid rgba(0,0,0,0.05);
@@ -303,7 +300,6 @@
         }
 
         .empty-dash{ color:#BDBDBD; }
-
         .actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
         .empty{ text-align:center; padding:4rem 2rem; color:var(--gris-50); }
@@ -332,36 +328,24 @@
             .table-card{ overflow-x:auto; }
             table{ min-width:1100px; }
         }
-        
-        .btn-barcode {
-    background: rgba(34, 139, 34, 0.12);
-    border: 1px solid rgba(34, 139, 34, 0.35);
-    color: #228B22;
-}
-.btn-barcode:hover {
-    background: rgba(34, 139, 34, 0.22);
-    color: #1a6e1a;
-}
 
-.badge-fulltime {
-    background: var(--rojo);
-    color: white;
-    border: none;
-}
+        .btn-barcode{
+            background:rgba(34,139,34,0.12);
+            border:1px solid rgba(34,139,34,0.35);
+            color:#228B22;
+        }
+        .btn-barcode:hover{ background:rgba(34,139,34,0.22); color:#1a6e1a; }
 
-.badge-sabatino {
-    background: var(--gris-70);
-    color: white;
-    border: none;
-}
+        .badge-fulltime{ background:var(--rojo); color:white; border:none; }
+        .badge-sabatino{ background:var(--gris-70); color:white; border:none; }
     </style>
 </head>
 
 <body>
 
 <nav>
-    <a th:href="@{/admin}" class="nav-left" style="display:flex; align-items:center; gap:14px; text-decoration:none; color:inherit; cursor:pointer;">
-        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px; width:auto;"/>
+    <a th:href="@{/admin}" class="nav-left" style="display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;cursor:pointer;">
+        <img src="/images/opor.png" alt="Logo Oportunidades" style="height:42px;width:auto;"/>
         <div class="brand-info">
             <span class="brand-name">Programa Oportunidades</span>
             <span class="brand-sub">Fundación Gloria Kriete</span>
@@ -385,10 +369,20 @@
                 <h1>Administración<br>de Alumnos</h1>
                 <p>Visualice, edite y gestione la información académica y administrativa de los estudiantes registrados dentro del sistema institucional.</p>
             </div>
-            <a th:href="@{/admin/alumnos/nuevo}" class="btn btn-primary">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuevo alumno
-            </a>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                <a th:href="@{/admin/alumnos/nuevo}" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Nuevo alumno
+                </a>
+                <a id="btnZipSeccion" href="#" class="btn btn-zip" style="display:none">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Descargar ZIP sección
+                </a>
+            </div>
         </div>
     </section>
 
@@ -402,7 +396,6 @@
         <span th:text="${error}"></span>
     </div>
 
-    <!-- Barra de filtros -->
     <div class="filters-bar">
         <div class="search-wrap">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -417,7 +410,6 @@
 
         <select class="filter-select" id="filterSeccion">
             <option value="">Todas las secciones</option>
-            <!-- Opciones generadas dinámicamente por JS desde los datos de la tabla -->
         </select>
 
         <div class="filters-count">
@@ -468,7 +460,8 @@
                          data-apellido=${a.apellido},
                          data-codigo=${a.codigoBarras},
                          data-modalidad=${a.jornada.name()},
-                         data-seccion=${!#lists.isEmpty(a.grupos) ? a.grupos[0].nombre : ''}">
+                         data-seccion=${!#lists.isEmpty(a.grupos) ? a.grupos[0].nombre : ''},
+                         data-grupoid=${!#lists.isEmpty(a.grupos) ? a.grupos[0].idGrupo : ''}">
 
                 <td th:text="${a.nombre}"></td>
                 <td th:text="${a.apellido}"></td>
@@ -478,15 +471,13 @@
                 <td class="direccion" th:text="${a.direccion}"></td>
 
                 <td>
-                    <span class="badge" th:classappend="${a.jornada.name() == 'FULL_TIME' ? 'badge-fulltime' : 'badge-sabatino'}" 
+                    <span class="badge"
+                          th:classappend="${a.jornada.name() == 'FULL_TIME' ? 'badge-fulltime' : 'badge-sabatino'}"
                           th:text="${a.jornada.name() == 'FULL_TIME' ? 'Full Time' : 'Sabatino'}"></span>
                 </td>
 
                 <td>
-                    <span th:if="${!#lists.isEmpty(a.grupos)}"
-                          class="badge"
-                          th:text="${a.grupos[0].nombre}">
-                    </span>
+                    <span th:if="${!#lists.isEmpty(a.grupos)}" class="badge" th:text="${a.grupos[0].nombre}"></span>
                     <span th:if="${#lists.isEmpty(a.grupos)}" class="empty-dash">—</span>
                 </td>
 
@@ -503,15 +494,14 @@
                             Eliminar
                         </a>
                         <a th:href="@{/admin/alumnos/{id}/barcode(id=${a.idEstudiante})}"
-   title="Descargar código de barras"
-   class="btn btn-secondary btn-barcode">
-    <svg viewBox="0 0 24 24" width="15" height="15"
-         fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 5v14M7 5v14M11 5v14M15 5v8M19 5v8M15 17l2 2 4-4"/>
-    </svg>
-    Código
-</a>
+                           title="Descargar código de barras"
+                           class="btn btn-secondary btn-barcode">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 5v14M7 5v14M11 5v14M15 5v8M19 5v8M15 17l2 2 4-4"/>
+                            </svg>
+                            Código
+                        </a>
                     </div>
                 </td>
             </tr>
@@ -530,42 +520,45 @@
 </div>
 
 <script>
-    const searchInput   = document.getElementById('searchInput');
-    const filterSeccion = document.getElementById('filterSeccion');
+    const searchInput     = document.getElementById('searchInput');
+    const filterSeccion   = document.getElementById('filterSeccion');
     const filterModalidad = document.getElementById('filterModalidad');
-    const rows          = document.querySelectorAll('#tablaAlumnos tr[data-nombre]');
-    const countVisible  = document.getElementById('countVisible');
-    const countTotal    = document.getElementById('countTotal');
-    const noResults     = document.getElementById('no-results');
+    const rows            = document.querySelectorAll('#tablaAlumnos tr[data-nombre]');
+    const countVisible    = document.getElementById('countVisible');
+    const countTotal      = document.getElementById('countTotal');
+    const noResults       = document.getElementById('no-results');
+    const btnZip          = document.getElementById('btnZipSeccion');
 
     countTotal.textContent = rows.length;
 
-    // Poblar filtro de secciones dinámicamente
-    const secciones = new Set();
+    // Poblar filtro de secciones y construir mapa nombre → idGrupo
+    const seccionMap = {};
     rows.forEach(row => {
-        const s = (row.dataset.seccion || '').trim();
-        if (s) secciones.add(s);
+        const nombre = (row.dataset.seccion || '').trim();
+        const id     = (row.dataset.grupoid || '').trim();
+        if (nombre && id && !seccionMap[nombre]) {
+            seccionMap[nombre] = id;
+        }
     });
 
-    secciones.forEach(s => {
+    Object.keys(seccionMap).sort().forEach(nombre => {
         const opt = document.createElement('option');
-        opt.value = s;
-        opt.textContent = s;
+        opt.value = nombre;
+        opt.textContent = nombre;
         filterSeccion.appendChild(opt);
     });
 
     function applyFilters() {
-        const q        = searchInput.value.toLowerCase().trim();
-        const seccion  = filterSeccion.value;
+        const q         = searchInput.value.toLowerCase().trim();
+        const seccion   = filterSeccion.value;
         const modalidad = filterModalidad.value;
-
         let visible = 0;
 
         rows.forEach(row => {
-            const nombre      = (row.dataset.nombre   || '').toLowerCase();
-            const apellido    = (row.dataset.apellido || '').toLowerCase();
-            const codigo      = (row.dataset.codigo   || '').toLowerCase();
-            const rowSec      = (row.dataset.seccion  || '').trim();
+            const nombre       = (row.dataset.nombre    || '').toLowerCase();
+            const apellido     = (row.dataset.apellido  || '').toLowerCase();
+            const codigo       = (row.dataset.codigo    || '').toLowerCase();
+            const rowSec       = (row.dataset.seccion   || '').trim();
             const rowModalidad = (row.dataset.modalidad || '').trim();
 
             const matchQ         = !q        || nombre.includes(q) || apellido.includes(q) || codigo.includes(q);
@@ -582,11 +575,19 @@
 
         countVisible.textContent = visible;
         noResults.style.display  = visible === 0 && rows.length > 0 ? 'block' : 'none';
+
+        // Mostrar botón ZIP solo cuando hay una sección seleccionada
+        if (seccion && seccionMap[seccion]) {
+            btnZip.href         = '/admin/alumnos/barcode/seccion/' + seccionMap[seccion];
+            btnZip.style.display = 'inline-flex';
+        } else {
+            btnZip.style.display = 'none';
+        }
     }
 
     applyFilters();
 
-    searchInput.addEventListener('input',   applyFilters);
+    searchInput.addEventListener('input',    applyFilters);
     filterSeccion.addEventListener('change', applyFilters);
     filterModalidad.addEventListener('change', applyFilters);
 </script>
