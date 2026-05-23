@@ -61,16 +61,37 @@ public class DocenteController {
     // Devuelve los grupos que tienen clase HOY (el día coincide),
     // sin importar si la hora actual está dentro del rango o no.
     // ─────────────────────────────────────────────────────────────
-    private List<Grupo> gruposActivosHoy() {
-        String diaHoy = DIA_MAP.get(LocalDate.now().getDayOfWeek());
+    // ✅ CORRECTO — valida día Y que la hora actual esté dentro del rango
+private List<Grupo> gruposActivosHoy() {
+    String diaHoy = DIA_MAP.get(LocalDate.now().getDayOfWeek());
+    LocalTime ahora = LocalTime.now();
 
-        return grupoRepository.findAll().stream()
-            .filter(g -> {
-                if (g.getDias() == null || diaHoy == null) return false;
-                return g.getDias().toUpperCase().contains(diaHoy);
-            })
-            .toList();
-    }
+    // LOG TEMPORAL - borrarlo después de verificar
+    grupoRepository.findAll().forEach(g -> {
+        System.out.println(">>> GRUPO: " + g.getNombre() 
+            + " | dias: [" + g.getDias() + "]"
+            + " | horaInicio: [" + g.getHoraInicio() + "]"
+            + " | horaFin: [" + g.getHoraFin() + "]");
+    });
+    System.out.println(">>> DIA HOY: [" + diaHoy + "] | AHORA: [" + ahora + "]");
+
+    return grupoRepository.findAll().stream()
+        .filter(g -> {
+            if (g.getDias() == null || diaHoy == null) return false;
+            if (!g.getDias().toUpperCase().contains(diaHoy)) return false;
+
+            // Validar que la hora actual esté dentro del horario del grupo
+            try {
+                if (g.getHoraInicio() == null || g.getHoraFin() == null) return false;
+                LocalTime inicio = LocalTime.parse(g.getHoraInicio().trim());
+                LocalTime fin    = LocalTime.parse(g.getHoraFin().trim());
+                return !ahora.isBefore(inicio) && !ahora.isAfter(fin);
+            } catch (Exception e) {
+                return false;
+            }
+        })
+        .toList();
+}
 
     private void agregarWidgetCalendario(Model model) {
         YearMonth ym = YearMonth.now();

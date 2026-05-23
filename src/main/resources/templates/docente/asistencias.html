@@ -861,9 +861,9 @@
 
 
 <!-- PANEL SECCIÓN ACTUAL (oculto por defecto) -->
-<div class="seccion-panel" id="seccionPanel" th:if="${!modoHistorial and !modoRango and !#lists.isEmpty(grupos)}">
+<div class="seccion-panel" id="seccionPanel" th:if="${!modoHistorial and !modoRango and !#lists.isEmpty(gruposActivos)}">
     <div class="seccion-panel-title">Secciones de hoy</div>
-    <div th:each="g, gStat : ${grupos}">
+    <div th:each="g, gStat : ${gruposActivos}">
         <div class="seccion-panel-name" th:text="${g.nombre}">A1</div>
         <div class="seccion-panel-row">
             <span>Modalidad</span>
@@ -897,14 +897,14 @@
         <span class="bubble-num rojo" id="bubbleAusentes" th:text="${#lists.size(ausentes)}">0</span>
         <span class="bubble-lbl">Ausentes</span>
     </div>
-    <div class="bubble-sep" th:if="${!#lists.isEmpty(grupos)}"></div>
+    <div class="bubble-sep" th:if="${!#lists.isEmpty(gruposActivos)}"></div>
     <button class="bubble-seccion-btn" id="btnSeccionActual"
             onclick="toggleSeccionPanel()"
-            th:if="${!#lists.isEmpty(grupos)}">
-        <span th:if="${#lists.size(grupos) == 1}"
-              th:text="${grupos[0].nombre}">A1</span>
-        <span th:if="${#lists.size(grupos) > 1}">
-            <th:block th:each="g, i : ${grupos}">
+            th:if="${!#lists.isEmpty(gruposActivos)}">
+        <span th:if="${#lists.size(gruposActivos) == 1}"
+              th:text="${gruposActivos[0].nombre}">A1</span>
+        <span th:if="${#lists.size(gruposActivos) > 1}">
+            <th:block th:each="g, i : ${gruposActivos}">
                 <span th:text="${g.nombre}">A1</span><br th:if="${!i.last}"/>
             </th:block>
         </span>
