@@ -37,7 +37,6 @@ public class Estudiante {
     @Column(length = 20)
     private Jornada jornada = Jornada.FULL_TIME;
 
-    private String direccion;
     
     @ManyToMany
 @JoinTable(
@@ -71,7 +70,4 @@ public void setGrupos(List<Grupo> grupos) { this.grupos = grupos; }
     public void setJornada(Jornada jornada) {
         this.jornada = jornada;
     }
-
-    public String getDireccion() { return direccion; }
-    public void setDireccion(String direccion) { this.direccion = direccion; }
 }

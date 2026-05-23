@@ -235,7 +235,6 @@
                 <th>Estudiante</th>
                 <th>Código</th>
                 <th>Modalidad</th>
-                <th>Dirección</th>
                 <th>Ausencias</th>
                 <th>Tardanzas</th>
                 <th>Estado</th>
@@ -279,9 +278,6 @@
                         Sabatino
                     </span>
                 </td>
-
-                <!-- Dirección -->
-                <td class="muted" th:text="${e.direccion != null ? e.direccion : '—'}"></td>
 
                 <!-- Ausencias -->
                 <td th:text="${riesgo != null ? riesgo.ausencias : 0}"

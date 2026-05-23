@@ -288,7 +288,6 @@
             background:#F8F8F8; padding:6px 10px; border-radius:8px; display:inline-block;
         }
 
-        .direccion{ color:var(--gris-50); max-width:240px; line-height:1.5; }
 
         .badge{
             display:inline-flex; align-items:center; justify-content:center;
@@ -431,7 +430,6 @@
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Código</th>
-                <th>Dirección</th>
                 <th>Modalidad</th>
                 <th>Sección</th>
                 <th>Acciones</th>
@@ -467,8 +465,6 @@
                 <td th:text="${a.apellido}"></td>
 
                 <td><span class="code" th:text="${a.codigoBarras}"></span></td>
-
-                <td class="direccion" th:text="${a.direccion}"></td>
 
                 <td>
                     <span class="badge"
