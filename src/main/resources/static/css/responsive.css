@@ -1,0 +1,297 @@
+/* ============================================================
+   RESPONSIVE GLOBAL — Programa Oportunidades
+   Agregar en todas las vistas:
+   <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
+   ============================================================ */
+
+/* ── TABLET (max 1024px) ─────────────────────────────────── */
+@media (max-width: 1024px) {
+
+    .container { padding: 0 1.2rem; }
+
+    .dash-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .row-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .layout {
+        flex-direction: column !important;
+    }
+
+    .panel-left,
+    .panel-right {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .bubble-float {
+        bottom: 16px;
+        top: auto !important;
+        right: 16px !important;
+        transform: none !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px 14px;
+        gap: 8px;
+        min-width: unset !important;
+        border-radius: 14px;
+    }
+
+    .seccion-panel {
+        right: 16px !important;
+        bottom: 120px;
+        top: auto !important;
+        transform: none !important;
+        max-width: calc(100vw - 32px);
+    }
+
+    .distribucion {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── MÓVIL (max 768px) ───────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* NAVBAR */
+    nav {
+        padding: 0 1rem !important;
+        height: auto !important;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+
+    .nav-left { gap: 10px; }
+    .brand-name { font-size: 13px !important; }
+    .brand-sub { font-size: 10px !important; }
+
+    .nav-links,
+    .nav-right,
+    .nav-tabs {
+        flex-wrap: wrap;
+        gap: 4px !important;
+        width: 100%;
+    }
+
+    .nav-links a,
+    .nav-tab {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
+
+    .logout { margin-left: 0 !important; padding-left: 0 !important; border-left: none !important; }
+
+    .user-chip { font-size: 11px !important; padding: 6px 10px !important; }
+
+    /* CONTENEDOR */
+    .container {
+        padding: 0 0.8rem;
+        margin: 1rem auto;
+    }
+
+    /* HEADERS */
+    .page-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.8rem !important;
+    }
+
+    .page-header h1,
+    .page-title h1 {
+        font-size: 1.6rem !important;
+    }
+
+    /* STATS */
+    .stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.6rem !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.6rem !important;
+    }
+
+    .stat-card { padding: 1rem !important; }
+    .stat-num  { font-size: 1.5rem !important; }
+
+    /* CARDS / FORMULARIOS */
+    .card { padding: 1.2rem !important; border-radius: 12px !important; }
+
+    .field-row {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    .range-form {
+        flex-direction: column !important;
+        gap: 0.8rem !important;
+    }
+
+    .range-field { width: 100% !important; }
+    .range-field input[type="date"] { min-width: unset !important; width: 100% !important; }
+
+    /* TABLAS — scroll horizontal */
+    .card,
+    .table-card,
+    .table-wrap,
+    .table-hoy-wrap {
+        overflow-x: auto !important;
+    }
+
+    table { min-width: 560px; }
+
+    th, td { padding: 10px 12px !important; font-size: 13px !important; }
+
+    /* FILTROS */
+    .filters-bar,
+    .filters-hoy {
+        flex-direction: column !important;
+        gap: 0.6rem !important;
+    }
+
+    .filters-bar input,
+    .filters-bar select,
+    .filters-hoy input,
+    .filters-hoy select,
+    .search-wrap,
+    .search-wrap input {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+
+    /* EXPORT BAR */
+    .export-bar {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.6rem !important;
+    }
+
+    .export-select { width: 100% !important; }
+    .btn-download  { width: 100% !important; justify-content: center; }
+
+    /* BOTONES FORM */
+    .form-actions {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .form-actions .btn,
+    .form-actions a {
+        width: 100% !important;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* MODALES */
+    .modal { margin: 1rem !important; padding: 1.4rem !important; max-width: calc(100vw - 2rem) !important; }
+
+    /* MULTISELECT */
+    .multi-select { width: 100% !important; }
+
+    /* BURBUJA FLOTANTE */
+    .bubble-float {
+        bottom: 12px;
+        top: auto !important;
+        right: 12px !important;
+        left: 12px;
+        transform: none !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px 12px;
+        gap: 8px;
+        min-width: unset !important;
+        border-radius: 14px;
+        width: calc(100% - 24px);
+    }
+
+    .bubble-sep { width: 1px !important; height: 30px !important; }
+
+    .seccion-panel {
+        right: 12px !important;
+        left: 12px;
+        bottom: 110px;
+        top: auto !important;
+        transform: none !important;
+        max-width: unset !important;
+        min-width: unset !important;
+    }
+
+    /* DASHBOARD GRID */
+    .dash-grid { grid-template-columns: 1fr !important; }
+    .dash-calendar { width: 100% !important; }
+
+    /* HISTORIAL CARD */
+    .historial-card { padding: 1rem !important; }
+
+    /* LECTOR BARCODE */
+    .scan-area { width: 100% !important; padding: 1rem !important; }
+    .panel-copy { font-size: 13px !important; }
+
+    /* SUPERVISOR */
+    .schedule { flex-direction: column !important; }
+    .dias-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+    /* TOPBAR */
+    .topbar {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+        padding: 0.8rem 1rem !important;
+    }
+
+    /* CHIPS Y BADGES */
+    .badge { font-size: 10px !important; padding: 4px 8px !important; }
+
+    /* SECTION HEADER */
+    .section-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+    }
+
+    /* CRITERIOS RIESGO */
+    .criterios { flex-direction: column !important; }
+
+    /* LOGIN */
+    .logo img { height: 48px !important; }
+}
+
+/* ── MÓVIL PEQUEÑO (max 480px) ───────────────────────────── */
+@media (max-width: 480px) {
+
+    .stats,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .page-header h1,
+    .page-title h1 {
+        font-size: 1.3rem !important;
+    }
+
+    nav img { height: 32px !important; }
+
+    .brand-name { font-size: 12px !important; }
+
+    table { min-width: 480px; }
+
+    .btn { font-size: 13px !important; padding: 0.6rem 1rem !important; }
+
+    .dias-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
