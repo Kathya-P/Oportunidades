@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -137,7 +138,7 @@ public class AsistenciaController {
 
         // ── Registrar asistencia en cada grupo con clase hoy ──────────────────
         String nombreCompleto = estudiante.getNombre() + " " + estudiante.getApellido();
-        LocalTime ahoraLocal  = LocalTime.now();
+        LocalTime ahoraLocal = LocalTime.now(ZoneId.of("America/El_Salvador"));
         String horaActual     = ahoraLocal.format(DateTimeFormatter.ofPattern("HH:mm"));
         String estadoResultado = "entrada";
 
@@ -161,7 +162,7 @@ public class AsistenciaController {
                 String estadoAsistencia = "PRESENTE";
 
                 try {
-                    LocalTime horaEntrada = LocalTime.now();
+                    LocalTime horaEntrada = LocalTime.now(ZoneId.of("America/El_Salvador"));
 
                     // ¿Llegó después del fin? → AUSENTE
                     if (grupo.getHoraFin() != null && !grupo.getHoraFin().isBlank()) {

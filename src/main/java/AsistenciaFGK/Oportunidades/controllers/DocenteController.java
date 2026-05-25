@@ -25,6 +25,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,7 +65,7 @@ public class DocenteController {
     // ✅ CORRECTO — valida día Y que la hora actual esté dentro del rango
 private List<Grupo> gruposActivosHoy() {
     String diaHoy = DIA_MAP.get(LocalDate.now().getDayOfWeek());
-    LocalTime ahora = LocalTime.now();
+    LocalTime ahora = LocalTime.now(ZoneId.of("America/El_Salvador"));
 
     // LOG TEMPORAL - borrarlo después de verificar
     grupoRepository.findAll().forEach(g -> {

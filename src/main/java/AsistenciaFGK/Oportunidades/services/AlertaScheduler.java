@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -65,7 +66,7 @@ public class AlertaScheduler {
             DayOfWeek.SUNDAY,    "DOMINGO"
         ).get(hoyLocal.getDayOfWeek());
 
-        LocalTime ahora = LocalTime.now();
+        LocalTime ahora = LocalTime.now(ZoneId.of("America/El_Salvador"));
         Date hoy = java.sql.Date.valueOf(hoyLocal);
 
         List<Usuario> supervisores = usuarioRepo.findByRole(Role.ROLE_SUPERVISOR);
