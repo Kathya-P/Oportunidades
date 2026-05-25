@@ -217,33 +217,42 @@ public class AlertaScheduler {
                 .filter(a -> "AUSENTE".equals(a.getEstado()))
                 .count();
 
-            if (ausencias > 2) {
-                boolean yaAlertado = alertaRepo.existsByEstudianteAndTipoAndAtendidaAndFechaAlertaBetween(
-                        est, "INASISTENCIA", false, periodoInicio, periodoFin);
+        String nivel;
+        if (ausencias >= 12) {
+            nivel = "CRITICO";
+        } else if (ausencias >= 9) {
+            nivel = "ALERTA";
+        } else if (ausencias >= 6) {
+            nivel = "PRECAUCION";
+        } else {
+            continue;
+        }
 
-                if (!yaAlertado) {
-                    Alerta alerta = new Alerta();
-                    alerta.setEstudiante(est);
-                    alerta.setTipo("INASISTENCIA");
-                    alerta.setFechaAlerta(new Date());
-                    alerta.setAtendida(false);
-                    alerta.setDescripcion(
-                        "Estudiante tiene " + ausencias + " ausencias en el período: " + periodo.getNombre());
-                    alertaRepo.save(alerta);
+        boolean yaAlertado = alertaRepo.existsByEstudianteAndTipoAndAtendidaAndFechaAlertaBetween(
+                est, "INASISTENCIA", false, periodoInicio, periodoFin);
 
-                    for (Usuario sup : supervisores) {
-                        if (sup.getEmail() != null && !sup.getEmail().isBlank()) {
-                            emailService.enviarAlertaAusentismo(
-                                sup.getEmail(),
-                                est.getNombre() + " " + est.getApellido(),
-                                ausencias,
-                                "CRITICO"
-                            );
-                        }
-                    }
-                    System.out.println("[Scheduler] Alerta de ausentismo acumulado enviada para: " + est.getNombre());
+        if (!yaAlertado) {
+            Alerta alerta = new Alerta();
+            alerta.setEstudiante(est);
+            alerta.setTipo("INASISTENCIA");
+            alerta.setFechaAlerta(new Date());
+            alerta.setAtendida(false);
+            alerta.setDescripcion(
+                "Estudiante tiene " + ausencias + " ausencias en el período: " + periodo.getNombre());
+            alertaRepo.save(alerta);
+
+            for (Usuario sup : supervisores) {
+                if (sup.getEmail() != null && !sup.getEmail().isBlank()) {
+                    emailService.enviarAlertaAusentismo(
+                        sup.getEmail(),
+                        est.getNombre() + " " + est.getApellido(),
+                        ausencias,
+                        nivel
+                    );
                 }
             }
+            System.out.println("[Scheduler] Alerta " + nivel + " enviada para: " + est.getNombre());
+        }
         }
     }
 

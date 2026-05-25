@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class OportunidadesApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OportunidadesApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("America/El_Salvador"));
+        SpringApplication.run(OportunidadesApplication.class, args);
+    }
 }

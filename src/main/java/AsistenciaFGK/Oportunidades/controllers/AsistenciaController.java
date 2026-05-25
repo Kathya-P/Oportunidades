@@ -165,13 +165,13 @@ public class AsistenciaController {
                     LocalTime horaEntrada = LocalTime.now(ZoneId.of("America/El_Salvador"));
 
                     // ¿Llegó después del fin? → AUSENTE
-                    if (grupo.getHoraFin() != null && !grupo.getHoraFin().isBlank()) {
-                        LocalTime fin = LocalTime.parse(grupo.getHoraFin());
-                        if (horaEntrada.isAfter(fin)) {
-                            estadoAsistencia = "AUSENTE";
-                            estadoResultado  = "ausente";
-                        }
-                    }
+                    //if (grupo.getHoraFin() != null && !grupo.getHoraFin().isBlank()) {
+                   //     LocalTime fin = LocalTime.parse(grupo.getHoraFin());
+                     //   if (horaEntrada.isAfter(fin)) {
+                       //     estadoAsistencia = "AUSENTE";
+                         //   estadoResultado  = "ausente";
+                        //}
+                    //}
 
                     // ¿Llegó tarde pero antes del fin? → TARDANZA
                     if (!"AUSENTE".equals(estadoAsistencia)
