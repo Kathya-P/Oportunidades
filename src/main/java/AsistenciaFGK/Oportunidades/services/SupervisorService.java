@@ -106,15 +106,14 @@ public class SupervisorService {
 
             long total = asistenciasPeriodo.size();
 
-            if (ausencias >= 1) {
-    String nivel;
-    if (ausencias >= 9) {
-        nivel = "CRITICO";
-    } else if (ausencias >= 6) {
-        nivel = "ALERTA";
-    } else {
-        nivel = "PRECAUCION";
-    }
+                // DESPUÉS
+          if (ausencias >= 3) {
+              String nivel;
+              if (ausencias >= 10) {
+                  nivel = "CRITICO";
+              } else {
+                  nivel = "PRECAUCION";
+              }
 
                 Map<String, Object> item = new HashMap<>();
                 item.put("idEstudiante", est.getIdEstudiante());

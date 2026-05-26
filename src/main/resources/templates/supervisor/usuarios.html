@@ -206,7 +206,6 @@
         <select id="nivelFilter" class="filter-select">
             <option value="">Todos los estados</option>
             <option value="CRITICO">Crítico</option>
-            <option value="ALERTA">Alerta</option>
             <option value="PRECAUCION">Precaución</option>
             <option value="OK">OK</option>
         </select>
@@ -222,7 +221,6 @@
     <div class="leyenda">
         <strong>Riesgo:</strong>
         <div class="leyenda-item"><div class="dot dot-critico"></div> Crítico</div>
-        <div class="leyenda-item"><div class="dot dot-alerta"></div> Alerta</div>
         <div class="leyenda-item"><div class="dot dot-precaucion"></div> Precaución</div>
         <div class="leyenda-item"><div class="dot dot-ok"></div> OK</div>
     </div>
@@ -250,9 +248,8 @@
                     jornada=${e.jornada != null ? e.jornada.name() : 'FULL_TIME'}
                 "
                 th:attr="data-nombre=${nombreCompleto},data-codigo=${e.codigoBarras},data-nivel=${nivel},data-modalidad=${jornada}"
-                th:classappend="${nivel == 'CRITICO'}    ? 'fila-critico' :
-                               (${nivel == 'ALERTA'}     ? 'fila-alerta' :
-                               (${nivel == 'PRECAUCION'} ? 'fila-precaucion' : ''))">
+                th:classappend="${nivel == 'CRITICO'} ? 'fila-critico' :
+                               (nivel == 'PRECAUCION' ? 'fila-precaucion' : '')">
 
                 <!-- Nombre -->
                 <td>
@@ -291,9 +288,6 @@
                 <td>
                     <span class="badge badge-critico"    th:if="${nivel == 'CRITICO'}">
                         <span class="dot dot-critico" style="width:6px;height:6px;"></span> CRÍTICO
-                    </span>
-                    <span class="badge badge-alerta"     th:if="${nivel == 'ALERTA'}">
-                        <span class="dot dot-alerta" style="width:6px;height:6px;"></span> ALERTA
                     </span>
                     <span class="badge badge-precaucion" th:if="${nivel == 'PRECAUCION'}">
                         <span class="dot dot-precaucion" style="width:6px;height:6px;"></span> PRECAUCIÓN

@@ -218,11 +218,10 @@ public class AlertaScheduler {
                 .count();
 
         String nivel;
-        if (ausencias >= 12) {
+                // DESPUÉS
+        if (ausencias >= 10) {
             nivel = "CRITICO";
-        } else if (ausencias >= 9) {
-            nivel = "ALERTA";
-        } else if (ausencias >= 6) {
+        } else if (ausencias >= 3) {
             nivel = "PRECAUCION";
         } else {
             continue;

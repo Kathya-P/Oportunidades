@@ -189,7 +189,7 @@ public class ExportService {
 
         doc.add(new Paragraph("Programa Oportunidades — FGK", fTitulo));
         doc.add(new Paragraph("Reporte de riesgo de ausentismo — " + java.time.LocalDate.now(), fSub));
-        doc.add(new Paragraph("Criterio: 1 falta = Precaución | 2 = Alerta | 3+ = Crítico", fSub));
+        doc.add(new Paragraph("Criterio: 3-9 ausencias = Precaución | 10 o más = Crítico", fSub));
         doc.add(Chunk.NEWLINE);
 
         PdfPTable tabla = new PdfPTable(4);

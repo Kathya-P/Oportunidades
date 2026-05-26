@@ -7,7 +7,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Riesgo de Ausentismo — Programa Oportunidades</title>
-<link rel="stylesheet" th:href="@{/css/responsive.css}"/>
+    <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
@@ -132,7 +132,6 @@
         tbody tr:hover td { background:#fcfcfc; }
 
         .fila-critico td    { background:#FFF7F7; }
-        .fila-alerta td     { background:#FAEAEA; }
         .fila-precaucion td { background:#F5F5F5; }
 
         .danger-num { color:var(--rojo); font-weight:700; font-size:15px; }
@@ -145,8 +144,6 @@
         .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
         .badge-critico    { background:#FEE2E2; color:#B91C1C; }
         .dot-critico      { background:#D92D20; }
-        .badge-alerta     { background:#F3E8E8; color:#C8102E; }
-        .dot-alerta       { background:#C8102E; }
         .badge-precaucion { background:#E8E8E8; color:#7A7A7A; }
         .dot-precaucion   { background:#B0B0B0; }
 
@@ -182,7 +179,7 @@
             <div class="eyebrow">⚠ Supervisión</div>
             <h1>Riesgo de Ausentismo</h1>
             <p>
-                Estudiantes con 1 o más ausencias en el período (máximo recomendado: 2)
+                Estudiantes con 3 o más ausencias en el período
                 <span th:if="${periodoActual}"> — <span th:text="${periodoActual.nombre}"></span></span>
             </p>
         </div>
@@ -190,20 +187,15 @@
 
     <div class="criterios">
         <strong>⚠ Criterio de riesgo (por ausencias):</strong>
-        1-5 ausencias = Precaución | 6-8 ausencias = Alerta | 9 o más = Crítico
+        3-9 ausencias = Precaución | 10 o más = Crítico
     </div>
 
     <div class="distribucion" th:if="${!#lists.isEmpty(enRiesgo)}">
         <h3>Distribución de riesgo</h3>
         <div class="bar-row">
             <div class="bar-label">Precaución</div>
-            <div class="bar-track"><div id="barPrec" class="bar-fill" style="background:var(--rojo)"></div></div>
+            <div class="bar-track"><div id="barPrec" class="bar-fill" style="background:var(--gris-30)"></div></div>
             <div id="countPrec" class="bar-count">0</div>
-        </div>
-        <div class="bar-row">
-            <div class="bar-label">Alerta</div>
-            <div class="bar-track"><div id="barAlerta" class="bar-fill" style="background:var(--rojo)"></div></div>
-            <div id="countAlerta" class="bar-count">0</div>
         </div>
         <div class="bar-row">
             <div class="bar-label">Crítico</div>
@@ -212,14 +204,14 @@
         </div>
     </div>
 
-<div class="export-bar">
-    <span class="export-label">Exportar vista:</span>
-    <select id="exportFormat" class="export-select">
-        <option value="jasper">PDF (Jasper)</option>
-        <option value="excel">Excel</option>
-    </select>
-    <button id="downloadBtn" class="btn-download">⬇ Descargar</button>
-</div>
+    <div class="export-bar">
+        <span class="export-label">Exportar vista:</span>
+        <select id="exportFormat" class="export-select">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+        </select>
+        <button id="downloadBtn" class="btn-download">⬇ Descargar</button>
+    </div>
 
     <div class="table-wrap">
         <table>
@@ -239,9 +231,8 @@
 
             <tr th:each="r : ${enRiesgo}"
                 th:attr="data-nivel=${r.nivel}"
-                th:classappend="${r.nivel == 'CRITICO'}    ? 'fila-critico' :
-                               (${r.nivel == 'ALERTA'}     ? 'fila-alerta' :
-                               (${r.nivel == 'PRECAUCION'} ? 'fila-precaucion' : ''))">
+                th:classappend="${r.nivel == 'CRITICO'} ? 'fila-critico' :
+                               (r.nivel == 'PRECAUCION' ? 'fila-precaucion' : '')">
 
                 <td th:text="${r.nombre}"></td>
                 <td><span class="danger-num" th:text="${r.ausencias}"></span></td>
@@ -250,14 +241,12 @@
                     <span class="badge badge-critico" th:if="${r.nivel == 'CRITICO'}">
                         <span class="dot dot-critico"></span> CRÍTICO
                     </span>
-                    <span class="badge badge-alerta" th:if="${r.nivel == 'ALERTA'}">
-                        <span class="dot dot-alerta"></span> ALERTA
-                    </span>
                     <span class="badge badge-precaucion" th:if="${r.nivel == 'PRECAUCION'}">
                         <span class="dot dot-precaucion"></span> PRECAUCIÓN
                     </span>
                 </td>
             </tr>
+
             </tbody>
         </table>
     </div>
@@ -267,40 +256,27 @@
 <script>
     (function(){
         const rows = document.querySelectorAll('tbody tr[data-nivel]');
-        let prec = 0, alerta = 0, crit = 0;
+        let prec = 0, crit = 0;
         rows.forEach(r => {
             const n = (r.getAttribute('data-nivel') || '').toUpperCase();
             if (n === 'PRECAUCION') prec++;
-            else if (n === 'ALERTA') alerta++;
             else if (n === 'CRITICO') crit++;
         });
-        const total = Math.max(prec + alerta + crit, 1);
+        const total = Math.max(prec + crit, 1);
         const set = (idFill, idCount, value) => {
-            const fill = document.getElementById(idFill);
+            const fill  = document.getElementById(idFill);
             const count = document.getElementById(idCount);
             if (count) count.textContent = String(value);
-            if (fill) fill.style.width = ((value * 100) / total).toFixed(0) + '%';
+            if (fill)  fill.style.width  = ((value * 100) / total).toFixed(0) + '%';
         };
-        set('barPrec',   'countPrec',   prec);
-        set('barAlerta', 'countAlerta', alerta);
-        set('barCrit',   'countCrit',   crit);
+        set('barPrec', 'countPrec', prec);
+        set('barCrit', 'countCrit', crit);
     })();
 
-    // Manejo de descarga de exportación
-    document.getElementById('downloadBtn')?.addEventListener('click', function(){
+    document.getElementById('downloadBtn')?.addEventListener('click', function() {
         const format = document.getElementById('exportFormat')?.value || 'pdf';
         window.location.href = '/supervisor/riesgo/exportar?formato=' + format;
     });
-    
-    document.getElementById('downloadBtn')?.addEventListener('click', function(){
-    const format = document.getElementById('exportFormat')?.value || 'jasper';
-    if (format === 'jasper') {
-        window.location.href = '/supervisor/riesgo/exportar/jasper';
-    } else {
-        window.location.href = '/supervisor/riesgo/exportar?formato=' + format;
-    }
-});
-
 </script>
 
 </body>
